@@ -18,9 +18,23 @@ ENV OPENROUTER_API_KEY=$OPENROUTER_API_KEY
 COPY . .
 RUN npm ci && npm run build
 
-# Stage 2: Serve with nginx
-FROM nginx:alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"] 
+# Stage 2: Production runtime
+FROM node:20-alpine
+WORKDIR /app
+
+# Install Oracle Instant Client dependencies
+RUN apk add --no-cache libaio libc6-compat
+
+# Copy package files and install production dependencies
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Copy built app and server
+COPY --from=builder /app/dist ./dist
+COPY server.js ./
+
+# Expose port (Cloud Run will set PORT environment variable)
+EXPOSE 8080
+
+# Start the server
+CMD ["npm", "start"] 

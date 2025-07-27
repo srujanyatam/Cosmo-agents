@@ -17,7 +17,7 @@ export const loadConnection = (type: 'sybase' | 'oracle'): DatabaseConnection | 
 // Real function to test Oracle database connection
 export const testConnection = async (connection: DatabaseConnection): Promise<{ success: boolean; message: string; details?: any }> => {
   try {
-    const response = await fetch('/.netlify/functions/oracle-test-connection', {
+    const response = await fetch('http://localhost:3001/oracle-test-connection', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ export const deployToOracle = async (
   fileName?: string
 ): Promise<{ success: boolean; message: string; details?: any }> => {
   try {
-    const response = await fetch('/.netlify/functions/oracle-deploy', {
+    const response = await fetch('http://localhost:3001/oracle-deploy', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

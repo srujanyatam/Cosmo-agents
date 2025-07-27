@@ -1,8 +1,8 @@
-const { testConnection, deployToOracle } = require('./src/utils/databaseUtils.ts');
+const fetch = require('node-fetch');
 
-// Test Oracle connection
-async function testOracleConnection() {
-  console.log('🧪 Testing Oracle Database Connectivity...\n');
+// Test Oracle connection via API endpoints
+async function testOracleConnectivity() {
+  console.log('🧪 Testing Oracle Database Connectivity via API...\n');
   
   // Test connection parameters (you'll need to replace these with real values)
   const testConnection = {
@@ -15,9 +15,20 @@ async function testOracleConnection() {
     serviceName: null
   };
 
+  const baseUrl = 'http://localhost:8082'; // Netlify dev server URL
+
   try {
     console.log('1. Testing Oracle Connection...');
-    const connectionResult = await testConnection(testConnection);
+    
+    const connectionResponse = await fetch(`${baseUrl}/.netlify/functions/oracle-test-connection`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ connection: testConnection })
+    });
+
+    const connectionResult = await connectionResponse.json();
     
     if (connectionResult.success) {
       console.log('✅ Connection successful!');
@@ -44,7 +55,19 @@ async function testOracleConnection() {
       INSERT INTO test_migration (id, name) VALUES (1, 'Test Record');
     `;
     
-    const deployResult = await deployToOracle(testConnection, testSQL, 'test_migration.sql');
+    const deployResponse = await fetch(`${baseUrl}/.netlify/functions/oracle-deploy`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        connection: testConnection,
+        code: testSQL,
+        fileName: 'test_migration.sql'
+      })
+    });
+
+    const deployResult = await deployResponse.json();
     
     if (deployResult.success) {
       console.log('✅ Deployment successful!');
@@ -59,8 +82,12 @@ async function testOracleConnection() {
     
   } catch (error) {
     console.error('❌ Test failed with error:', error.message);
+    console.log('\n💡 Make sure:');
+    console.log('   1. Netlify dev server is running (netlify dev)');
+    console.log('   2. Oracle database is accessible');
+    console.log('   3. Connection parameters are correct');
   }
 }
 
 // Run the test
-testOracleConnection(); 
+testOracleConnectivity(); 

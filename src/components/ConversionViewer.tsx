@@ -246,6 +246,7 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
                       height={originalHeight}
                       language="sql"
                       filename={file.name}
+                      editorId="original-sybase-code"
                     />
                   </div>
                 </div>
@@ -275,6 +276,7 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
                             language="plsql"
                             filename={convertedFilename || file.name}
                             actions={undefined}
+                            editorId="converted-oracle-code-readonly"
                           />
                         ) : (
                           <>
@@ -289,6 +291,7 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
                               selection={selection}
                               onSelectionChange={setSelection}
                               filename={convertedFilename || file.name}
+                              editorId="converted-oracle-code-editable"
                               actions={(isDarkMode) => (
                                 <div className="flex items-center gap-2 mt-0">
                                   <TooltipProvider>
@@ -350,7 +353,8 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
                             height={convertedHeight}
                             language="plsql"
                             filename={convertedFilename || file.name}
-                          actions={hideEdit ? undefined : (isDarkMode) => (
+                            editorId="converted-oracle-code-view"
+                            actions={hideEdit ? undefined : (isDarkMode) => (
                               <div className="flex items-center gap-2 mt-0">
                                 <TooltipProvider>
                                   <Tooltip>

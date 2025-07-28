@@ -35,6 +35,7 @@ const CodeDiffViewer: React.FC<CodeDiffViewerProps> = ({
               height="500px"
               language="sql"
               filename={originalFilename}
+              editorId="original-code"
             />
           </div>
           <div>
@@ -45,6 +46,7 @@ const CodeDiffViewer: React.FC<CodeDiffViewerProps> = ({
               height="500px"
               language="plsql"
               filename={convertedFilename}
+              editorId="converted-code"
             />
           </div>
         </div>

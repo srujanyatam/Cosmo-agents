@@ -334,7 +334,7 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
                                             setPreservedSelection({ start: selection.start, end: selection.end });
                                             setShowRewriteDialog(true);
                                           }}
-                                          disabled={isRewriting || selection.start === selection.end}
+                                          disabled={isRewriting}
                                           className="h-8 w-8 p-0 bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-md hover:from-purple-600 hover:to-indigo-700 transition-all duration-200"
                                         >
                                           <Sparkles className="h-5 w-5 text-white drop-shadow" />
@@ -774,13 +774,15 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
                 setIsRewriting(true);
                 try {
                   // Get the selected code only
-                  const selectedCode = editedContent.substring(selection.start, selection.end);
+                  const codeToRewrite = (selection.start !== selection.end)
+                    ? editedContent.slice(selection.start, selection.end)
+                    : editedContent;
                   
                   const res = await fetch('/.netlify/functions/ai-rewrite', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                      code: selectedCode,
+                      code: codeToRewrite,
                       prompt: rewritePrompt || 'Rewrite this code to improve performance, readability, and add appropriate comments',
                       language: 'oracle sql'
                     }),

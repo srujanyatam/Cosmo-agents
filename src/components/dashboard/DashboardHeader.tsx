@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { Button } from '@/components/ui/button';
-import { Database, History, HelpCircle } from 'lucide-react';
+import { Database, History, HelpCircle, Sun, Moon } from 'lucide-react';
 import UserDropdown from '@/components/UserDropdown';
 import HomeButton from '@/components/HomeButton';
+import { CodeEditorThemeContext } from '@/contexts/CodeEditorThemeContext';
 
 interface DashboardHeaderProps {
   onGoToHistory: () => void;
@@ -18,6 +19,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   onShowHelp,
   title = "Migration Dashboard"
 }) => {
+  const { isDarkMode, toggleDarkMode } = useContext(CodeEditorThemeContext);
   return (
     <header className="bg-white shadow-sm border-b">
       <div className="container mx-auto px-4 py-4">
@@ -29,7 +31,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
             </div>
           </div>
-          
           <div className="flex items-center gap-4">
             <Button 
               variant="outline" 
@@ -46,6 +47,15 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             >
               <HelpCircle className="h-4 w-4" />
               Help
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={toggleDarkMode}
+              className="h-8 w-8 p-0"
+              title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              {isDarkMode ? <Sun className="h-5 w-5 text-yellow-400" /> : <Moon className="h-5 w-5 text-gray-700" />}
             </Button>
             <UserDropdown />
           </div>

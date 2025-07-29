@@ -1,11 +1,12 @@
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useContext } from 'react';
 import Editor from '@monaco-editor/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Search, X, ChevronUp, ChevronDown, Replace, ChevronRight, ChevronLeft, Maximize2, Minimize2, Moon, Sun, Edit } from 'lucide-react';
 import * as monaco from 'monaco-editor';
+import { CodeEditorThemeContext } from '@/contexts/CodeEditorThemeContext';
 
 interface CodeEditorProps {
   initialCode: string;
@@ -49,7 +50,6 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   const [useRegex, setUseRegex] = useState<boolean>(false);
   const [showReplace, setShowReplace] = useState<boolean>(false);
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [showGoToLine, setShowGoToLine] = useState<boolean>(false);
   const [lineNumber, setLineNumber] = useState<string>('');
   const { toast } = useToast();
@@ -58,6 +58,8 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const replaceInputRef = useRef<HTMLInputElement>(null);
   const goToLineInputRef = useRef<HTMLInputElement>(null);
+
+  const { isDarkMode, toggleDarkMode } = useContext(CodeEditorThemeContext);
 
   // Create unique data attributes for this editor instance
   const editorDataAttr = `data-editor-id="${editorId}"`;
@@ -353,7 +355,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             <Button
               size="icon"
               variant="ghost"
-              onClick={() => setIsDarkMode((prev) => !prev)}
+              onClick={toggleDarkMode}
               className="h-8 w-8 p-0"
               title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
@@ -547,7 +549,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             <Button
               size="icon"
               variant="ghost"
-              onClick={() => setIsDarkMode((prev) => !prev)}
+              onClick={toggleDarkMode}
               className="h-8 w-8 p-0"
               title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >

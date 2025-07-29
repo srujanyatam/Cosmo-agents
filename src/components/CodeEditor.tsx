@@ -61,6 +61,15 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
   const { isDarkMode, toggleDarkMode } = useContext(CodeEditorThemeContext);
 
+  // Force Monaco to update theme on global dark mode change
+  useEffect(() => {
+    if (isDarkMode) {
+      monaco.editor.setTheme('vs-dark');
+    } else {
+      monaco.editor.setTheme('vs');
+    }
+  }, [isDarkMode]);
+
   // Create unique data attributes for this editor instance
   const editorDataAttr = `data-editor-id="${editorId}"`;
   const darkModeDataAttr = `data-dark-mode="${isDarkMode}"`;
@@ -682,50 +691,50 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         </div>
       )}
 
-      {/* Go to Line Overlay */}
-      {showGoToLine && (
+        {/* Go to Line Overlay */}
+        {showGoToLine && (
         <div className={`absolute top-2 right-2 border rounded-lg shadow-lg p-3 z-50 min-w-[300px] ${isDarkMode ? 'bg-[#2d2d30] border-gray-700' : 'bg-white border-gray-200'}`}>
-          <div className="flex items-center gap-2 mb-2">
-            <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-700'}`}>Go to Line</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setShowGoToLine(false);
-                setLineNumber('');
-              }}
-              className="h-8 w-8 p-0 ml-auto"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Input
-              ref={goToLineInputRef}
-              value={lineNumber}
-              onChange={(e) => setLineNumber(e.target.value)}
+            <div className="flex items-center gap-2 mb-2">
+              <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-100' : 'text-gray-700'}`}>Go to Line</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setShowGoToLine(false);
+                  setLineNumber('');
+                }}
+                className="h-8 w-8 p-0 ml-auto"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Input
+                ref={goToLineInputRef}
+                value={lineNumber}
+                onChange={(e) => setLineNumber(e.target.value)}
               placeholder="Enter line number"
-              className="flex-1 h-8 text-sm"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  goToLine();
-                }
-              }}
-            />
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={goToLine}
-              className="h-8 text-xs"
-            >
-              Go
-            </Button>
+                className="flex-1 h-8 text-sm"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    goToLine();
+                  }
+                }}
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={goToLine}
+                className="h-8 text-xs"
+              >
+                Go
+              </Button>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
-  );
+        )}
+      </div>
+    );
 };
 
 export default CodeEditor;

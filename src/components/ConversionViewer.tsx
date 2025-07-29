@@ -773,42 +773,43 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
                 setPreservedSelection({ start: selection.start, end: selection.end });
                 setIsRewriting(true);
                 try {
-                  // Get the selected code only
-                  const codeToRewrite = (selection.start !== selection.end)
+                  const isPartial = selection.start !== selection.end;
+                  const codeToRewrite = isPartial
                     ? editedContent.slice(selection.start, selection.end)
                     : editedContent;
-                  
+
+                  const prompt = isPartial
+                    ? (rewritePrompt || "Rewrite only the following code snippet, do not include any extra code or context. Return only the rewritten snippet.")
+                    : (rewritePrompt || "Rewrite this code to improve performance, readability, and add appropriate comments");
+
                   const res = await fetch('/.netlify/functions/ai-rewrite', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                       code: codeToRewrite,
-                      prompt: rewritePrompt || 'Rewrite this code to improve performance, readability, and add appropriate comments',
+                      prompt,
                       language: 'oracle sql'
                     }),
                   });
                   const data = await res.json();
-                  if (data.rewrittenCode) {
-                    // Replace only the selected portion with the rewritten code
-                    const beforeSelection = editedContent.substring(0, selection.start);
-                    const afterSelection = editedContent.substring(selection.end);
-                    const newContent = beforeSelection + data.rewrittenCode + afterSelection;
+                  if (!res.ok) throw new Error(data.error || 'Rewrite failed');
+
+                  if (isPartial) {
+                    // Replace only the selected part
+                    const newContent =
+                      editedContent.slice(0, selection.start) +
+                      data.rewrittenCode +
+                      editedContent.slice(selection.end);
                     setEditedContent(newContent);
-                    setShowRewriteDialog(false);
-                    
-                    // Restore the selection after a short delay to ensure the content is updated
-                    setTimeout(() => {
-                      if (preservedSelection) {
-                        setSelection(preservedSelection);
-                        setPreservedSelection(null);
-                      }
-                    }, 100);
-                    
-                    toast({
-                      title: "Code Rewritten",
-                      description: "The selected code has been successfully rewritten by AI.",
-                    });
+                  } else {
+                    setEditedContent(data.rewrittenCode);
                   }
+                  setShowRewriteDialog(false);
+                  setRewritePrompt('');
+                  toast({
+                    title: 'AI Rewrite Complete',
+                    description: 'Your code has been rewritten by AI.',
+                  });
                 } catch (err) {
                   toast({
                     title: "Rewrite Failed",

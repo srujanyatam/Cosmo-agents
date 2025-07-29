@@ -44,7 +44,7 @@ const CodeDiffViewer: React.FC<CodeDiffViewerProps> = ({
               initialCode={convertedCode} 
               readOnly={true} 
               height="500px"
-              language="plsql"
+              language="sql"
               filename={convertedFilename}
               editorId="converted-code"
             />

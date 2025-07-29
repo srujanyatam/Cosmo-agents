@@ -58,6 +58,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const replaceInputRef = useRef<HTMLInputElement>(null);
   const goToLineInputRef = useRef<HTMLInputElement>(null);
+  const prevFullScreenRef = useRef(isFullScreen);
 
   const { isDarkMode, toggleDarkMode } = useContext(CodeEditorThemeContext);
 
@@ -69,6 +70,15 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       monaco.editor.setTheme('vs');
     }
   }, [isDarkMode]);
+
+  // When exiting full screen, force light mode
+  useEffect(() => {
+    // Only force light mode when exiting full screen
+    if (prevFullScreenRef.current && !isFullScreen && isDarkMode) {
+      toggleDarkMode();
+    }
+    prevFullScreenRef.current = isFullScreen;
+  }, [isFullScreen, isDarkMode, toggleDarkMode]);
 
   // Create unique data attributes for this editor instance
   const editorDataAttr = `data-editor-id="${editorId}"`;
@@ -361,6 +371,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
           </div>
           <div className="flex items-center gap-2">
             {typeof actions === 'function' && <div className="flex items-center gap-2 mr-2">{actions(isDarkMode)}</div>}
+            {/* Only show dark mode toggle in full screen */}
             <Button
               size="icon"
               variant="ghost"
@@ -555,15 +566,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
           <div className={`text-sm font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-700'}`}>{filename || 'main.py'}</div>
           <div className="flex items-center gap-2">
             {typeof actions === 'function' && <div className="flex items-center gap-2 mr-2">{actions(isDarkMode)}</div>}
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={toggleDarkMode}
-              className="h-8 w-8 p-0"
-              title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            >
-              {isDarkMode ? <Sun className="h-5 w-5 text-yellow-400" /> : <Moon className="h-5 w-5 text-gray-700" />}
-            </Button>
+            {/* Remove dark mode toggle from normal header */}
             <Button
               variant="ghost"
               size="sm"

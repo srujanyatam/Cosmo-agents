@@ -362,10 +362,13 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       <div 
         className={`fixed inset-0 z-50 flex flex-col ${isDarkMode ? 'bg-[#1e1e1e]' : 'bg-white'}`} 
         data-code-editor
+        style={{ height: '100vh' }}
         {...{ [editorDataAttr]: true, [darkModeDataAttr]: true }}
       >
         {/* Minimal Top Bar with filename on left and full-screen button on right */}
-        <div className={`flex items-center justify-between px-4 py-2 border-b ${isDarkMode ? 'bg-[#1e1e1e] border-gray-700' : 'bg-white'}`}>
+        <div className={`flex items-center justify-between px-4 py-2 border-b ${isDarkMode ? 'bg-[#1e1e1e] border-gray-700' : 'bg-white'}`}
+          style={{ flexShrink: 0 }}
+        >
           <div className="flex items-center gap-2">
             <span className={`text-sm font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-700'}`}>{filename || 'main.py'}</span>
           </div>
@@ -397,8 +400,18 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         </div>
         
         {/* Full Screen Code Editor */}
-        <div className="flex-1 overflow-hidden relative">
-          {editorContainer}
+        <div className="flex-1 overflow-hidden relative h-full">
+          <Editor
+            height="100%"
+            language={language}
+            value={code}
+            options={editorOptions}
+            onMount={handleEditorDidMount}
+            onChange={(value) => {
+              setCode(value || '');
+              if (onChange) onChange(value || '');
+            }}
+          />
         </div>
 
         {/* Full Screen Search Overlay - Only show when search is active */}

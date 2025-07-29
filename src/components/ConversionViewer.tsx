@@ -315,7 +315,10 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
                                         <Button
                                           size="icon"
                                           variant="ghost"
-                                          onClick={() => setIsEditing(false)}
+                                          onClick={() => {
+                                            setIsEditing(false);
+                                            setEditedContent(file.convertedContent || '');
+                                          }}
                                           className="h-8 w-8 p-0"
                                         >
                                           <X className="h-5 w-5 text-red-500" />

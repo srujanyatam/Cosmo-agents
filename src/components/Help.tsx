@@ -137,28 +137,61 @@ const Help: React.FC<HelpProps> = ({ onClose }) => {
             <TabsContent value="shortcuts" className="space-y-6">
               <div>
                 <h3 className="text-lg font-semibold mb-4">Keyboard Shortcuts</h3>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between p-3 border rounded bg-gray-50">
-                    <span className="font-mono">Shift + F</span>
-                    <span className="text-sm text-gray-700">Toggle fullscreen mode (Conversion/Dev Review)</span>
+                <div className="space-y-6">
+                  {/* Navigation */}
+                  <div>
+                    <h4 className="font-medium mb-2">Navigation</h4>
+                    <div className="space-y-2">
+                      <ShortcutRow keys="Ctrl + G" desc="Go to Line" />
+                      <ShortcutRow keys="Ctrl + Home / End" desc="Go to Top/Bottom" />
+                      <ShortcutRow keys="Ctrl + Shift + \\" desc="Jump to Matching Bracket" />
+                      <ShortcutRow keys="F11" desc="Toggle Full Screen" />
+                      <ShortcutRow keys="Esc" desc="Exit Full Screen / Close Dialog" />
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between p-3 border rounded bg-gray-50">
-                    <span className="font-mono">Esc</span>
-                    <span className="text-sm text-gray-700">Exit fullscreen mode</span>
+                  {/* Editing */}
+                  <div>
+                    <h4 className="font-medium mb-2">Editing</h4>
+                    <div className="space-y-2">
+                      <ShortcutRow keys="Ctrl + /" desc="Toggle Line Comment" />
+                      <ShortcutRow keys="Shift + Alt + A" desc="Toggle Block Comment" />
+                      <ShortcutRow keys="Alt + Up/Down" desc="Move Line Up/Down" />
+                      <ShortcutRow keys="Shift + Alt + Down/Up" desc="Copy Line Down/Up" />
+                      <ShortcutRow keys="Ctrl + Shift + K" desc="Delete Line" />
+                      <ShortcutRow keys="Ctrl + L" desc="Select Line" />
+                      <ShortcutRow keys="Ctrl + Z / Ctrl + Y" desc="Undo / Redo" />
+                      <ShortcutRow keys="Ctrl + S" desc="Save" />
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between p-3 border rounded bg-gray-50">
-                    <span className="font-mono">Ctrl + F / Cmd + F</span>
-                    <span className="text-sm text-gray-700">Find in code editor</span>
+                  {/* Multi-cursor & Selection */}
+                  <div>
+                    <h4 className="font-medium mb-2">Multi-cursor & Selection</h4>
+                    <div className="space-y-2">
+                      <ShortcutRow keys="Ctrl + D" desc="Add Selection to Next Find Match" />
+                      <ShortcutRow keys="Alt + Click" desc="Add Cursor at Clicked Location" />
+                      <ShortcutRow keys="Ctrl + Alt + Down/Up" desc="Add Cursor Below/Above" />
+                      <ShortcutRow keys="Ctrl + Shift + L" desc="Select All Occurrences of Current Word" />
+                      <ShortcutRow keys="Alt + Enter" desc="Select All Occurrences of Find Match" />
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between p-3 border rounded bg-gray-50">
-                    <span className="font-mono">Ctrl + H / Cmd + H</span>
-                    <span className="text-sm text-gray-700">Replace in code editor</span>
+                  {/* Search & Replace */}
+                  <div>
+                    <h4 className="font-medium mb-2">Search & Replace</h4>
+                    <div className="space-y-2">
+                      <ShortcutRow keys="Ctrl + F" desc="Find" />
+                      <ShortcutRow keys="Ctrl + H" desc="Replace" />
+                      <ShortcutRow keys="F3 / Shift + F3" desc="Find Next / Previous" />
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between p-3 border rounded bg-gray-50">
-                    <span className="font-mono">Ctrl + G / Cmd + G</span>
-                    <span className="text-sm text-gray-700">Go to line in code editor</span>
+                  {/* Miscellaneous */}
+                  <div>
+                    <h4 className="font-medium mb-2">Miscellaneous</h4>
+                    <div className="space-y-2">
+                      <ShortcutRow keys="Ctrl + Space" desc="Trigger Suggest (IntelliSense)" />
+                      <ShortcutRow keys="Ctrl + Shift + M" desc="Show Problems" />
+                      <ShortcutRow keys="Ctrl + Shift + P" desc="Command Palette" />
+                    </div>
                   </div>
-                  {/* Add more shortcuts here as needed */}
                 </div>
               </div>
             </TabsContent>
@@ -371,5 +404,12 @@ const Help: React.FC<HelpProps> = ({ onClose }) => {
     </div>
   );
 };
+
+const ShortcutRow: React.FC<{ keys: string; desc: string }> = ({ keys, desc }) => (
+  <div className="flex items-center justify-between p-3 border rounded bg-gray-50">
+    <span className="font-mono whitespace-nowrap">{keys}</span>
+    <span className="text-sm text-gray-700 ml-4">{desc}</span>
+  </div>
+);
 
 export default Help;

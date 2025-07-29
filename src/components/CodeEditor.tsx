@@ -198,10 +198,12 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     // Handle selection changes
     editor.onDidChangeCursorSelection((e) => {
       if (onSelectionChange) {
-        const position = editor.getPosition();
-        if (position) {
-          const offset = editor.getModel()?.getOffsetAt(position) || 0;
-          onSelectionChange({ start: offset, end: offset });
+        const selection = e.selection;
+        const model = editor.getModel();
+        if (model && selection) {
+          const start = model.getOffsetAt({ lineNumber: selection.startLineNumber, column: selection.startColumn });
+          const end = model.getOffsetAt({ lineNumber: selection.endLineNumber, column: selection.endColumn });
+          onSelectionChange({ start, end });
         }
       }
     });

@@ -330,7 +330,10 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
                                         <Button
                                           size="icon"
                                           variant="ghost"
-                                          onClick={() => setShowRewriteDialog(true)}
+                                          onClick={() => {
+                                            setPreservedSelection({ start: selection.start, end: selection.end });
+                                            setShowRewriteDialog(true);
+                                          }}
                                           disabled={isRewriting || selection.start === selection.end}
                                           className="h-8 w-8 p-0 bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-md hover:from-purple-600 hover:to-indigo-700 transition-all duration-200"
                                         >

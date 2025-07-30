@@ -1,11 +1,11 @@
-import { commentsSupabase } from '@/integrations/supabase/commentsClient';
+import { supabase } from '@/integrations/supabase/client'; // Use main supabase client
 import { ConversionComment, CreateCommentData, UpdateCommentData } from '@/types/conversionComments';
 
 export const commentUtils = {
   // Get comments for a specific file
   async getCommentsForFile(fileId: string): Promise<ConversionComment[]> {
     try {
-      const { data, error } = await commentsSupabase
+      const { data, error } = await supabase
         .from('conversion_comments')
         .select('*')
         .eq('file_id', fileId)
@@ -26,7 +26,7 @@ export const commentUtils = {
   // Get comments for a specific conversion
   async getCommentsForConversion(conversionId: string): Promise<ConversionComment[]> {
     try {
-      const { data, error } = await commentsSupabase
+      const { data, error } = await supabase
         .from('conversion_comments')
         .select('*')
         .eq('conversion_id', conversionId)
@@ -47,8 +47,8 @@ export const commentUtils = {
   // Create a new comment
   async createComment(commentData: CreateCommentData): Promise<ConversionComment | null> {
     try {
-      // First check if we have a valid session
-      const { data: { session }, error: sessionError } = await commentsSupabase.auth.getSession();
+      // Get the current user's session from main client
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
         console.error('Session error:', sessionError);
@@ -73,7 +73,7 @@ export const commentUtils = {
         user_id: session.user.id
       };
       
-      const { data, error } = await commentsSupabase
+      const { data, error } = await supabase
         .from('conversion_comments')
         .insert([commentWithUserId])
         .select()
@@ -94,7 +94,7 @@ export const commentUtils = {
   // Update an existing comment
   async updateComment(commentId: string, updateData: UpdateCommentData): Promise<ConversionComment | null> {
     try {
-      const { data, error } = await commentsSupabase
+      const { data, error } = await supabase
         .from('conversion_comments')
         .update(updateData)
         .eq('id', commentId)
@@ -116,7 +116,7 @@ export const commentUtils = {
   // Delete a comment
   async deleteComment(commentId: string): Promise<boolean> {
     try {
-      const { error } = await commentsSupabase
+      const { error } = await supabase
         .from('conversion_comments')
         .delete()
         .eq('id', commentId);
@@ -136,15 +136,15 @@ export const commentUtils = {
   // Get all comments for the current user
   async getUserComments(): Promise<ConversionComment[]> {
     try {
-      // Get the current user's session
-      const { data: { session }, error: sessionError } = await commentsSupabase.auth.getSession();
+      // Get the current user's session from main client
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError || !session || !session.user) {
         console.error('Error getting user session:', sessionError);
         return [];
       }
       
-      const { data, error } = await commentsSupabase
+      const { data, error } = await supabase
         .from('conversion_comments')
         .select('*')
         .eq('user_id', session.user.id)

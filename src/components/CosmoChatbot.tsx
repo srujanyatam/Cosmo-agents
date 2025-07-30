@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { testChatbotFunction, testChatbotMessage } from '@/utils/debugEnv';
 
 // Simulated responses for when the AI service is unavailable
 const getSimulatedResponse = (userMessage: string): string => {
@@ -293,6 +294,54 @@ const CosmoChatbot = () => {
     setTimeout(() => inputRef.current?.focus(), 100);
   };
 
+  // Add a function to test AI functions
+  const testAIFunctions = async () => {
+    try {
+      console.log('🧪 Testing AI functions...');
+      
+      // Test chatbot function
+      const chatbotTest = await testChatbotFunction();
+      console.log('Chatbot test result:', chatbotTest);
+      
+      // Test with a message
+      const messageTest = await testChatbotMessage('Hello, this is a test message.');
+      console.log('Message test result:', messageTest);
+      
+      // Test AI functions directly
+      const testResponse = await fetch('/.netlify/functions/test-ai-functions');
+      const testData = await testResponse.json();
+      console.log('AI functions test result:', testData);
+      
+      toast({
+        title: 'AI Functions Test',
+        description: 'Check console for detailed test results.',
+      });
+      
+      // Add test results to chat
+      const testMessage: Message = {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: `🧪 **AI Functions Test Results:**
+
+**Chatbot API:** ${chatbotTest ? '✅ Working' : '❌ Failed'}
+**Message Test:** ${messageTest ? '✅ Working' : '❌ Failed'}
+**API Keys:** ${testData.apiKeys ? '✅ Configured' : '❌ Missing'}
+
+Check browser console for detailed results.`,
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, testMessage]);
+      
+    } catch (error) {
+      console.error('AI functions test failed:', error);
+      toast({
+        title: 'Test Failed',
+        description: 'Check console for error details.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">
       {/* Animated Chat Toggle Button */}
@@ -385,15 +434,24 @@ const CosmoChatbot = () => {
                   <Plus className="h-3 w-3 mr-1" />
                   New Chat
                 </Button>
-                <Button
-                  onClick={startNewMigration}
-                  variant="ghost"
-                  size="sm"
-                  className="text-xs text-green-600 hover:text-green-700 hover:bg-green-100 h-6 px-2"
-                >
-                  <Zap className="h-3 w-3 mr-1" />
-                  Start New Migration
-                </Button>
+                                 <Button
+                   onClick={startNewMigration}
+                   variant="ghost"
+                   size="sm"
+                   className="text-xs text-green-600 hover:text-green-700 hover:bg-green-100 h-6 px-2"
+                 >
+                   <Zap className="h-3 w-3 mr-1" />
+                   Start New Migration
+                 </Button>
+                 <Button
+                   onClick={testAIFunctions}
+                   variant="ghost"
+                   size="sm"
+                   className="text-xs text-purple-600 hover:text-purple-700 hover:bg-purple-100 h-6 px-2"
+                 >
+                   <RefreshCw className="h-3 w-3 mr-1" />
+                   Test AI Functions
+                 </Button>
               </div>
               <div className="text-xs text-gray-500">
                 {messages.length} messages

@@ -47,21 +47,31 @@ export const commentUtils = {
   // Create a new comment
   async createComment(commentData: CreateCommentData): Promise<ConversionComment | null> {
     try {
-      // Get the current user's ID from the comments client
-      const { data: { user }, error: userError } = await commentsSupabase.auth.getUser();
+      // First check if we have a valid session
+      const { data: { session }, error: sessionError } = await commentsSupabase.auth.getSession();
       
-      if (userError || !user) {
-        console.error('Error getting user for comment creation:', userError);
-        throw new Error('User not authenticated');
+      if (sessionError) {
+        console.error('Session error:', sessionError);
+        throw new Error('Authentication session error');
       }
+      
+      if (!session) {
+        console.error('No active session found');
+        throw new Error('User not authenticated - please log in');
+      }
+      
+      if (!session.user) {
+        console.error('No user in session');
+        throw new Error('User not authenticated - please log in');
+      }
+      
+      console.log('Creating comment with user_id:', session.user.id);
       
       // Ensure user_id is set
       const commentWithUserId = {
         ...commentData,
-        user_id: user.id
+        user_id: session.user.id
       };
-      
-      console.log('Creating comment with user_id:', user.id);
       
       const { data, error } = await commentsSupabase
         .from('conversion_comments')
@@ -77,7 +87,7 @@ export const commentUtils = {
       return data;
     } catch (error) {
       console.error('Error in createComment:', error);
-      return null;
+      throw error; // Re-throw to let the component handle it
     }
   },
 
@@ -126,18 +136,18 @@ export const commentUtils = {
   // Get all comments for the current user
   async getUserComments(): Promise<ConversionComment[]> {
     try {
-      // Get the current user's ID
-      const { data: { user }, error: userError } = await commentsSupabase.auth.getUser();
+      // Get the current user's session
+      const { data: { session }, error: sessionError } = await commentsSupabase.auth.getSession();
       
-      if (userError || !user) {
-        console.error('Error getting user for fetching comments:', userError);
+      if (sessionError || !session || !session.user) {
+        console.error('Error getting user session:', sessionError);
         return [];
       }
       
       const { data, error } = await commentsSupabase
         .from('conversion_comments')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', session.user.id)
         .order('created_at', { ascending: false });
 
       if (error) {

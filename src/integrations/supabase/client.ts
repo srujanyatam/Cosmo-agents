@@ -6,11 +6,20 @@ import type { Database } from './types';
 const getSupabaseUrl = () => {
   try {
     const url = import.meta.env.VITE_SUPABASE_URL;
+    console.log('Supabase URL check:', {
+      hasUrl: !!url,
+      urlType: typeof url,
+      urlLength: url?.length,
+      startsWithHttps: url?.startsWith('https://')
+    });
+    
     if (!url || url === 'undefined' || url === '' || typeof url !== 'string') {
+      console.warn('Supabase URL is missing or invalid');
       return null;
     }
     // Basic URL validation
     if (!url.startsWith('https://') || url.length < 10) {
+      console.warn('Supabase URL format is invalid:', url);
       return null;
     }
     return url;
@@ -23,11 +32,20 @@ const getSupabaseUrl = () => {
 const getSupabaseKey = () => {
   try {
     const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    console.log('Supabase Key check:', {
+      hasKey: !!key,
+      keyType: typeof key,
+      keyLength: key?.length,
+      startsWithEyJ: key?.startsWith('eyJ')
+    });
+    
     if (!key || key === 'undefined' || key === '' || typeof key !== 'string') {
+      console.warn('Supabase key is missing or invalid');
       return null;
     }
     // Basic key validation (should start with eyJ)
     if (!key.startsWith('eyJ') || key.length < 50) {
+      console.warn('Supabase key format is invalid:', key.substring(0, 20) + '...');
       return null;
     }
     return key;
@@ -42,7 +60,13 @@ const SUPABASE_PUBLISHABLE_KEY = getSupabaseKey();
 
 // Log configuration status
 if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-  console.log('Supabase not configured - using mock client for demo mode');
+  console.error('❌ Supabase not configured properly!');
+  console.error('Missing or invalid environment variables:');
+  console.error('- VITE_SUPABASE_URL:', SUPABASE_URL ? '✅ Present' : '❌ Missing/Invalid');
+  console.error('- VITE_SUPABASE_ANON_KEY:', SUPABASE_PUBLISHABLE_KEY ? '✅ Present' : '❌ Missing/Invalid');
+  console.error('Please check your Netlify environment variables.');
+} else {
+  console.log('✅ Supabase configured successfully');
 }
 
 // Create a comprehensive mock client
@@ -59,10 +83,10 @@ const createMockClient = () => {
         } 
       }),
       getSession: () => mockResponse({ session: null }),
-      signUp: () => mockResponse(null, { message: 'Supabase not configured. Please set environment variables.' }),
-      signInWithPassword: () => mockResponse(null, { message: 'Supabase not configured. Please set environment variables.' }),
+      signUp: () => mockResponse(null, { message: 'Supabase not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables in Netlify.' }),
+      signInWithPassword: () => mockResponse(null, { message: 'Supabase not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables in Netlify.' }),
       signOut: () => mockResponse(),
-      resetPasswordForEmail: () => mockResponse(null, { message: 'Supabase not configured. Please set environment variables.' }),
+      resetPasswordForEmail: () => mockResponse(null, { message: 'Supabase not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables in Netlify.' }),
       getUser: () => mockResponse({ user: null }),
     },
     from: (table: string) => ({
@@ -106,9 +130,13 @@ let supabaseClient: any;
 
 try {
   if (SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY) {
+    console.log('Creating real Supabase client...');
     supabaseClient = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+    console.log('✅ Real Supabase client created successfully');
   } else {
+    console.log('Creating mock Supabase client...');
     supabaseClient = createMockClient();
+    console.log('⚠️ Using mock Supabase client - authentication will not work');
   }
 } catch (error) {
   console.error('Error creating Supabase client:', error);

@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import { checkEnvironmentVariables, getSetupInstructions } from './utils/envChecker'
+import { debugEnvironmentVariables } from './utils/debugEnv'
 
 // Global error handler to catch URL construction errors
 const originalURL = window.URL;
@@ -55,6 +56,7 @@ window.addEventListener('message', (event) => {
 console.log('🚀 Cosmo Agents - Starting up...');
 checkEnvironmentVariables();
 getSetupInstructions();
+debugEnvironmentVariables();
 
 // Error boundary for better error handling
 class ErrorBoundary extends React.Component<

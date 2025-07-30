@@ -17,6 +17,102 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 
+// Simulated responses for when the AI service is unavailable
+const getSimulatedResponse = (userMessage: string): string => {
+  const message = userMessage.toLowerCase();
+  
+  // React questions
+  if (message.includes('react')) {
+    if (message.includes('hook') || message.includes('use')) {
+      return `React Hooks are functions that allow you to use state and other React features in functional components. The most common hooks are:
+
+• **useState** - Manages component state
+• **useEffect** - Handles side effects and lifecycle
+• **useContext** - Accesses React context
+• **useRef** - Creates mutable references
+
+Example:
+\`\`\`jsx
+const [count, setCount] = useState(0);
+useEffect(() => {
+  document.title = \`Count: \${count}\`;
+}, [count]);
+\`\`\`
+
+In your Cosmo Agents project, we use hooks extensively for state management, authentication, and UI interactions.`;
+    }
+    return `React.js is a JavaScript library for building user interfaces. In your Cosmo Agents project, we use React 18.3.1 with TypeScript for:
+
+• **Component Architecture** - Reusable UI components
+• **State Management** - Managing application state
+• **Routing** - Navigation with React Router DOM
+• **Forms** - Form handling with React Hook Form
+
+Key features used in your project:
+- Functional components with hooks
+- TypeScript for type safety
+- Tailwind CSS for styling
+- shadcn/ui component library`;
+  }
+  
+  // TypeScript questions
+  if (message.includes('typescript')) {
+    return `TypeScript is a superset of JavaScript that adds static typing. In your Cosmo Agents project, we use TypeScript 5.8.3 for:
+
+• **Type Safety** - Catch errors at compile time
+• **Better IDE Support** - IntelliSense and autocomplete
+• **Interface Definitions** - Define data structures
+• **Generic Types** - Reusable type definitions
+
+Example from your project:
+\`\`\`typescript
+interface Message {
+  id: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  timestamp: Date;
+}
+\`\`\`
+
+Benefits in your project:
+- Prevents runtime errors
+- Better code documentation
+- Enhanced developer experience
+- Safer refactoring`;
+  }
+  
+  // Supabase questions
+  if (message.includes('supabase')) {
+    return `Supabase is an open-source Firebase alternative that provides:
+
+• **Database** - PostgreSQL database with real-time subscriptions
+• **Authentication** - User auth with multiple providers
+• **Real-time** - Live data updates across clients
+• **Storage** - File storage and management
+
+In your Cosmo Agents project, Supabase is used for:
+- User authentication (sign up/login)
+- Database storage for conversion logs
+- Real-time updates for deployment status
+- File management and storage
+
+Configuration:
+- Project URL: \`VITE_SUPABASE_URL\`
+- Anonymous Key: \`VITE_SUPABASE_ANON_KEY\`
+- Real-time subscriptions for live updates`;
+  }
+  
+  // Default response
+  return `I'm Cosmo Agents, your AI assistant for all technologies used in this platform. I can help with:
+
+• **Frontend**: React, TypeScript, Vite, Tailwind CSS
+• **Backend**: Supabase, Netlify Functions, PostgreSQL
+• **AI/ML**: Google Generative AI, LangChain
+• **Tools**: Git, GitHub, Docker, ESLint
+
+Please ask me about any of these technologies or any programming language/framework you're working with!`;
+};
+
 interface Message {
   id: string;
   role: 'user' | 'assistant' | 'system';
@@ -119,6 +215,12 @@ const CosmoChatbot = () => {
         fallbackContent += 'Unable to connect to the server. Please check your internet connection.';
       } else {
         fallbackContent += 'Please try again or contact support if the issue persists.';
+      }
+      
+      // Add simulated response for common questions
+      const userMessageLower = userMessage.content.toLowerCase();
+      if (userMessageLower.includes('react') || userMessageLower.includes('typescript') || userMessageLower.includes('supabase')) {
+        fallbackContent = getSimulatedResponse(userMessage.content);
       }
       
       const errorMessage: Message = {

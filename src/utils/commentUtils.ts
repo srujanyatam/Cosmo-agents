@@ -47,9 +47,25 @@ export const commentUtils = {
   // Create a new comment
   async createComment(commentData: CreateCommentData): Promise<ConversionComment | null> {
     try {
+      // Get the current user's ID from the comments client
+      const { data: { user }, error: userError } = await commentsSupabase.auth.getUser();
+      
+      if (userError || !user) {
+        console.error('Error getting user for comment creation:', userError);
+        throw new Error('User not authenticated');
+      }
+      
+      // Ensure user_id is set
+      const commentWithUserId = {
+        ...commentData,
+        user_id: user.id
+      };
+      
+      console.log('Creating comment with user_id:', user.id);
+      
       const { data, error } = await commentsSupabase
         .from('conversion_comments')
-        .insert([commentData])
+        .insert([commentWithUserId])
         .select()
         .single();
 
@@ -110,9 +126,18 @@ export const commentUtils = {
   // Get all comments for the current user
   async getUserComments(): Promise<ConversionComment[]> {
     try {
+      // Get the current user's ID
+      const { data: { user }, error: userError } = await commentsSupabase.auth.getUser();
+      
+      if (userError || !user) {
+        console.error('Error getting user for fetching comments:', userError);
+        return [];
+      }
+      
       const { data, error } = await commentsSupabase
         .from('conversion_comments')
         .select('*')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) {

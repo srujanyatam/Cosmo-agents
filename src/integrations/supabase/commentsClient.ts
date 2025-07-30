@@ -1,5 +1,6 @@
 // Separate Supabase client for comments feature
 import { createClient } from '@supabase/supabase-js';
+import { supabase } from './client'; // Import the main supabase client
 
 // Get environment variables for comments database
 const getCommentsSupabaseUrl = () => {
@@ -124,6 +125,36 @@ try {
     console.log('🔧 Creating Comments Supabase client...');
     commentsSupabaseClient = createClient(COMMENTS_SUPABASE_URL, COMMENTS_SUPABASE_KEY);
     console.log('✅ Comments Supabase client created successfully');
+    
+    // Sync authentication session from main client
+    const syncAuthSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          console.log('🔄 Syncing auth session to comments client...');
+          await commentsSupabaseClient.auth.setSession(session);
+          console.log('✅ Auth session synced successfully');
+        }
+      } catch (error) {
+        console.warn('⚠️ Could not sync auth session:', error);
+      }
+    };
+    
+    // Initial sync
+    syncAuthSession();
+    
+    // Listen for auth changes in main client and sync to comments client
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('🔄 Auth state changed in main client:', event);
+      if (session) {
+        await commentsSupabaseClient.auth.setSession(session);
+        console.log('✅ Auth session synced to comments client');
+      } else {
+        await commentsSupabaseClient.auth.signOut();
+        console.log('✅ Signed out from comments client');
+      }
+    });
+    
   } else {
     console.log('⚠️ Creating mock Comments Supabase client...');
     commentsSupabaseClient = createMockCommentsClient();

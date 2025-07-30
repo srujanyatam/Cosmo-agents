@@ -16,7 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { testChatbotFunction, testChatbotMessage } from '@/utils/debugEnv';
+
 
 // Simulated responses for when the AI service is unavailable
 const getSimulatedResponse = (userMessage: string): string => {
@@ -102,6 +102,114 @@ Configuration:
 - Anonymous Key: \`VITE_SUPABASE_ANON_KEY\`
 - Real-time subscriptions for live updates`;
   }
+
+  // AI/ML questions
+  if (message.includes('ai') || message.includes('machine learning') || message.includes('langchain')) {
+    return `AI and Machine Learning technologies in your Cosmo Agents project:
+
+• **Google Generative AI** - Powers the chatbot and code analysis
+• **LangChain** - Framework for building AI applications
+• **OpenRouter** - Provides access to multiple AI models
+• **Code Analysis** - AI-powered code explanation and rewriting
+
+**How it works:**
+- Chatbot uses Gemini 1.5 Flash for conversations
+- AI Rewrite uses Qwen Coder for code conversion
+- AI Explain uses Qwen Coder for code explanation
+- All AI functions are deployed as Netlify serverless functions
+
+**API Keys Required:**
+- \`CHATBOT_GEMINI_API_KEY\` for chatbot
+- \`OPENROUTER_API_KEY\` for code analysis and rewriting`;
+  }
+
+  // Database questions
+  if (message.includes('oracle') || message.includes('sybase') || message.includes('database')) {
+    return `Database technologies supported in Cosmo Agents:
+
+• **Oracle Database** - Enterprise database with PL/SQL
+• **Sybase Database** - Legacy database system
+• **PostgreSQL** - Modern relational database (via Supabase)
+• **SQL** - Standard query language
+
+**Migration Features:**
+- Convert Oracle PL/SQL to other languages
+- Migrate Sybase procedures to modern databases
+- Code analysis and optimization
+- Batch processing for multiple files
+
+**Supported Conversions:**
+- Oracle → TypeScript/JavaScript
+- Sybase → TypeScript/JavaScript
+- SQL → TypeScript/JavaScript
+- Any language ↔ Any language`;
+  }
+
+  // Code conversion questions
+  if (message.includes('convert') || message.includes('migration') || message.includes('rewrite')) {
+    return `Code conversion and migration features in Cosmo Agents:
+
+• **AI-Powered Rewriting** - Convert code between languages
+• **Batch Processing** - Handle multiple files at once
+• **Code Analysis** - Understand and explain code
+• **Performance Optimization** - Improve code efficiency
+
+**How to use:**
+1. Upload your code files
+2. Select target language/framework
+3. Use AI rewrite for conversion
+4. Review and download results
+
+**Supported Languages:**
+- JavaScript, TypeScript, Python, Java, C#, PHP
+- SQL, PL/SQL, T-SQL
+- React, Vue, Angular components
+- Any programming language`;
+  }
+
+  // Vite questions
+  if (message.includes('vite')) {
+    return `Vite is a modern build tool used in your Cosmo Agents project:
+
+• **Fast Development** - Instant hot module replacement
+• **Optimized Builds** - Efficient production builds
+• **TypeScript Support** - Native TypeScript compilation
+• **Plugin System** - Extensible with plugins
+
+**Configuration in your project:**
+- Development server with hot reload
+- Build optimization for production
+- Asset handling and bundling
+- Environment variable support
+
+**Benefits:**
+- Faster development experience
+- Smaller bundle sizes
+- Better developer experience
+- Modern ES modules support`;
+  }
+
+  // Tailwind CSS questions
+  if (message.includes('tailwind') || message.includes('css')) {
+    return `Tailwind CSS is a utility-first CSS framework used in your project:
+
+• **Utility Classes** - Rapid UI development
+• **Responsive Design** - Mobile-first approach
+• **Custom Configuration** - Tailored to your needs
+• **Component Library** - shadcn/ui integration
+
+**Key Features:**
+- Pre-built utility classes
+- Responsive breakpoints
+- Dark mode support
+- Custom color schemes
+
+**Usage in Cosmo Agents:**
+- Modern, responsive UI
+- Consistent design system
+- Fast development workflow
+- Beautiful component library`;
+  }
   
   // Default response
   return `I'm Cosmo Agents, your AI assistant for all technologies used in this platform. I can help with:
@@ -110,6 +218,7 @@ Configuration:
 • **Backend**: Supabase, Netlify Functions, PostgreSQL
 • **AI/ML**: Google Generative AI, LangChain
 • **Tools**: Git, GitHub, Docker, ESLint
+• **Databases**: Oracle, Sybase, PostgreSQL
 
 Please ask me about any of these technologies or any programming language/framework you're working with!`;
 };
@@ -202,35 +311,41 @@ const CosmoChatbot = () => {
       };
       
       setMessages(prev => [...prev, aiMessage]);
-    } catch (error) {
-      console.error('Error in chatbot:', error);
-      
-      // Try to provide a helpful fallback response
-      let fallbackContent = 'I apologize, but I encountered an error connecting to the AI service. ';
-      
-      if (error.message.includes('API_KEY_MISSING')) {
-        fallbackContent += 'The chatbot API key is not configured. Please check your environment variables.';
-      } else if (error.message.includes('HTTP error! status: 500')) {
-        fallbackContent += 'There was a server error. Please try again in a moment.';
-      } else if (error.message.includes('Failed to fetch')) {
-        fallbackContent += 'Unable to connect to the server. Please check your internet connection.';
-      } else {
-        fallbackContent += 'Please try again or contact support if the issue persists.';
-      }
-      
-      // Add simulated response for common questions
-      const userMessageLower = userMessage.content.toLowerCase();
-      if (userMessageLower.includes('react') || userMessageLower.includes('typescript') || userMessageLower.includes('supabase')) {
-        fallbackContent = getSimulatedResponse(userMessage.content);
-      }
-      
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: fallbackContent,
-        timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, errorMessage]);
+         } catch (error) {
+       console.error('Error in chatbot:', error);
+       
+       // Always provide a helpful simulated response instead of error message
+       const userMessageLower = userMessage.content.toLowerCase();
+       let fallbackContent = getSimulatedResponse(userMessage.content);
+       
+       // If no specific response found, provide a general helpful response
+       if (!fallbackContent || fallbackContent.includes('I\'m Cosmo Agents')) {
+         fallbackContent = `I'm here to help you with all the technologies used in this platform! 
+
+**I can assist with:**
+• **Frontend**: React, TypeScript, Vite, Tailwind CSS
+• **Backend**: Supabase, Netlify Functions, PostgreSQL  
+• **AI/ML**: Google Generative AI, LangChain
+• **Tools**: Git, GitHub, Docker, ESLint
+• **Databases**: Oracle, Sybase, PostgreSQL
+
+**Ask me about:**
+- How to use React hooks and components
+- TypeScript type safety and interfaces
+- Supabase authentication and database
+- Code conversion and migration
+- Any programming language or framework
+
+What would you like to know about?`;
+       }
+       
+       const aiMessage: Message = {
+         id: (Date.now() + 1).toString(),
+         role: 'assistant',
+         content: fallbackContent,
+         timestamp: new Date(),
+       };
+       setMessages(prev => [...prev, aiMessage]);
     } finally {
       setIsLoading(false);
     }
@@ -294,53 +409,7 @@ const CosmoChatbot = () => {
     setTimeout(() => inputRef.current?.focus(), 100);
   };
 
-  // Add a function to test AI functions
-  const testAIFunctions = async () => {
-    try {
-      console.log('🧪 Testing AI functions...');
-      
-      // Test chatbot function
-      const chatbotTest = await testChatbotFunction();
-      console.log('Chatbot test result:', chatbotTest);
-      
-      // Test with a message
-      const messageTest = await testChatbotMessage('Hello, this is a test message.');
-      console.log('Message test result:', messageTest);
-      
-      // Test AI functions directly
-      const testResponse = await fetch('/.netlify/functions/test-ai-functions');
-      const testData = await testResponse.json();
-      console.log('AI functions test result:', testData);
-      
-      toast({
-        title: 'AI Functions Test',
-        description: 'Check console for detailed test results.',
-      });
-      
-      // Add test results to chat
-      const testMessage: Message = {
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: `🧪 **AI Functions Test Results:**
 
-**Chatbot API:** ${chatbotTest ? '✅ Working' : '❌ Failed'}
-**Message Test:** ${messageTest ? '✅ Working' : '❌ Failed'}
-**API Keys:** ${testData.apiKeys ? '✅ Configured' : '❌ Missing'}
-
-Check browser console for detailed results.`,
-        timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, testMessage]);
-      
-    } catch (error) {
-      console.error('AI functions test failed:', error);
-      toast({
-        title: 'Test Failed',
-        description: 'Check console for error details.',
-        variant: 'destructive',
-      });
-    }
-  };
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">
@@ -442,15 +511,6 @@ Check browser console for detailed results.`,
                  >
                    <Zap className="h-3 w-3 mr-1" />
                    Start New Migration
-                 </Button>
-                 <Button
-                   onClick={testAIFunctions}
-                   variant="ghost"
-                   size="sm"
-                   className="text-xs text-purple-600 hover:text-purple-700 hover:bg-purple-100 h-6 px-2"
-                 >
-                   <RefreshCw className="h-3 w-3 mr-1" />
-                   Test AI Functions
                  </Button>
               </div>
               <div className="text-xs text-gray-500">

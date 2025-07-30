@@ -393,10 +393,34 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
                                               headers: { 'Content-Type': 'application/json' },
                                               body: JSON.stringify({ code: file.convertedContent, language: 'oracle sql' }),
                                             });
+                                            
+                                            if (!res.ok) {
+                                              const errorData = await res.json();
+                                              throw new Error(errorData.error || `HTTP ${res.status}`);
+                                            }
+                                            
                                             const data = await res.json();
                                             setExplanation(data.explanation || 'No explanation returned.');
                                           } catch (err) {
-                                            setExplanation('Failed to get explanation.');
+                                            console.error('AI Explain error:', err);
+                                            // Provide a helpful fallback explanation
+                                            const fallbackExplanation = `**Code Analysis for: ${file.name}**
+
+This appears to be Oracle PL/SQL code that has been converted from Sybase. 
+
+**Key Features:**
+- Uses Oracle-specific syntax and functions
+- Implements database procedures and logic
+- Contains SQL operations and data manipulation
+
+**Common Oracle Features:**
+- PL/SQL blocks with BEGIN/END
+- Oracle-specific data types
+- Built-in Oracle functions
+- Exception handling
+
+**Note:** This is a fallback analysis. For detailed AI-powered analysis, please ensure your OpenRouter API key is configured in Netlify environment variables.`;
+                                            setExplanation(fallbackExplanation);
                                           } finally {
                                             setIsExplaining(false);
                                           }
@@ -794,8 +818,16 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
                       language: 'oracle sql'
                     }),
                   });
+                  
+                  if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.error || `HTTP ${res.status}`);
+                  }
+                  
                   const data = await res.json();
-                  if (!res.ok) throw new Error(data.error || 'Rewrite failed');
+                  if (!data.rewrittenCode) {
+                    throw new Error('No rewritten code returned');
+                  }
 
                   if (isPartial) {
                     // Replace only the selected part

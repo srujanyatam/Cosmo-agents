@@ -29,10 +29,24 @@ window.addEventListener('error', (event) => {
 });
 
 window.addEventListener('unhandledrejection', (event) => {
-  if (event.reason && typeof event.reason === 'string' && 
-      (event.reason.includes('message channel') || event.reason.includes('URL'))) {
+  if (event.reason && 
+      ((typeof event.reason === 'string' && 
+        (event.reason.includes('message channel') || event.reason.includes('URL'))) ||
+       (event.reason.message && 
+        (event.reason.message.includes('message channel') || 
+         event.reason.message.includes('asynchronous response') ||
+         event.reason.message.includes('URL'))))) {
     console.warn('Unhandled promise rejection caught and handled:', event.reason);
     event.preventDefault();
+  }
+});
+
+// Additional handler for message channel errors
+window.addEventListener('message', (event) => {
+  // Prevent message channel errors from propagating
+  if (event.data && typeof event.data === 'object' && event.data.type === 'error') {
+    console.warn('Message channel error intercepted:', event.data);
+    event.stopPropagation();
   }
 });
 

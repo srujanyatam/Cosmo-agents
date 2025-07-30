@@ -42,8 +42,7 @@ const SUPABASE_PUBLISHABLE_KEY = getSupabaseKey();
 
 // Log configuration status
 if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-  console.warn('Supabase configuration incomplete. Features requiring database will be disabled.');
-  console.warn('To enable full functionality, set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables.');
+  console.log('Supabase not configured - using mock client for demo mode');
 }
 
 // Create a comprehensive mock client

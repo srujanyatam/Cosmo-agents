@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { Edit, Save, X, ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
+import { Edit, Save, X, ArrowLeft, ArrowRight, Sparkles, MessageSquare } from 'lucide-react';
 import ConversionIssuesPanel from './ConversionIssuesPanel';
 import FileDownloader from './FileDownloader';
 import { supabase } from '@/integrations/supabase/client';
@@ -17,7 +17,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import CodeEditor from './CodeEditor'; // Added import for CodeEditor
-import CommentsSection from './CommentsSection'; // Added import for CommentsSection
+import { commentUtils } from '@/utils/commentUtils'; // Import commentUtils
 
 interface DataTypeMapping {
   sybaseType: string;
@@ -124,6 +124,8 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
   const [showExplainDialog, setShowExplainDialog] = useState(false);
   const [explanation, setExplanation] = useState('');
   const [isExplaining, setIsExplaining] = useState(false);
+  const [newComment, setNewComment] = useState('');
+  const [isAddingComment, setIsAddingComment] = useState(false);
 
   // Calculate dynamic height based on content length
   const getDynamicHeight = (content: string) => {
@@ -199,6 +201,47 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
     }
   };
 
+  const handleAddComment = async () => {
+    if (!newComment.trim()) {
+      toast({
+        title: "Comment Required",
+        description: "Please enter a comment before saving.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsAddingComment(true);
+    try {
+      const commentData = {
+        file_id: file.id,
+        file_name: file.name,
+        comment: newComment.trim(),
+        is_public: false
+      };
+
+      const result = await commentUtils.createComment(commentData);
+      if (result) {
+        setNewComment('');
+        toast({
+          title: "Comment Added",
+          description: "Your comment has been saved successfully.",
+        });
+      } else {
+        throw new Error('Failed to create comment');
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save comment. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAddingComment(false);
+    }
+  };
+
   // Add color helpers:
   const getScalabilityColor = (score) => {
     if (score >= 8) return 'text-green-700 font-semibold';
@@ -215,12 +258,11 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
     <>
       {/* Removed top bar with filename, badges, and download button. Now only tabs and code sections remain. */}
       <Tabs defaultValue="code" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="code">Code</TabsTrigger>
           <TabsTrigger value="mapping">Data Types</TabsTrigger>
           <TabsTrigger value="issues">Issues {file.issues && file.issues.length > 0 && (<Badge variant="outline" className="ml-1">{file.issues.length}</Badge>)}</TabsTrigger>
           <TabsTrigger value="performance">Performance</TabsTrigger>
-          <TabsTrigger value="comments">Comments</TabsTrigger>
         </TabsList>
         
         <TabsContent value="code" className="space-y-4">
@@ -753,15 +795,38 @@ This appears to be Oracle PL/SQL code that has been converted from Sybase.
           )}
         </TabsContent>
         
-        <TabsContent value="comments" className="space-y-4">
-          <CommentsSection
-            fileId={file.id}
-            fileName={file.name}
-            conversionId={file.id}
-            isDevReview={!hideEdit}
-          />
-        </TabsContent>
       </Tabs>
+
+      {/* Comment Input Section - Only show in dev review mode */}
+      {!hideEdit && (
+        <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
+          <div className="flex items-start gap-3">
+            <MessageSquare className="h-5 w-5 text-gray-500 mt-1 flex-shrink-0" />
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Add Comment for this conversion
+              </label>
+              <Textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Add your notes, reminders, or comments about this conversion..."
+                rows={2}
+                className="resize-none"
+              />
+              <div className="flex justify-end mt-2">
+                <Button
+                  onClick={handleAddComment}
+                  disabled={isAddingComment || !newComment.trim()}
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {isAddingComment ? 'Saving...' : 'Save Comment'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Rewrite Dialog */}
       <Dialog open={showRewriteDialog} onOpenChange={setShowRewriteDialog}>

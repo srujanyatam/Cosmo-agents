@@ -10,7 +10,7 @@
 const fetch = require('node-fetch');
 
 // Configuration
-const BASE_URL = process.env.NETLIFY_URL || 'https://your-site.netlify.app';
+const BASE_URL = process.env.NETLIFY_URL || 'https://cosmoagents.netlify.app';
 const FUNCTIONS = {
   test: '/.netlify/functions/test-ai-functions',
   chatbot: '/.netlify/functions/chatbot',

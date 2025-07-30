@@ -75,7 +75,7 @@ exports.handler = async function(event, context) {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            model: 'qwen/qwen3-coder:free',
+            model: 'anthropic/claude-3.5-sonnet:free',
             messages: [
               { role: 'user', content: 'Hello, this is a test message.' }
             ]
@@ -88,7 +88,7 @@ exports.handler = async function(event, context) {
           results.tests.openrouter = {
             success: true,
             responseLength: data.choices[0].message.content.length,
-            model: 'qwen/qwen3-coder:free'
+            model: 'anthropic/claude-3.5-sonnet:free'
           };
         } else {
           results.tests.openrouter = {

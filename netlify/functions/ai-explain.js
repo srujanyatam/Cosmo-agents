@@ -54,34 +54,58 @@ exports.handler = async function(event, context) {
     console.log('API key present:', !!OPENROUTER_API_KEY);
     console.log('API key length:', OPENROUTER_API_KEY.length);
 
+    // Use a better model for code analysis
+    const model = 'anthropic/claude-3.5-sonnet:free';
+
     const body = {
-      model: 'qwen/qwen3-coder:free',
+      model: model,
       messages: [
         { 
           role: 'system', 
-          content: 'You are a helpful AI assistant for code explanation. Provide clear, detailed explanations of what the code does, its purpose, and how it works. Include the code in your explanation and use markdown formatting for better readability.' 
+          content: `You are an expert code analyst and technical writer. Your task is to provide comprehensive, well-structured explanations of code.
+
+IMPORTANT REQUIREMENTS:
+1. Use proper markdown formatting with clear headings and sections
+2. Include the original code in a code block with proper syntax highlighting
+3. Provide detailed analysis with proper indentation and structure
+4. Break down complex code into logical sections
+5. Explain the purpose, functionality, and implementation details
+6. Use bullet points and numbered lists for better readability
+7. Highlight important concepts, patterns, and best practices
+8. Provide context about the technology/language being used
+
+Your response should be structured as follows:
+- **Code Overview**: Brief summary of what the code does
+- **Original Code**: The code in a properly formatted code block
+- **Detailed Analysis**: Section-by-section breakdown
+- **Key Components**: Important functions, variables, and their purposes
+- **Technical Details**: Implementation patterns, algorithms, or techniques used
+- **Use Cases**: When and why this code would be used
+- **Best Practices**: Any relevant coding standards or recommendations` 
         },
         { 
           role: 'user', 
-          content: `Explain what the following ${language || 'code'} does in detail. Include the code in your explanation and explain each part clearly:
+          content: `Please provide a comprehensive analysis of the following ${language || 'code'}:
 
 \`\`\`${language || 'text'}
 ${code}
 \`\`\`
 
-Please provide a comprehensive explanation including:
-1. What the code does overall
-2. Key functions and their purposes
-3. Important variables and their roles
-4. Any notable patterns or techniques used
-5. Potential use cases or applications` 
+Analyze this code thoroughly and provide a detailed explanation with proper formatting, indentation, and structure. Focus on:
+- What the code accomplishes
+- How it works step by step
+- Important functions and their purposes
+- Variables and their roles
+- Any patterns or techniques used
+- Potential applications or use cases
+- Technical considerations and best practices` 
         }
       ],
-      temperature: 0.3,
-      max_tokens: 2000
+      temperature: 0.2,
+      max_tokens: 3000
     };
 
-    console.log('Sending request to OpenRouter API...');
+    console.log('Sending request to OpenRouter API with model:', model);
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -124,12 +148,27 @@ Please provide a comprehensive explanation including:
         })
       };
     }
+
+    // Ensure the explanation has proper formatting
+    let formattedExplanation = explanation;
+    
+    // If the explanation doesn't start with proper markdown, add structure
+    if (!explanation.includes('##') && !explanation.includes('**')) {
+      formattedExplanation = `## Code Analysis
+
+**Language**: ${language || 'Unknown'}
+
+${explanation}
+
+---
+*Analysis provided by AI Code Analyzer*`;
+    }
     
     return { 
       statusCode: 200, 
       headers,
       body: JSON.stringify({ 
-        explanation,
+        explanation: formattedExplanation,
         timestamp: new Date().toISOString()
       }) 
     };

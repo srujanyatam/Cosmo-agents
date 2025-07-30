@@ -876,7 +876,19 @@ This appears to be Oracle PL/SQL code that has been converted from Sybase.
               </div>
             ) : (
               <div className="w-full">
-                <pre className="whitespace-pre-wrap text-sm bg-gray-50 p-4 rounded overflow-x-auto max-w-full break-words">{explanation}</pre>
+                <div className="bg-gray-50 p-6 rounded-lg border">
+                  <div className="prose prose-sm max-w-none">
+                    <div 
+                      className="whitespace-pre-wrap text-sm overflow-x-auto max-w-full break-words"
+                      style={{
+                        fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
+                        lineHeight: '1.6'
+                      }}
+                    >
+                      {explanation}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>

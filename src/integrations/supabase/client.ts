@@ -6,18 +6,44 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
 // Validate environment variables
-if (!SUPABASE_URL || SUPABASE_URL === 'undefined') {
-  console.error('VITE_SUPABASE_URL is not defined or invalid');
+if (!SUPABASE_URL || SUPABASE_URL === 'undefined' || SUPABASE_URL === '') {
+  console.warn('VITE_SUPABASE_URL is not defined or invalid. Supabase features will be disabled.');
 }
 
-if (!SUPABASE_PUBLISHABLE_KEY || SUPABASE_PUBLISHABLE_KEY === 'undefined') {
-  console.error('VITE_SUPABASE_ANON_KEY is not defined or invalid');
+if (!SUPABASE_PUBLISHABLE_KEY || SUPABASE_PUBLISHABLE_KEY === 'undefined' || SUPABASE_PUBLISHABLE_KEY === '') {
+  console.warn('VITE_SUPABASE_ANON_KEY is not defined or invalid. Supabase features will be disabled.');
 }
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(
-  SUPABASE_URL || 'https://placeholder.supabase.co',
-  SUPABASE_PUBLISHABLE_KEY || 'placeholder-key'
-);
+// Create a mock client if environment variables are missing
+const createMockClient = () => {
+  return {
+    auth: {
+      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+      getSession: () => Promise.resolve({ data: { session: null } }),
+      signUp: () => Promise.resolve({ error: { message: 'Supabase not configured' } }),
+      signInWithPassword: () => Promise.resolve({ error: { message: 'Supabase not configured' } }),
+      signOut: () => Promise.resolve(),
+      resetPasswordForEmail: () => Promise.resolve({ error: { message: 'Supabase not configured' } }),
+      getUser: () => Promise.resolve({ data: { user: null } }),
+    },
+    from: () => ({
+      select: () => ({ eq: () => ({ single: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }) }) }),
+      insert: () => Promise.resolve({ error: { message: 'Supabase not configured' } }),
+      update: () => ({ eq: () => Promise.resolve({ error: { message: 'Supabase not configured' } }) }),
+      delete: () => ({ eq: () => Promise.resolve({ error: { message: 'Supabase not configured' } }) }),
+    }),
+    channel: () => ({
+      on: () => ({ subscribe: () => ({ unsubscribe: () => {} }) }),
+    }),
+    removeChannel: () => {},
+  } as any;
+};
+
+export const supabase = (SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY && 
+                        SUPABASE_URL !== 'undefined' && SUPABASE_PUBLISHABLE_KEY !== 'undefined' &&
+                        SUPABASE_URL !== '' && SUPABASE_PUBLISHABLE_KEY !== '')
+  ? createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+  : createMockClient();

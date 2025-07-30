@@ -1,7 +1,8 @@
+// Fallback commentUtils using main Supabase client
 import { supabase } from '@/integrations/supabase/client';
 import { ConversionComment, CreateCommentData, UpdateCommentData } from '@/types/conversionComments';
 
-export const commentUtils = {
+export const commentUtilsFallback = {
   // Get comments for a specific file
   async getCommentsForFile(fileId: string): Promise<ConversionComment[]> {
     try {
@@ -47,7 +48,7 @@ export const commentUtils = {
   // Create a new comment
   async createComment(commentData: CreateCommentData): Promise<ConversionComment | null> {
     try {
-      // Get the current user's ID from the main client
+      // Get current user
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       
       if (userError || !user) {
@@ -126,7 +127,7 @@ export const commentUtils = {
   // Get all comments for the current user
   async getUserComments(): Promise<ConversionComment[]> {
     try {
-      // Get the current user's ID
+      // Get current user
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       
       if (userError || !user) {

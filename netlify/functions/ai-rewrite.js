@@ -107,7 +107,7 @@ exports.handler = async function(event, context) {
     console.log('API key length:', OPENROUTER_API_KEY.length);
 
     const body = {
-      model: 'anthropic/claude-3.5-sonnet:free',
+      model: 'openai/gpt-4o-mini',
       messages: [
         { 
           role: 'system', 

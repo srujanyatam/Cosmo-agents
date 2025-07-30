@@ -17,6 +17,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import CodeEditor from './CodeEditor'; // Added import for CodeEditor
+import CommentsSection from './CommentsSection'; // Added import for CommentsSection
 
 interface DataTypeMapping {
   sybaseType: string;
@@ -214,11 +215,12 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
     <>
       {/* Removed top bar with filename, badges, and download button. Now only tabs and code sections remain. */}
       <Tabs defaultValue="code" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="code">Code</TabsTrigger>
           <TabsTrigger value="mapping">Data Types</TabsTrigger>
           <TabsTrigger value="issues">Issues {file.issues && file.issues.length > 0 && (<Badge variant="outline" className="ml-1">{file.issues.length}</Badge>)}</TabsTrigger>
           <TabsTrigger value="performance">Performance</TabsTrigger>
+          <TabsTrigger value="comments">Comments</TabsTrigger>
         </TabsList>
         
         <TabsContent value="code" className="space-y-4">
@@ -749,6 +751,15 @@ This appears to be Oracle PL/SQL code that has been converted from Sybase.
               <p className="text-gray-500">No performance metrics available</p>
             </div>
           )}
+        </TabsContent>
+        
+        <TabsContent value="comments" className="space-y-4">
+          <CommentsSection
+            fileId={file.id}
+            fileName={file.name}
+            conversionId={file.id}
+            isDevReview={!hideEdit}
+          />
         </TabsContent>
       </Tabs>
 

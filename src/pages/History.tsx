@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@
 import { useToast } from '@/hooks/use-toast';
 import { useUnreviewedFiles } from '@/hooks/useUnreviewedFiles';
 import ReportViewer from '@/components/ReportViewer';
+import CommentIndicator from '@/components/CommentIndicator';
 
 interface Migration {
   id: string;
@@ -759,6 +760,7 @@ const History = () => {
                                   >
                                     <Eye className="h-4 w-4" />
                                   </Button>
+                                  <CommentIndicator fileId={file.id} fileName={file.file_name} />
                                   <Button 
                                     size="sm" 
                                     variant="ghost"

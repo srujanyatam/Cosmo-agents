@@ -38,24 +38,41 @@ const ReportViewer: React.FC<ReportViewerProps> = ({ report, onBack }) => {
   
   useEffect(() => {
     fetchDeploymentLogs();
-    const channel = supabase
-      .channel('deployment-logs-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'deployment_logs',
-        },
-        () => {
-          fetchDeploymentLogs();
+    
+    // Only set up real-time subscription if we have a valid user and Supabase connection
+    if (!user) return;
+    
+    try {
+      const channel = supabase
+        .channel('deployment-logs-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'deployment_logs',
+          },
+          () => {
+            fetchDeploymentLogs();
+          }
+        )
+        .subscribe((status) => {
+          if (status === 'CHANNEL_ERROR') {
+            console.warn('Supabase real-time subscription failed, falling back to polling');
+          }
+        });
+      
+      return () => {
+        try {
+          supabase.removeChannel(channel);
+        } catch (error) {
+          console.warn('Error removing Supabase channel:', error);
         }
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+      };
+    } catch (error) {
+      console.warn('Failed to set up Supabase real-time subscription:', error);
+    }
+  }, [user]);
 
   const fetchDeploymentLogs = async () => {
     if (!user) return;

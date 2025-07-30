@@ -7,12 +7,17 @@ let cacheEnabled = true;
 
 // Get API key safely for browser environment
 const getApiKey = () => {
-  if (typeof window !== 'undefined') {
-    // Browser environment - try to get from window or use empty string
-    return (window as any).__NEXT_PUBLIC_GOOGLE_API_KEY || '';
+  try {
+    if (typeof window !== 'undefined') {
+      // Browser environment - try to get from window or use empty string
+      return (window as any).__NEXT_PUBLIC_GOOGLE_API_KEY || '';
+    }
+    // Server environment
+    return process.env.NEXT_PUBLIC_GOOGLE_API_KEY || '';
+  } catch (error) {
+    console.warn('Error getting API key:', error);
+    return '';
   }
-  // Server environment
-  return process.env.NEXT_PUBLIC_GOOGLE_API_KEY || '';
 };
 
 export function isCacheEnabled() {

@@ -13,6 +13,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ReportPage from "./pages/ReportPage";
 import { CodeEditorThemeProvider } from "@/contexts/CodeEditorThemeContext";
+import CosmoChatbot from "@/components/CosmoChatbot";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,8 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+            {/* CosmoChatbot - Available on all pages */}
+            <CosmoChatbot />
           </BrowserRouter>
         </CodeEditorThemeProvider>
       </AuthProvider>

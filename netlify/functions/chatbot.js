@@ -41,7 +41,12 @@ exports.handler = async (event, context) => {
     // Get the chatbot API key
     const apiKey = process.env.CHATBOT_GEMINI_API_KEY;
     
+    console.log('Chatbot function called with message:', message.substring(0, 100) + '...');
+    console.log('API key present:', !!apiKey);
+    console.log('API key length:', apiKey ? apiKey.length : 0);
+    
     if (!apiKey) {
+      console.error('Chatbot API key not configured');
       return {
         statusCode: 500,
         headers,
@@ -171,6 +176,19 @@ Remember: You're here to help users understand and work with ALL technologies th
     const text = response.text();
     
     console.log('Response generated successfully, length:', text.length);
+    console.log('Response preview:', text.substring(0, 200) + '...');
+
+    if (!text || text.trim().length === 0) {
+      console.error('Empty response from AI model');
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ 
+          error: 'AI model returned empty response. Please try again.',
+          timestamp: new Date().toISOString()
+        })
+      };
+    }
 
     return {
       statusCode: 200,
@@ -186,15 +204,26 @@ Remember: You're here to help users understand and work with ALL technologies th
     console.error('Error details:', {
       message: error.message,
       stack: error.stack,
-      apiKey: apiKey ? 'Present' : 'Missing',
+      apiKey: process.env.CHATBOT_GEMINI_API_KEY ? 'Present' : 'Missing',
       model: 'gemini-1.5-flash'
     });
+    
+    // Return a more specific error message
+    let errorMessage = 'An error occurred while processing your request. Please try again.';
+    
+    if (error.message.includes('API key')) {
+      errorMessage = 'API key configuration error. Please check your CHATBOT_GEMINI_API_KEY.';
+    } else if (error.message.includes('quota') || error.message.includes('rate limit')) {
+      errorMessage = 'API rate limit exceeded. Please try again later.';
+    } else if (error.message.includes('model')) {
+      errorMessage = 'AI model error. Please try again.';
+    }
     
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({ 
-        error: 'An error occurred while processing your request. Please try again.',
+        error: errorMessage,
         details: process.env.NODE_ENV === 'development' ? error.message : undefined,
         timestamp: new Date().toISOString()
       })

@@ -300,7 +300,13 @@ const CosmoChatbot = () => {
       console.log('Chatbot response data:', data);
       
       if (data.error) {
+        console.error('Chatbot returned error:', data.error);
         throw new Error(data.error);
+      }
+
+      if (!data.response || data.response.trim().length === 0) {
+        console.error('Chatbot returned empty response');
+        throw new Error('AI returned empty response');
       }
 
       const aiMessage: Message = {
@@ -311,16 +317,24 @@ const CosmoChatbot = () => {
       };
       
       setMessages(prev => [...prev, aiMessage]);
-         } catch (error) {
-       console.error('Error in chatbot:', error);
-       
-       // Always provide a helpful simulated response instead of error message
-       const userMessageLower = userMessage.content.toLowerCase();
-       let fallbackContent = getSimulatedResponse(userMessage.content);
-       
-       // If no specific response found, provide a general helpful response
-       if (!fallbackContent || fallbackContent.includes('I\'m Cosmo Agents')) {
-         fallbackContent = `I'm here to help you with all the technologies used in this platform! 
+    } catch (error) {
+      console.error('Error in chatbot:', error);
+      
+      // Only use fallback for genuine errors, not when AI is working
+      let fallbackContent = '';
+      
+      if (error.message.includes('API key') || 
+          error.message.includes('not configured') ||
+          error.message.includes('rate limit') ||
+          error.message.includes('quota') ||
+          error.message.includes('network') ||
+          error.message.includes('fetch')) {
+        // Use simulated response for API/network errors
+        fallbackContent = getSimulatedResponse(userMessage.content);
+        
+        // If no specific response found, provide a general helpful response
+        if (!fallbackContent || fallbackContent.includes('I\'m Cosmo Agents')) {
+          fallbackContent = `I'm here to help you with all the technologies used in this platform! 
 
 **I can assist with:**
 • **Frontend**: React, TypeScript, Vite, Tailwind CSS
@@ -337,15 +351,19 @@ const CosmoChatbot = () => {
 - Any programming language or framework
 
 What would you like to know about?`;
-       }
-       
-       const aiMessage: Message = {
-         id: (Date.now() + 1).toString(),
-         role: 'assistant',
-         content: fallbackContent,
-         timestamp: new Date(),
-       };
-       setMessages(prev => [...prev, aiMessage]);
+        }
+      } else {
+        // For other errors, show a more specific error message
+        fallbackContent = `I apologize, but I encountered an error: ${error.message}. Please try again or contact support if the issue persists.`;
+      }
+      
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: fallbackContent,
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, aiMessage]);
     } finally {
       setIsLoading(false);
     }

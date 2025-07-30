@@ -68,6 +68,8 @@ const CosmoChatbot = () => {
     setIsLoading(true);
 
     try {
+      console.log('Sending message to chatbot:', userMessage.content);
+      
       // Call the chatbot API
       const response = await fetch('/.netlify/functions/chatbot', {
         method: 'POST',
@@ -79,11 +81,17 @@ const CosmoChatbot = () => {
         }),
       });
 
+      console.log('Chatbot response status:', response.status);
+      console.log('Chatbot response headers:', Object.fromEntries(response.headers.entries()));
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error('Chatbot error response:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
       }
 
       const data = await response.json();
+      console.log('Chatbot response data:', data);
       
       if (data.error) {
         throw new Error(data.error);
@@ -99,10 +107,24 @@ const CosmoChatbot = () => {
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
       console.error('Error in chatbot:', error);
+      
+      // Try to provide a helpful fallback response
+      let fallbackContent = 'I apologize, but I encountered an error connecting to the AI service. ';
+      
+      if (error.message.includes('API_KEY_MISSING')) {
+        fallbackContent += 'The chatbot API key is not configured. Please check your environment variables.';
+      } else if (error.message.includes('HTTP error! status: 500')) {
+        fallbackContent += 'There was a server error. Please try again in a moment.';
+      } else if (error.message.includes('Failed to fetch')) {
+        fallbackContent += 'Unable to connect to the server. Please check your internet connection.';
+      } else {
+        fallbackContent += 'Please try again or contact support if the issue persists.';
+      }
+      
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'I apologize, but I encountered an error connecting to the AI service. Please try again or contact support if the issue persists.',
+        content: fallbackContent,
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, errorMessage]);
@@ -287,30 +309,50 @@ const CosmoChatbot = () => {
                 </div>
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-3">Welcome to Cosmo Agents</h3>
                 <p className="text-sm text-gray-600 mb-6 max-w-xs mx-auto">
-                  Cosmo Agents is your AI assistant for database migration, SQL, Oracle, Sybase, and more!<br />
-                  Ask questions, get migration help, and start new migration sessions directly in chat.
+                  Cosmo Agents is your comprehensive AI assistant for ALL technologies used in this platform!<br />
+                  Ask questions about any programming language, framework, library, or technology.
                 </p>
                 {/* Feature Cards */}
                 <div className="grid grid-cols-1 gap-1.5 sm:gap-2 md:gap-3 mb-3 sm:mb-4 md:mb-6">
                   <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 p-1.5 sm:p-2 md:p-3 bg-blue-50 rounded-xl border border-blue-200">
                     <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 md:w-3 md:h-3 bg-blue-500 rounded-full"></div>
-                    <span className="text-xs sm:text-sm font-medium text-gray-700">Oracle Database & PL/SQL</span>
+                    <span className="text-xs sm:text-sm font-medium text-gray-700">React, TypeScript & Vite</span>
                   </div>
                   <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 p-1.5 sm:p-2 md:p-3 bg-blue-50 rounded-xl border border-blue-200">
                     <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 md:w-3 md:h-3 bg-blue-600 rounded-full"></div>
-                    <span className="text-xs sm:text-sm font-medium text-gray-700">SQL Queries & Optimization</span>
+                    <span className="text-xs sm:text-sm font-medium text-gray-700">Tailwind CSS & shadcn/ui</span>
                   </div>
                   <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 p-1.5 sm:p-2 md:p-3 bg-blue-50 rounded-xl border border-blue-200">
                     <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 md:w-3 md:h-3 bg-blue-700 rounded-full"></div>
-                    <span className="text-xs sm:text-sm font-medium text-gray-700">Sybase Database Migration</span>
+                    <span className="text-xs sm:text-sm font-medium text-gray-700">Oracle & Sybase Databases</span>
                   </div>
                   <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 p-1.5 sm:p-2 md:p-3 bg-blue-50 rounded-xl border border-blue-200">
                     <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 md:w-3 md:h-3 bg-blue-800 rounded-full"></div>
-                    <span className="text-xs sm:text-sm font-medium text-gray-700">Supabase Backend Services</span>
+                    <span className="text-xs sm:text-sm font-medium text-gray-700">Supabase & PostgreSQL</span>
                   </div>
                   <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 p-1.5 sm:p-2 md:p-3 bg-blue-50 rounded-xl border border-blue-200">
                     <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 md:w-3 md:h-3 bg-blue-900 rounded-full"></div>
-                    <span className="text-xs sm:text-sm font-medium text-gray-700">Git & GitHub Workflows</span>
+                    <span className="text-xs sm:text-sm font-medium text-gray-700">AI/ML & LangChain</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 p-1.5 sm:p-2 md:p-3 bg-green-50 rounded-xl border border-green-200">
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 md:w-3 md:h-3 bg-green-500 rounded-full"></div>
+                    <span className="text-xs sm:text-sm font-medium text-gray-700">Git, GitHub & Netlify</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 p-1.5 sm:p-2 md:p-3 bg-green-50 rounded-xl border border-green-200">
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 md:w-3 md:h-3 bg-green-600 rounded-full"></div>
+                    <span className="text-xs sm:text-sm font-medium text-gray-700">React Query & State Management</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 p-1.5 sm:p-2 md:p-3 bg-green-50 rounded-xl border border-green-200">
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 md:w-3 md:h-3 bg-green-700 rounded-full"></div>
+                    <span className="text-xs sm:text-sm font-medium text-gray-700">Monaco Editor & Code Analysis</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 p-1.5 sm:p-2 md:p-3 bg-purple-50 rounded-xl border border-purple-200">
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 md:w-3 md:h-3 bg-purple-500 rounded-full"></div>
+                    <span className="text-xs sm:text-sm font-medium text-gray-700">Any Programming Language</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 p-1.5 sm:p-2 md:p-3 bg-purple-50 rounded-xl border border-purple-200">
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 md:w-3 md:h-3 bg-purple-600 rounded-full"></div>
+                    <span className="text-xs sm:text-sm font-medium text-gray-700">Any Framework or Library</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-center gap-2 sm:gap-3 md:gap-4 text-xs text-gray-500">

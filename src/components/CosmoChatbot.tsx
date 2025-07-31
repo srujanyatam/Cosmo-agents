@@ -231,6 +231,167 @@ Configuration:
 - Optimized for production builds`;
   }
 
+  // Git and GitHub questions
+  if (message.includes('git') || message.includes('github')) {
+    if (message.includes('difference') || message.includes('vs') || message.includes('compare')) {
+      return `**Git vs GitHub Comparison:**
+
+| Feature | Git | GitHub |
+|---------|-----|--------|
+| **Type** | Version control system | Web-based hosting platform |
+| **Purpose** | Local code version management | Remote repository hosting |
+| **Functionality** | Tracks changes, creates branches, merges code | Provides Git hosting with collaboration features |
+| **Location** | Installed on your computer | Cloud-based service |
+| **Features** | Commit, branch, merge, log | Issues, pull requests, wikis, actions |
+| **Collaboration** | Basic merging capabilities | Advanced team collaboration tools |
+| **Cost** | Free and open source | Free for public repos, paid for private |
+
+**In Cosmo Agents:**
+- **Git** is used for local version control
+- **GitHub** hosts the project repository
+- Both work together for seamless development workflow`;
+    }
+    
+    if (message.includes('git')) {
+      return `**Git - Version Control System:**
+
+**🎯 What is Git?**
+Git is a distributed version control system that tracks changes in your code files. It's essential for modern software development.
+
+**✨ Key Features:**
+• **Version Tracking** - Keep history of all code changes
+• **Branching** - Work on features without affecting main code
+• **Merging** - Combine changes from different branches
+• **Collaboration** - Multiple developers can work together
+• **Backup** - Your code is safely stored with full history
+
+**🔧 Basic Git Commands:**
+\`\`\`bash
+git init          # Start a new repository
+git add .         # Stage files for commit
+git commit -m "message"  # Save changes with message
+git push          # Upload changes to remote repository
+git pull          # Download changes from remote
+git branch        # List all branches
+git checkout -b feature  # Create and switch to new branch
+\`\`\`
+
+**💡 In Cosmo Agents Project:**
+- Git tracks all your code changes
+- Each feature is developed in separate branches
+- Changes are committed with descriptive messages
+- Code is pushed to GitHub for backup and collaboration
+
+**🚀 Benefits:**
+- Never lose your work
+- Work on multiple features simultaneously
+- Collaborate with team members
+- Roll back to previous versions if needed`;
+    }
+    
+    if (message.includes('github')) {
+      return `**GitHub - Code Hosting Platform:**
+
+**🎯 What is GitHub?**
+GitHub is a web-based platform that hosts Git repositories and provides collaboration tools for developers.
+
+**✨ Key Features:**
+• **Repository Hosting** - Store your code in the cloud
+• **Collaboration Tools** - Work with teams effectively
+• **Issue Tracking** - Manage bugs and feature requests
+• **Pull Requests** - Review code before merging
+• **GitHub Actions** - Automate workflows and deployments
+• **Wikis & Documentation** - Project documentation
+
+**🔧 GitHub Workflow:**
+1. **Create Repository** - Start a new project
+2. **Clone Repository** - Download to your computer
+3. **Make Changes** - Edit code locally
+4. **Commit & Push** - Upload changes to GitHub
+5. **Create Pull Request** - Request code review
+6. **Merge Changes** - Integrate approved code
+
+**💡 In Cosmo Agents Project:**
+- Repository: \`https://github.com/srujanyatam/Cosmo-agents\`
+- Used for version control and collaboration
+- GitHub Actions for automated deployment
+- Issues for bug tracking and feature requests
+
+**🚀 Benefits:**
+- Free hosting for public repositories
+- Excellent collaboration tools
+- Integration with CI/CD pipelines
+- Large developer community`;
+    }
+  }
+
+  // Python questions
+  if (message.includes('python')) {
+    return `**Python in Cosmo Agents:**
+
+**🎯 What is Python?**
+Python is a high-level, interpreted programming language known for its simplicity and readability.
+
+**✨ Key Features:**
+• **Easy to Learn** - Simple syntax and clear structure
+• **Versatile** - Web development, data science, automation
+• **Rich Ecosystem** - Extensive libraries and frameworks
+• **Cross-platform** - Runs on Windows, macOS, Linux
+
+**🔧 In Cosmo Agents Project:**
+- **AI Integration** - Python scripts for AI model processing
+- **Data Processing** - Handle large datasets and conversions
+- **Automation** - Automated testing and deployment scripts
+- **Backend Services** - API development and data analysis
+
+**💡 Common Use Cases:**
+- Data analysis and visualization
+- Web development with Django/Flask
+- Machine learning and AI
+- Automation and scripting
+- API development
+
+**🚀 Benefits:**
+- Rapid development and prototyping
+- Excellent for beginners
+- Strong community support
+- Extensive library ecosystem`;
+  }
+
+  // SQL questions
+  if (message.includes('sql')) {
+    return `**SQL - Structured Query Language:**
+
+**🎯 What is SQL?**
+SQL is a standard language for managing and manipulating relational databases.
+
+**✨ Key Features:**
+• **Data Querying** - Retrieve data from databases
+• **Data Manipulation** - Insert, update, delete records
+• **Data Definition** - Create and modify database structures
+• **Data Control** - Manage user permissions and security
+
+**🔧 In Cosmo Agents Project:**
+- **Supabase Database** - PostgreSQL with SQL queries
+- **Data Storage** - Store user data and conversion logs
+- **Real-time Queries** - Live data updates and subscriptions
+- **Performance Optimization** - Efficient database queries
+
+**💡 Common SQL Commands:**
+\`\`\`sql
+SELECT * FROM users WHERE id = 1;
+INSERT INTO conversions (file_name, status) VALUES ('test.sql', 'completed');
+UPDATE users SET last_login = NOW() WHERE id = 1;
+DELETE FROM logs WHERE created_at < '2024-01-01';
+\`\`\`
+
+**🚀 Benefits:**
+- Standard language across all databases
+- Powerful data manipulation capabilities
+- Excellent performance for large datasets
+- Strong data integrity and consistency`;
+  }
+
   // Comments feature questions
   if (message.includes('comment') || message.includes('note')) {
     return `**💬 Comments Feature in Cosmo Agents:**

@@ -739,7 +739,13 @@ Just ask me anything! 🚀`,
                           : 'bg-white text-gray-800 border-2 border-blue-200 shadow-sm'
                       }`}
                     >
-                      {message.content}
+                      <div 
+                        className={`${
+                          message.role === 'assistant' ? 'chatbot-message' : ''
+                        }`}
+                      >
+                        {message.content}
+                      </div>
                     </div>
                   </div>
                 ))}

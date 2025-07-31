@@ -38,20 +38,20 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Get the OpenRouter API key
-    const apiKey = process.env.OPENROUTER_API_KEY;
+    // Get the Chatbot OpenRouter API key
+    const apiKey = process.env.CHATBOT_OPENROUTER_API_KEY;
     
     console.log('Chatbot function called with message:', message.substring(0, 100) + '...');
-    console.log('OpenRouter API key present:', !!apiKey);
+          console.log('Chatbot OpenRouter API key present:', !!apiKey);
     console.log('API key length:', apiKey ? apiKey.length : 0);
     
     if (!apiKey) {
-      console.error('OpenRouter API key not configured');
+      console.error('Chatbot OpenRouter API key not configured');
       return {
         statusCode: 500,
         headers,
         body: JSON.stringify({ 
-          error: 'OpenRouter API key not configured. Please set OPENROUTER_API_KEY environment variable.' 
+          error: 'Chatbot OpenRouter API key not configured. Please set CHATBOT_OPENROUTER_API_KEY environment variable.' 
         })
       };
     }
@@ -156,8 +156,31 @@ exports.handler = async (event, context) => {
 - Explain technical concepts in accessible terms
 - Always be helpful and supportive
 - Provide specific examples from the Cosmo Agents codebase when relevant
+- **CRITICAL: Use proper spacing and formatting**
+- **CRITICAL: Add line breaks between sections**
+- **CRITICAL: Use tables for comparison questions**
+- **CRITICAL: Ensure clean, readable formatting**
 
-Remember: You're here to help users understand and work with ALL technologies that power the Cosmo Agents platform. You can answer questions about any programming language, framework, library, or technology - not just the ones listed above.`;
+**Formatting Rules:**
+1. **Always add proper spacing** between paragraphs and sections
+2. **Use tables** when comparing technologies, features, or differences
+3. **Add line breaks** after each bullet point or section
+4. **Use markdown formatting** for better readability
+5. **Separate code examples** with proper spacing
+6. **Use headers** to organize information clearly
+
+**Table Format Example:**
+When comparing technologies, use this format:
+
+| Feature | Technology A | Technology B |
+|---------|-------------|-------------|
+| Purpose | Description | Description |
+| Pros | List | List |
+| Cons | List | List |
+
+Remember: You're here to help users understand and work with ALL technologies that power the Cosmo Agents platform. You can answer questions about any programming language, framework, library, or technology - not just the ones listed above.
+
+**IMPORTANT: Always format your responses with proper spacing, line breaks, and clean structure for optimal readability.**`;
 
     // Generate response using OpenRouter API
     console.log('Generating response for message:', message.substring(0, 100) + '...');
@@ -171,7 +194,7 @@ Remember: You're here to help users understand and work with ALL technologies th
         'X-Title': 'Cosmo Agents Chatbot'
       },
       body: JSON.stringify({
-        model: 'qwen/qwen3-coder:free',
+        model: 'openai/gpt-4o-mini',
         messages: [
           {
             role: 'system',
@@ -232,15 +255,15 @@ Remember: You're here to help users understand and work with ALL technologies th
     console.error('Error details:', {
       message: error.message,
       stack: error.stack,
-      apiKey: process.env.OPENROUTER_API_KEY ? 'Present' : 'Missing',
-      model: 'qwen/qwen3-coder:free'
+      apiKey: process.env.CHATBOT_OPENROUTER_API_KEY ? 'Present' : 'Missing',
+      model: 'openai/gpt-4o-mini'
     });
     
     // Return a more specific error message
     let errorMessage = 'An error occurred while processing your request. Please try again.';
     
     if (error.message.includes('API key')) {
-      errorMessage = 'API key configuration error. Please check your OPENROUTER_API_KEY.';
+      errorMessage = 'API key configuration error. Please check your CHATBOT_OPENROUTER_API_KEY.';
     } else if (error.message.includes('quota') || error.message.includes('rate limit')) {
       errorMessage = 'API rate limit exceeded. Please try again later.';
     } else if (error.message.includes('model')) {

@@ -203,16 +203,16 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
 
 
   // Add color helpers:
-  const getScalabilityColor = (score) => {
+  const getScalabilityColor = (score: number): string => {
     if (score >= 8) return 'text-green-700 font-semibold';
     if (score >= 5) return 'text-orange-600 font-semibold';
     return 'text-red-700 font-semibold';
   };
-  const getModernFeaturesColor = (count) => count > 0 ? 'text-blue-700 font-semibold' : 'text-gray-700 font-semibold';
-  const getBulkColor = (used) => used ? 'text-green-700 font-semibold' : 'text-red-700 font-semibold';
-  const getLinesColor = (v) => v < 0 ? 'text-green-700 font-semibold' : v > 0 ? 'text-red-700 font-semibold' : 'text-gray-700 font-semibold';
-  const getLoopsColor = (v) => v < 0 ? 'text-green-700 font-semibold' : v > 0 ? 'text-red-700 font-semibold' : 'text-gray-700 font-semibold';
-  const getComplexityColor = (orig, conv) => conv < orig ? 'text-green-700 font-semibold' : conv > orig ? 'text-red-700 font-semibold' : 'text-gray-700 font-semibold';
+  const getModernFeaturesColor = (count: number): string => count > 0 ? 'text-blue-700 font-semibold' : 'text-gray-700 font-semibold';
+  const getBulkColor = (used: boolean): string => used ? 'text-green-700 font-semibold' : 'text-red-700 font-semibold';
+  const getLinesColor = (v: number): string => v < 0 ? 'text-green-700 font-semibold' : v > 0 ? 'text-red-700 font-semibold' : 'text-gray-700 font-semibold';
+  const getLoopsColor = (v: number): string => v < 0 ? 'text-green-700 font-semibold' : v > 0 ? 'text-red-700 font-semibold' : 'text-gray-700 font-semibold';
+  const getComplexityColor = (orig: number, conv: number): string => conv < orig ? 'text-green-700 font-semibold' : conv > orig ? 'text-red-700 font-semibold' : 'text-gray-700 font-semibold';
 
   return (
     <>
@@ -760,11 +760,13 @@ This appears to be Oracle PL/SQL code that has been converted from Sybase.
       {/* Comments Section - Only show in dev review mode */}
       {!hideEdit && (
         <div className="mt-6">
-          <CommentsSection 
-            fileId={file.id}
-            fileName={file.name}
-            isDevReview={true}
-          />
+          <React.Suspense fallback={<div>Loading comments...</div>}>
+            <CommentsSection 
+              fileId={file.id}
+              fileName={file.name}
+              isDevReview={true}
+            />
+          </React.Suspense>
         </div>
       )}
 

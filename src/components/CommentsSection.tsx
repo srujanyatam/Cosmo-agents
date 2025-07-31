@@ -43,15 +43,18 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
 
   // Load comments on component mount
   useEffect(() => {
+    console.log('CommentsSection: Loading comments for fileId:', fileId);
     loadComments();
   }, [fileId, loadComments]);
 
   const loadComments = React.useCallback(async () => {
     try {
+      console.log('CommentsSection: loadComments called for fileId:', fileId);
       const fileComments = await commentUtils.getCommentsForFile(fileId);
+      console.log('CommentsSection: Comments loaded:', fileComments);
       setComments(fileComments);
     } catch (error) {
-      console.error('Error loading comments:', error);
+      console.error('CommentsSection: Error loading comments:', error);
     }
   }, [fileId]);
 

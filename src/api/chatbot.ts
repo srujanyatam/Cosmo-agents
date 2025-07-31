@@ -19,6 +19,9 @@ export interface ChatbotAPIResponse {
 
 export const sendChatMessage = async (request: ChatbotRequest): Promise<ChatbotResponse> => {
   try {
+    console.log('Sending request to:', `${API_BASE_URL}/chatbot`);
+    console.log('Request payload:', request);
+    
     const response = await fetch(`${API_BASE_URL}/chatbot`, {
       method: 'POST',
       headers: {
@@ -27,11 +30,17 @@ export const sendChatMessage = async (request: ChatbotRequest): Promise<ChatbotR
       body: JSON.stringify(request),
     });
 
+    console.log('Response status:', response.status);
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorText = await response.text();
+      console.error('Error response body:', errorText);
+      throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
     }
 
     const data: ChatbotAPIResponse = await response.json();
+    console.log('Response data:', data);
 
     const assistantMessage: ChatMessage = {
       id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,

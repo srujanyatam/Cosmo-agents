@@ -139,15 +139,62 @@ function generateSuggestions(intent) {
 }
 
 exports.handler = async function(event, context) {
+  // Add CORS headers for browser requests
+  const headers = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS'
+  };
+
+  // Handle preflight requests
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
+
+  // Add a simple GET endpoint for testing
+  if (event.httpMethod === 'GET') {
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        message: 'Chatbot function is running!',
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        hasOpenRouterKey: !!OPENROUTER_API_KEY,
+        hasGoogleKey: !!GOOGLE_API_KEY
+      })
+    };
+  }
+
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
+    return { 
+      statusCode: 405, 
+      headers,
+      body: JSON.stringify({ error: 'Method not allowed' }) 
+    };
+  }
+
+  // Check if API keys are configured
+  if (!OPENROUTER_API_KEY && !GOOGLE_API_KEY) {
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ 
+        error: 'API keys not configured. Please set OPENROUTER_API_KEY or GOOGLE_API_KEY environment variables in Netlify.' 
+      })
+    };
   }
 
   try {
     const { message, conversationHistory = [], model = 'qwen' } = JSON.parse(event.body);
     
     if (!message) {
-      return { statusCode: 400, body: JSON.stringify({ error: 'Missing message' }) };
+      return { 
+        statusCode: 400, 
+        headers,
+        body: JSON.stringify({ error: 'Missing message' }) 
+      };
     }
 
     // Extract intent from user message
@@ -176,6 +223,7 @@ exports.handler = async function(event, context) {
 
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify({
         message: response,
         intent: intent,
@@ -188,6 +236,7 @@ exports.handler = async function(event, context) {
     console.error('Chatbot error:', error);
     return {
       statusCode: 500,
+      headers,
       body: JSON.stringify({
         error: 'Failed to process message',
         details: error.message

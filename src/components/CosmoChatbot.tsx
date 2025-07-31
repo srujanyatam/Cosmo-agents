@@ -11,7 +11,9 @@ import {
   Clock,
   Star,
   Zap,
-  Minimize2
+  Minimize2,
+  Copy,
+  Check
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,14 +27,13 @@ const getSimulatedResponse = (userMessage: string): string => {
   // React questions
   if (message.includes('react')) {
     if (message.includes('hook') || message.includes('use')) {
-      return `React Hooks are functions that allow you to use state and other React features in functional components. The most common hooks are:
+      return `**React Hooks** are functions for functional components:
 
-• **useState** - Manages component state
-• **useEffect** - Handles side effects and lifecycle
-• **useContext** - Accesses React context
-• **useRef** - Creates mutable references
+• **useState** - Component state
+• **useEffect** - Side effects & lifecycle
+• **useContext** - React context access
+• **useRef** - Mutable references
 
-Example:
 \`\`\`jsx
 const [count, setCount] = useState(0);
 useEffect(() => {
@@ -40,32 +41,32 @@ useEffect(() => {
 }, [count]);
 \`\`\`
 
-In your Cosmo Agents project, we use hooks extensively for state management, authentication, and UI interactions.`;
+Used extensively in your project for state management and UI interactions.`;
     }
-    return `React.js is a JavaScript library for building user interfaces. In your Cosmo Agents project, we use React 18.3.1 with TypeScript for:
+    return `**React.js** - JavaScript library for building UIs.
 
-• **Component Architecture** - Reusable UI components
-• **State Management** - Managing application state
-• **Routing** - Navigation with React Router DOM
-• **Forms** - Form handling with React Hook Form
+**Key Features in Your Project:**
+• Component architecture with TypeScript
+• State management with hooks
+• Routing with React Router DOM
+• Styling with Tailwind CSS + shadcn/ui
 
-Key features used in your project:
+**Project Setup:**
+- React 18.3.1 with TypeScript
 - Functional components with hooks
-- TypeScript for type safety
-- Tailwind CSS for styling
-- shadcn/ui component library`;
+- Type-safe development`;
   }
   
   // TypeScript questions
   if (message.includes('typescript')) {
-    return `TypeScript is a superset of JavaScript that adds static typing. In your Cosmo Agents project, we use TypeScript 5.8.3 for:
+    return `**TypeScript** - JavaScript with static typing.
 
-• **Type Safety** - Catch errors at compile time
-• **Better IDE Support** - IntelliSense and autocomplete
-• **Interface Definitions** - Define data structures
-• **Generic Types** - Reusable type definitions
+**Benefits in Your Project:**
+• Type safety at compile time
+• Better IDE support & IntelliSense
+• Interface definitions for data structures
+• Safer refactoring
 
-Example from your project:
 \`\`\`typescript
 interface Message {
   id: string;
@@ -75,29 +76,26 @@ interface Message {
 }
 \`\`\`
 
-Benefits in your project:
-- Prevents runtime errors
-- Better code documentation
-- Enhanced developer experience
-- Safer refactoring`;
+**Version:** TypeScript 5.8.3`;
   }
   
   // Supabase questions
   if (message.includes('supabase')) {
-    return `Supabase is an open-source Firebase alternative that provides:
+    return `**Supabase** - Open-source Firebase alternative.
 
-• **Database** - PostgreSQL database with real-time subscriptions
-• **Authentication** - User auth with multiple providers
-• **Real-time** - Live data updates across clients
-• **Storage** - File storage and management
+**Core Features:**
+• PostgreSQL database with real-time
+• Authentication with multiple providers
+• File storage and management
+• Row-level security (RLS)
 
-In your Cosmo Agents project, Supabase is used for:
+**In Your Project:**
 - User authentication (sign up/login)
-- Database storage for conversion logs
-- Real-time updates for deployment status
-- File management and storage
+- Database for conversion logs
+- Real-time deployment updates
+- File management
 
-Configuration:
+**Configuration:**
 - Project URL: \`VITE_SUPABASE_URL\`
 - Anonymous Key: \`VITE_SUPABASE_ANON_KEY\`
 - Real-time subscriptions for live updates`;
@@ -482,32 +480,49 @@ const CosmoChatbot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  // Copy message to clipboard
+  const copyMessage = async (content: string, messageId: string) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedMessageId(messageId);
+      toast({
+        title: 'Copied!',
+        description: 'Message copied to clipboard.',
+      });
+      setTimeout(() => setCopiedMessageId(null), 2000);
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to copy message.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  // Auto-scroll to bottom when new messages are added
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   // Initialize with welcome message on component mount - fresh start every time
   useEffect(() => {
     const welcomeMessage: Message = {
       id: Date.now().toString(),
       role: 'assistant',
-      content: `👋 **Welcome to Cosmo Agents!** 
+      content: `👋 **Hi! I'm your AI assistant.**
 
-I'm your AI assistant specializing in all the technologies used in this website. I can help you with:
+I can help with React, TypeScript, Supabase, and all technologies used in this project.
 
-**🛠️ Technologies I know:**
-• React.js, TypeScript, Vite, Tailwind CSS
-• Supabase, PostgreSQL, Netlify Functions
-• Google Generative AI, LangChain
-• Git, GitHub, Oracle, Sybase, Python
-• And much more!
-
-**💡 What I can do:**
-• Answer questions about any technology
-• Explain code concepts and best practices
-• Help with debugging and troubleshooting
-• Provide guidance on features and implementation
-
-Just ask me anything! 🚀`,
+Ask me anything! 🚀`,
       timestamp: new Date(),
     };
     setMessages([welcomeMessage]);
@@ -791,8 +806,8 @@ Just ask me anything! 🚀`,
 
           {/* Messages Area */}
           <div className="flex-1 h-[250px] sm:h-[320px] md:h-[360px] lg:h-[380px] xl:h-[400px] overflow-y-auto p-2 sm:p-3 md:p-4 bg-white">
-            {/* Quick Actions */}
-            <div className="flex items-center justify-between mt-2">
+                        {/* Quick Actions */}
+            <div className="flex items-center justify-between mt-2 mb-3">
               <div className="flex items-center gap-2">
                 <Button
                   onClick={startNewChat}
@@ -803,20 +818,58 @@ Just ask me anything! 🚀`,
                   <Plus className="h-3 w-3 mr-1" />
                   New Chat
                 </Button>
-                                 <Button
-                   onClick={startNewMigration}
-                   variant="ghost"
-                   size="sm"
-                   className="text-xs text-green-600 hover:text-green-700 hover:bg-green-100 h-6 px-2"
-                 >
-                   <Zap className="h-3 w-3 mr-1" />
-                   Start New Migration
-                 </Button>
+                <Button
+                  onClick={startNewMigration}
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs text-green-600 hover:text-green-700 hover:bg-green-100 h-6 px-2"
+                >
+                  <Zap className="h-3 w-3 mr-1" />
+                  Migration
+                </Button>
               </div>
               <div className="text-xs text-gray-500">
                 {messages.length} messages
               </div>
             </div>
+            
+            {/* Quick Question Buttons */}
+            {messages.length === 1 && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                <Button
+                  onClick={() => setInputMessage("How do I use React hooks?")}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs h-7 px-2"
+                >
+                  React Hooks
+                </Button>
+                <Button
+                  onClick={() => setInputMessage("Explain TypeScript")}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs h-7 px-2"
+                >
+                  TypeScript
+                </Button>
+                <Button
+                  onClick={() => setInputMessage("How to use Supabase?")}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs h-7 px-2"
+                >
+                  Supabase
+                </Button>
+                <Button
+                  onClick={() => setInputMessage("Code conversion features")}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs h-7 px-2"
+                >
+                  Code Conversion
+                </Button>
+              </div>
+            )}
             {messages.length === 0 ? (
               // Enhanced Welcome Message
               <div className="text-center py-6 sm:py-8">
@@ -903,17 +956,48 @@ Just ask me anything! 🚀`,
                       <div 
                         className={`${
                           message.role === 'assistant' ? 'chatbot-message' : ''
-                        }`}
+                        } prose prose-sm max-w-none`}
+                        style={{
+                          lineHeight: '1.5',
+                          fontSize: '14px'
+                        }}
                       >
                         {message.content}
+                      </div>
+                      <div className="flex items-center justify-between mt-1">
+                        <div className="text-xs text-gray-400">
+                          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                        {message.role === 'assistant' && (
+                          <Button
+                            onClick={() => copyMessage(message.content, message.id)}
+                            variant="ghost"
+                            size="sm"
+                            className="h-5 w-5 p-0 text-gray-400 hover:text-gray-600"
+                          >
+                            {copiedMessageId === message.id ? (
+                              <Check className="h-3 w-3" />
+                            ) : (
+                              <Copy className="h-3 w-3" />
+                            )}
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
                 ))}
+                <div ref={messagesEndRef} />
                 {isLoading && (
                   <div className="flex justify-start">
                     <div className="max-w-[85%] rounded-2xl px-2 py-1.5 sm:px-3 sm:py-2 md:px-4 md:py-3 bg-white text-gray-800 border-2 border-blue-200 shadow-sm">
-                      <p>Thinking...</p>
+                      <div className="flex items-center gap-2">
+                        <div className="flex space-x-1">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                          <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                        </div>
+                        <span className="text-sm text-gray-600">AI is thinking...</span>
+                      </div>
                     </div>
                   </div>
                 )}

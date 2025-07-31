@@ -1,8 +1,8 @@
 import { ChatMessage, ChatbotResponse } from '@/types/chatbot';
 
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? '/.netlify/functions' 
-  : 'http://localhost:8888/.netlify/functions';
+const API_BASE_URL = window.location.hostname === 'localhost' 
+  ? 'http://localhost:8888/.netlify/functions' 
+  : '/.netlify/functions';
 
 export interface ChatbotRequest {
   message: string;

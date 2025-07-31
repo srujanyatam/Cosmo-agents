@@ -36,6 +36,9 @@ async function callOpenRouterAPI(messages, model = 'qwen/qwen3-coder:free') {
     });
 
     if (!response.ok) {
+      if (response.status === 429) {
+        throw new Error(`OpenRouter API rate limited (429). Please try again in a few minutes or upgrade your plan.`);
+      }
       throw new Error(`OpenRouter API error: ${response.status}`);
     }
 
@@ -212,10 +215,20 @@ exports.handler = async function(event, context) {
 
     // Call appropriate API based on model preference
     let response;
-    if (model === 'gemini' && GOOGLE_API_KEY) {
-      response = await callGeminiAPI(messages);
-    } else {
-      response = await callOpenRouterAPI(messages);
+    try {
+      if (model === 'gemini' && GOOGLE_API_KEY) {
+        response = await callGeminiAPI(messages);
+      } else {
+        response = await callOpenRouterAPI(messages);
+      }
+    } catch (error) {
+      // If OpenRouter fails (rate limit), try Gemini as fallback
+      if (error.message.includes('429') && GOOGLE_API_KEY) {
+        console.log('OpenRouter rate limited, falling back to Gemini');
+        response = await callGeminiAPI(messages);
+      } else {
+        throw error;
+      }
     }
 
     // Generate contextual suggestions

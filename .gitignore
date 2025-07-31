@@ -26,3 +26,18 @@ dist-ssr
 
 # Temporary fix files
 fix_*.sql
+
+# Build outputs
+dist/
+build/
+
+# Lock files (keep only the one you're using)
+bun.lockb
+yarn.lock
+pnpm-lock.yaml
+
+# Environment files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

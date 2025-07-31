@@ -41,12 +41,6 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  // Load comments on component mount
-  useEffect(() => {
-    console.log('CommentsSection: Loading comments for fileId:', fileId);
-    loadComments();
-  }, [fileId, loadComments]);
-
   const loadComments = React.useCallback(async () => {
     try {
       console.log('CommentsSection: loadComments called for fileId:', fileId);
@@ -57,6 +51,12 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
       console.error('CommentsSection: Error loading comments:', error);
     }
   }, [fileId]);
+
+  // Load comments on component mount
+  useEffect(() => {
+    console.log('CommentsSection: Loading comments for fileId:', fileId);
+    loadComments();
+  }, [fileId, loadComments]);
 
   const handleAddComment = async () => {
     if (!newComment.trim()) {

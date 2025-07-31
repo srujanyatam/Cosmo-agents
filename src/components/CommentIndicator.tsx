@@ -26,10 +26,6 @@ const CommentIndicator: React.FC<CommentIndicatorProps> = ({ fileId, fileName })
   const [isAddingComment, setIsAddingComment] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    loadComments();
-  }, [fileId, loadComments]);
-
   const loadComments = React.useCallback(async () => {
     try {
       setIsLoading(true);
@@ -41,6 +37,10 @@ const CommentIndicator: React.FC<CommentIndicatorProps> = ({ fileId, fileName })
       setIsLoading(false);
     }
   }, [fileId]);
+
+  useEffect(() => {
+    loadComments();
+  }, [fileId, loadComments]);
 
   const handleEditComment = (comment: ConversionComment) => {
     setEditingCommentId(comment.id);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -145,7 +145,7 @@ const DevReviewPanel: React.FC<DevReviewPanelProps> = ({
   const reviewedProcedures = mappedReviewedFiles.filter(f => f.type === 'procedure');
   const reviewedTriggers = mappedReviewedFiles.filter(f => f.type === 'trigger');
   const reviewedOther = mappedReviewedFiles.filter(f => f.type === 'other');
-  const allFilteredFiles = [
+  const allFilteredFiles = useMemo(() => [
     ...filteredTables,
     ...filteredProcedures,
     ...filteredTriggers,
@@ -154,7 +154,7 @@ const DevReviewPanel: React.FC<DevReviewPanelProps> = ({
     ...reviewedProcedures,
     ...reviewedTriggers,
     ...reviewedOther
-  ];
+  ], [filteredTables, filteredProcedures, filteredTriggers, filteredOther, reviewedTables, reviewedProcedures, reviewedTriggers, reviewedOther]);
   const currentIndex = allFilteredFiles.findIndex(f => f.id === selectedFileId);
   const hasPrev = currentIndex > 0;
   const hasNext = currentIndex >= 0 && currentIndex < allFilteredFiles.length - 1;

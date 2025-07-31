@@ -35,6 +35,15 @@ export interface ChatbotContext {
   isLoading: boolean;
   error: string | null;
   config: ChatbotConfig;
+  createConversation: (title: string) => void;
+  setCurrentConversation: (conversation: ChatConversation | null) => void;
+  addMessage: (conversationId: string, message: ChatMessage) => void;
+  updateConversationTitle: (conversationId: string, title: string) => void;
+  deleteConversation: (conversationId: string) => void;
+  clearConversation: (conversationId: string) => void;
+  updateConfig: (config: Partial<ChatbotConfig>) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
 }
 
 export interface ChatbotResponse {

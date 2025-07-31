@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
+const GOOGLE_API_KEY = process.env.VITE_GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 
 const SYSTEM_PROMPT = `You are an expert Oracle database migration assistant specializing in Sybase to Oracle conversions. You help users with:
 
@@ -181,7 +181,7 @@ exports.handler = async function(event, context) {
       statusCode: 500,
       headers,
       body: JSON.stringify({ 
-        error: 'API keys not configured. Please set OPENROUTER_API_KEY or GOOGLE_API_KEY environment variables in Netlify.' 
+        error: 'API keys not configured. Please set OPENROUTER_API_KEY or VITE_GEMINI_API_KEY environment variables in Netlify.' 
       })
     };
   }

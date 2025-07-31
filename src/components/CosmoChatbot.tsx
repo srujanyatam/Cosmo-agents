@@ -239,25 +239,53 @@ const CosmoChatbot = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  // Load chat history from localStorage on component mount
+  // Initialize with welcome message on component mount - fresh start every time
   useEffect(() => {
-    const savedHistory = localStorage.getItem('cosmo-chatbot-history');
-    if (savedHistory) {
-      try {
-        const parsedHistory = JSON.parse(savedHistory);
-        setMessages(parsedHistory);
-      } catch (error) {
-        console.error('Error loading chat history:', error);
-      }
-    }
-  }, []);
+    const welcomeMessage: Message = {
+      id: Date.now().toString(),
+      role: 'assistant',
+      content: `👋 **Welcome to Cosmo Agents!** 
 
-  // Save messages to localStorage whenever messages change
-  useEffect(() => {
-    if (messages.length > 0) {
-      localStorage.setItem('cosmo-chatbot-history', JSON.stringify(messages));
-    }
-  }, [messages]);
+I'm your AI assistant specializing in all the technologies used in this website. I can help you with:
+
+**🛠️ Technologies I know:**
+• React.js, TypeScript, Vite, Tailwind CSS
+• Supabase, PostgreSQL, Netlify Functions
+• Google Generative AI, LangChain
+• Git, GitHub, Oracle, Sybase, Python
+• And much more!
+
+**💡 What I can do:**
+• Answer questions about any technology
+• Explain code concepts and best practices
+• Help with debugging and troubleshooting
+• Provide guidance on features and implementation
+
+Just ask me anything! 🚀`,
+      timestamp: new Date(),
+    };
+    setMessages([welcomeMessage]);
+  }, []); // Empty dependency array means this runs only once on mount
+
+  // Remove localStorage persistence - no longer needed for fresh start
+  // useEffect(() => {
+  //   const savedHistory = localStorage.getItem('cosmo-chatbot-history');
+  //   if (savedHistory) {
+  //     try {
+  //       const parsedHistory = JSON.parse(savedHistory);
+  //       setMessages(parsedHistory);
+  //     } catch (error) {
+  //       console.error('Error loading chat history:', error);
+  //     }
+  //   }
+  // }, []);
+
+  // Remove localStorage saving - no longer needed
+  // useEffect(() => {
+  //   if (messages.length > 0) {
+  //     localStorage.setItem('cosmo-chatbot-history', JSON.stringify(messages));
+  //   }
+  // }, [messages]);
 
   const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
@@ -377,8 +405,30 @@ What would you like to know about?`;
   };
 
   const startNewChat = () => {
-    setMessages([]);
-    localStorage.removeItem('cosmo-chatbot-history');
+    const welcomeMessage: Message = {
+      id: Date.now().toString(),
+      role: 'assistant',
+      content: `👋 **Welcome to Cosmo Agents!** 
+
+I'm your AI assistant specializing in all the technologies used in this website. I can help you with:
+
+**🛠️ Technologies I know:**
+• React.js, TypeScript, Vite, Tailwind CSS
+• Supabase, PostgreSQL, Netlify Functions
+• Google Generative AI, LangChain
+• Git, GitHub, Oracle, Sybase, Python
+• And much more!
+
+**💡 What I can do:**
+• Answer questions about any technology
+• Explain code concepts and best practices
+• Help with debugging and troubleshooting
+• Provide guidance on features and implementation
+
+Just ask me anything! 🚀`,
+      timestamp: new Date(),
+    };
+    setMessages([welcomeMessage]);
     toast({
       title: 'New Chat Started',
       description: 'A fresh conversation has begun.',
@@ -400,8 +450,30 @@ What would you like to know about?`;
 
   // Add a function to clear chat history (refresh)
   const refreshChat = () => {
-    setMessages([]);
-    localStorage.removeItem('cosmo-chatbot-history');
+    const welcomeMessage: Message = {
+      id: Date.now().toString(),
+      role: 'assistant',
+      content: `👋 **Welcome to Cosmo Agents!** 
+
+I'm your AI assistant specializing in all the technologies used in this website. I can help you with:
+
+**🛠️ Technologies I know:**
+• React.js, TypeScript, Vite, Tailwind CSS
+• Supabase, PostgreSQL, Netlify Functions
+• Google Generative AI, LangChain
+• Git, GitHub, Oracle, Sybase, Python
+• And much more!
+
+**💡 What I can do:**
+• Answer questions about any technology
+• Explain code concepts and best practices
+• Help with debugging and troubleshooting
+• Provide guidance on features and implementation
+
+Just ask me anything! 🚀`,
+      timestamp: new Date(),
+    };
+    setMessages([welcomeMessage]);
     toast({
       title: 'Chat Refreshed',
       description: 'Chat history has been cleared.',
@@ -419,7 +491,6 @@ What would you like to know about?`;
         timestamp: new Date(),
       },
     ]);
-    localStorage.removeItem('cosmo-chatbot-history');
     toast({
       title: 'New Migration',
       description: 'A new migration session has started.',

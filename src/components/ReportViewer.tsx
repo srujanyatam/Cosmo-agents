@@ -239,9 +239,36 @@ const ReportViewer: React.FC<ReportViewerProps> = ({ report, onBack }) => {
         .select()
         .single();
       if (!migrationError && migration) {
-        await supabase.from('migration_files').insert(
-          filesToInsert.map(f => ({ ...f, migration_id: migration.id }))
-        );
+        // Insert files into migration_files and get their new IDs
+        const { data: insertedFiles, error: insertError } = await supabase
+          .from('migration_files')
+          .insert(
+            filesToInsert.map(f => ({ ...f, migration_id: migration.id }))
+          )
+          .select('id, file_name');
+
+        if (insertError) {
+          console.error('Error inserting migration files:', insertError);
+          throw insertError;
+        }
+
+        // Update comments to point to the new migration file IDs
+        if (insertedFiles && insertedFiles.length > 0) {
+          for (const newFile of insertedFiles) {
+            // Find the corresponding unreviewed file to get its ID
+            const unreviewedFile = latestFiles.find(f => f.file_name === newFile.file_name);
+            if (unreviewedFile) {
+              // Update comments from the old unreviewed file ID to the new migration file ID
+              await supabase
+                .from('conversion_comments')
+                .update({ file_id: newFile.id })
+                .eq('file_name', newFile.file_name)
+                .eq('user_id', user.id);
+            }
+          }
+        }
+
+        // Delete the unreviewed files after comments are updated
         await supabase.from('unreviewed_files').delete().eq('user_id', user.id).eq('status', 'reviewed');
       }
       const logEntry = await saveDeploymentLog(

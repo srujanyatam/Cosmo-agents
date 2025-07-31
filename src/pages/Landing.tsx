@@ -74,140 +74,153 @@ const Landing = () => {
       {showHelp && <Help onClose={() => setShowHelp(false)} />}
 
       {/* Hero Section */}
-      <section className="py-16 px-4">
+      <section className="py-20 px-4">
         <div className="container mx-auto text-center">
-          <div className="max-w-3xl mx-auto">
-            {/* Animated Logo */}
-            <div className="mb-8 flex justify-center">
-              <div className="relative">
-                <Database className="h-20 w-20 text-primary animate-pulse" />
-                <div className="absolute -top-2 -right-2">
-                  <Zap className="h-8 w-8 text-yellow-500 animate-bounce" />
-                </div>
-              </div>
-            </div>
-            
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                AI-Powered
-              </span>
-              <br />
-              Database Migration
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-5xl font-bold text-gray-900 mb-6 leading-tight">
+              Migrate Your Sybase Database to Oracle with{' '}
+              <span className="text-primary">AI-Powered Precision</span>
             </h2>
-            
-            <p className="text-lg text-gray-600 mb-8">
-              Transform Sybase to Oracle with precision and speed
+            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+              Transform your legacy Sybase applications to modern Oracle infrastructure 
+              with intelligent code conversion, automated testing, and seamless deployment.
             </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <Button 
                 onClick={handleGetStarted}
                 size="lg" 
-                className="text-lg px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="text-lg px-8 py-4"
               >
                 Start Migration
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              
-              {user && (
-                <Button 
-                  onClick={handleGoToHistory}
-                  variant="outline"
-                  size="lg" 
-                  className="text-lg px-8 py-4"
-                >
-                  <History className="mr-2 h-5 w-5" />
-                  View History
-                </Button>
-              )}
             </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-12 px-4 bg-white">
+      <section className="py-16 px-4 bg-white">
         <div className="container mx-auto">
-          <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">
-              Key Features
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">
+              Why Choose Our Migration Platform?
             </h3>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Leverage cutting-edge AI technology to ensure accurate, efficient, and reliable database migration
+            </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="hover:shadow-lg transition-shadow text-center">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <Card className="hover:shadow-lg transition-shadow">
               <CardHeader>
-                <div className="flex justify-center mb-2">
+                <div className="flex items-center gap-3">
                   <Zap className="h-8 w-8 text-primary" />
+                  <CardTitle>AI-Powered Conversion</CardTitle>
                 </div>
-                <CardTitle className="text-lg">AI Conversion</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription>
-                  Smart Sybase to Oracle conversion
+                <CardDescription className="text-base">
+                  Advanced AI models automatically convert Sybase SQL to Oracle PL/SQL 
+                  with high accuracy and intelligent error detection.
                 </CardDescription>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow text-center">
+            <Card className="hover:shadow-lg transition-shadow">
               <CardHeader>
-                <div className="flex justify-center mb-2">
+                <div className="flex items-center gap-3">
                   <FileText className="h-8 w-8 text-primary" />
+                  <CardTitle>Comprehensive Analysis</CardTitle>
                 </div>
-                <CardTitle className="text-lg">Analysis</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription>
-                  Detailed performance reports
+                <CardDescription className="text-base">
+                  Detailed reports on data type mappings, performance improvements, 
+                  and potential issues with suggested fixes.
                 </CardDescription>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow text-center">
+            <Card className="hover:shadow-lg transition-shadow">
               <CardHeader>
-                <div className="flex justify-center mb-2">
+                <div className="flex items-center gap-3">
                   <Shield className="h-8 w-8 text-primary" />
+                  <CardTitle>Secure & Reliable</CardTitle>
                 </div>
-                <CardTitle className="text-lg">Secure</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription>
-                  Enterprise-grade security
+                <CardDescription className="text-base">
+                  Enterprise-grade security with user isolation, encrypted data handling, 
+                  and comprehensive audit trails.
                 </CardDescription>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow text-center">
+            <Card className="hover:shadow-lg transition-shadow">
               <CardHeader>
-                <div className="flex justify-center mb-2">
+                <div className="flex items-center gap-3">
                   <Clock className="h-8 w-8 text-primary" />
+                  <CardTitle>Faster Migration</CardTitle>
                 </div>
-                <CardTitle className="text-lg">Fast</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription>
-                  Weeks instead of months
+                <CardDescription className="text-base">
+                  Reduce migration time from months to weeks with automated conversion 
+                  and intelligent code optimization.
                 </CardDescription>
               </CardContent>
             </Card>
 
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <Users className="h-8 w-8 text-primary" />
+                  <CardTitle>Team Collaboration</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base">
+                  Multi-user support with project sharing, version control, 
+                  and collaborative review processes.
+                </CardDescription>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <Database className="h-8 w-8 text-primary" />
+                  <CardTitle>Direct Deployment</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base">
+                  Seamless deployment to Oracle databases with automated testing 
+                  and rollback capabilities.
+                </CardDescription>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-12 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+      <section className="py-16 px-4 bg-primary text-white">
         <div className="container mx-auto text-center">
-          <h3 className="text-2xl font-bold mb-4">
-            Ready to Start?
+          <h3 className="text-3xl font-bold mb-4">
+            Ready to Transform Your Database?
           </h3>
+          <p className="text-xl mb-8 opacity-90">
+            Join thousands of developers who have successfully migrated to Oracle
+          </p>
           <Button 
             onClick={handleGetStarted}
             size="lg" 
             variant="secondary"
             className="text-lg px-8 py-4"
           >
-            Begin Migration
+            Start Your Migration Today
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>

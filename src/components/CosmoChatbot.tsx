@@ -422,49 +422,109 @@ DELETE FROM logs WHERE created_at < '2024-01-01';
 - Only you can see your comments
 - Comments are linked to specific file conversions`;
   }
+
+  // General programming questions
+  if (message.includes('programming') || message.includes('coding') || message.includes('development')) {
+    return `**💻 Programming & Development:**
+
+**🎯 What is Programming?**
+Programming is the process of creating instructions for computers to follow. It involves writing code in programming languages to solve problems and build applications.
+
+**✨ Key Concepts:**
+• **Algorithms** - Step-by-step problem-solving procedures
+• **Data Structures** - Ways to organize and store data
+• **Logic** - Making decisions and controlling program flow
+• **Debugging** - Finding and fixing errors in code
+
+**🔧 Popular Programming Languages:**
+• **Python** - Great for beginners, data science, AI
+• **JavaScript** - Web development, frontend and backend
+• **Java** - Enterprise applications, Android development
+• **C++** - System programming, game development
+• **C#** - Windows applications, game development with Unity
+
+**💡 Getting Started:**
+1. Choose a language based on your goals
+2. Learn basic syntax and concepts
+3. Practice with small projects
+4. Build a portfolio of work
+5. Join coding communities
+
+**🚀 Best Practices:**
+- Write clean, readable code
+- Use meaningful variable names
+- Comment your code
+- Test thoroughly
+- Keep learning and practicing`;
+  }
+
+  // General technology questions
+  if (message.includes('technology') || message.includes('tech') || message.includes('software')) {
+    return `**🔧 Technology & Software:**
+
+**🎯 What is Technology?**
+Technology refers to tools, systems, and methods used to solve problems and improve human life. In software, it includes programming languages, frameworks, and tools.
+
+**✨ Key Areas:**
+• **Web Development** - Building websites and web applications
+• **Mobile Development** - Creating apps for smartphones
+• **Data Science** - Analyzing and interpreting data
+• **Artificial Intelligence** - Creating intelligent systems
+• **Cloud Computing** - Using remote servers and services
+
+**🔧 Modern Tech Stack:**
+• **Frontend** - React, Vue, Angular (user interfaces)
+• **Backend** - Node.js, Python, Java (server-side logic)
+• **Databases** - MySQL, PostgreSQL, MongoDB (data storage)
+• **Cloud** - AWS, Google Cloud, Azure (hosting and services)
+
+**💡 Learning Path:**
+1. Start with fundamentals (HTML, CSS, JavaScript)
+2. Learn a framework (React, Vue, etc.)
+3. Explore backend development
+4. Understand databases and APIs
+5. Learn about DevOps and deployment
+
+**🚀 Industry Trends:**
+- Artificial Intelligence and Machine Learning
+- Cloud-native applications
+- Mobile-first development
+- Cybersecurity and privacy
+- Sustainable technology`;
+  }
   
   // Default response
-  return `I'm Cosmo Agents, your AI assistant for all technologies used in this platform! 🚀
+  return `I'm Cosmo Agents, your AI assistant! 🚀
 
-**🛠️ Technologies I can help you with:**
+I can help you with any programming, technology, or general questions you might have. Feel free to ask me about:
 
-**Frontend Development:**
-• React.js (v18.3.1) - Components, hooks, state management
-• TypeScript (v5.8.3) - Type safety, interfaces, generics
-• Vite (v5.4.1) - Build tool, development server, optimization
-• Tailwind CSS (v3.4.11) - Utility-first CSS, responsive design
-• shadcn/ui - Component library, accessible UI components
+**Programming & Development:**
+• Any programming language (Python, JavaScript, Java, C++, etc.)
+• Web development frameworks and libraries
+• Database technologies and SQL
+• Cloud platforms and services
+• DevOps and deployment strategies
 
-**Backend & Database:**
-• Supabase (v2.50.2) - PostgreSQL database, authentication, real-time
-• Netlify Functions - Serverless backend, API endpoints
-• PostgreSQL - Database engine, SQL queries, performance
+**Technology & Tools:**
+• Software development methodologies
+• Best practices and design patterns
+• Debugging and troubleshooting
+• Performance optimization
+• Security best practices
 
-**AI & Machine Learning:**
-• Google Generative AI - Gemini models, AI-powered features
-• LangChain (v0.3.66) - AI/ML integration, prompt engineering
-• OpenRouter - Multiple AI model access
+**General Questions:**
+• Technology concepts and explanations
+• Learning resources and tutorials
+• Industry trends and insights
+• Problem-solving approaches
 
-**Development Tools:**
-• Git & GitHub - Version control, collaboration
-• Docker - Containerization, deployment
-• ESLint - Code quality, linting
-• React Query - Server state management
+**Project-Specific Help:**
+• React, TypeScript, and modern web development
+• Database migration and conversion
+• AI/ML integration and implementation
+• Code analysis and optimization
 
-**Database Technologies:**
-• Oracle Database - Enterprise database, PL/SQL
-• Sybase Database - Legacy database system
-• SQL - Standard query language
-
-**Ask me about:**
-- How to use React hooks and components
-- TypeScript type safety and interfaces
-- Supabase authentication and database setup
-- Code conversion and migration strategies
-- Any programming language or framework
-- Best practices and optimization techniques
-
-What would you like to know about? 💡`;
+What would you like to know about? I'm here to help with anything! 💡`;
 };
 
 interface Message {

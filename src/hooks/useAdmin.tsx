@@ -222,57 +222,53 @@ export const useAdmin = () => {
   };
 
   const getMigrationStats = async (): Promise<MigrationStats> => {
-    const { data: migrations } = await supabase
-      .from('migrations')
-      .select('id');
+    try {
+      // Get total users
+      const { count: totalUsers } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true });
 
-    const { data: files } = await supabase
-      .from('migration_files')
-      .select('conversion_status');
+      // Get total migrations
+      const { count: totalMigrations } = await supabase
+        .from('migrations')
+        .select('*', { count: 'exact', head: true });
 
-    const { data: users } = await supabase
-      .from('profiles')
-      .select('created_at');
+      // Get total files
+      const { count: totalFiles } = await supabase
+        .from('migration_files')
+        .select('*', { count: 'exact', head: true });
 
-    const totalMigrations = migrations?.length || 0;
-    const totalFiles = files?.length || 0;
-    const successfulConversions = files?.filter(f => f.conversion_status === 'success').length || 0;
-    const failedConversions = files?.filter(f => f.conversion_status === 'failed').length || 0;
-    const pendingConversions = files?.filter(f => f.conversion_status === 'pending').length || 0;
-    const totalUsers = users?.length || 0;
+      // Get successful conversions
+      const { count: successfulConversions } = await supabase
+        .from('migration_files')
+        .select('*', { count: 'exact', head: true })
+        .eq('conversion_status', 'success');
 
-    const today = new Date();
-    const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+      // Get active users today (users who created migrations today)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const { count: activeUsersToday } = await supabase
+        .from('migrations')
+        .select('user_id', { count: 'exact', head: true })
+        .gte('created_at', today.toISOString());
 
-    const activeUsersToday = users?.filter(u => new Date(u.created_at) >= today).length || 0;
-    const activeUsersWeek = users?.filter(u => new Date(u.created_at) >= weekAgo).length || 0;
-    const activeUsersMonth = users?.filter(u => new Date(u.created_at) >= monthAgo).length || 0;
-
-    return {
-      total_migrations: totalMigrations,
-      total_files: totalFiles,
-      successful_conversions: successfulConversions,
-      failed_conversions: failedConversions,
-      pending_conversions: pendingConversions,
-      total_users: totalUsers,
-      active_users_today: activeUsersToday,
-      active_users_week: activeUsersWeek,
-      active_users_month: activeUsersMonth,
-    };
-  };
-
-  const getSystemMetrics = async (): Promise<SystemMetrics> => {
-    // Mock system metrics - in a real implementation, these would come from your server
-    return {
-      cpu_usage: Math.random() * 100,
-      memory_usage: Math.random() * 100,
-      disk_usage: Math.random() * 100,
-      active_conversions: Math.floor(Math.random() * 10),
-      queue_length: Math.floor(Math.random() * 50),
-      cache_hit_rate: Math.random() * 100,
-      average_response_time: Math.random() * 2000,
-    };
+      return {
+        total_users: totalUsers || 0,
+        total_migrations: totalMigrations || 0,
+        total_files: totalFiles || 0,
+        successful_conversions: successfulConversions || 0,
+        active_users_today: activeUsersToday || 0,
+      };
+    } catch (error) {
+      console.error('Error fetching migration stats:', error);
+      return {
+        total_users: 0,
+        total_migrations: 0,
+        total_files: 0,
+        successful_conversions: 0,
+        active_users_today: 0,
+      };
+    }
   };
 
   const deleteUser = async (userId: string) => {
@@ -428,8 +424,6 @@ export const useAdmin = () => {
     getAdminLogs,
     logAdminAction,
     getMigrationStats,
-    getSystemMetrics,
-    checkAdminStatus,
     getUserMigrations,
     getUserPerformanceMetrics,
     getUserDetails,

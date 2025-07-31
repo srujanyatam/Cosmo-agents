@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useAuth } from '@/hooks/useAuth';
-import { UserProfile, SystemSetting, AdminLog, MigrationStats, SystemMetrics } from '@/types/admin';
+import { UserProfile, SystemSetting, AdminLog, MigrationStats } from '@/types/admin';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -49,7 +49,6 @@ const AdminPanel = () => {
     updateSystemSetting,
     getAdminLogs,
     getMigrationStats,
-    getSystemMetrics,
     getUserDetails
   } = useAdmin();
 
@@ -58,7 +57,6 @@ const AdminPanel = () => {
   const [systemSettings, setSystemSettings] = useState<SystemSetting[]>([]);
   const [adminLogs, setAdminLogs] = useState<AdminLog[]>([]);
   const [migrationStats, setMigrationStats] = useState<MigrationStats | null>(null);
-  const [systemMetrics, setSystemMetrics] = useState<SystemMetrics | null>(null);
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   const [showUserDialog, setShowUserDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -85,26 +83,23 @@ const AdminPanel = () => {
 
   const loadData = async () => {
     try {
-      const [usersData, settingsData, logsData, statsData, metricsData] = await Promise.allSettled([
+      const [usersData, settingsData, logsData, statsData] = await Promise.allSettled([
         getUsers(),
         getSystemSettings(),
         getAdminLogs(),
-        getMigrationStats(),
-        getSystemMetrics()
+        getMigrationStats()
       ]);
 
       setUsers(usersData.status === 'fulfilled' ? usersData.value : []);
       setSystemSettings(settingsData.status === 'fulfilled' ? settingsData.value : []);
       setAdminLogs(logsData.status === 'fulfilled' ? logsData.value : []);
       setMigrationStats(statsData.status === 'fulfilled' ? statsData.value : null);
-      setSystemMetrics(metricsData.status === 'fulfilled' ? metricsData.value : null);
 
       // Log any errors for debugging
       if (usersData.status === 'rejected') console.error('Users error:', usersData.reason);
       if (settingsData.status === 'rejected') console.error('Settings error:', settingsData.reason);
       if (logsData.status === 'rejected') console.error('Logs error:', logsData.reason);
       if (statsData.status === 'rejected') console.error('Stats error:', statsData.reason);
-      if (metricsData.status === 'rejected') console.error('Metrics error:', metricsData.reason);
     } catch (error) {
       console.error('Error loading admin data:', error);
     }
@@ -228,16 +223,15 @@ const AdminPanel = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
             <TabsTrigger value="logs">Activity Logs</TabsTrigger>
-            <TabsTrigger value="monitoring">Monitoring</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Total Users</CardTitle>
@@ -280,24 +274,9 @@ const AdminPanel = () => {
                   </p>
                 </CardContent>
               </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">System Health</CardTitle>
-                  <Activity className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {systemMetrics?.cpu_usage ? Math.round(systemMetrics.cpu_usage) : 0}%
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    CPU Usage
-                  </p>
-                </CardContent>
-              </Card>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Recent Activity</CardTitle>
@@ -315,37 +294,6 @@ const AdminPanel = () => {
                         <Badge variant="outline">{log.target_type}</Badge>
                       </div>
                     ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>System Metrics</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>CPU Usage</span>
-                        <span>{systemMetrics?.cpu_usage ? Math.round(systemMetrics.cpu_usage) : 0}%</span>
-                      </div>
-                      <Progress value={systemMetrics?.cpu_usage || 0} />
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Memory Usage</span>
-                        <span>{systemMetrics?.memory_usage ? Math.round(systemMetrics.memory_usage) : 0}%</span>
-                      </div>
-                      <Progress value={systemMetrics?.memory_usage || 0} />
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Cache Hit Rate</span>
-                        <span>{systemMetrics?.cache_hit_rate ? Math.round(systemMetrics.cache_hit_rate) : 0}%</span>
-                      </div>
-                      <Progress value={systemMetrics?.cache_hit_rate || 0} />
-                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -539,67 +487,6 @@ const AdminPanel = () => {
                 </Table>
               </CardContent>
             </Card>
-          </TabsContent>
-
-          <TabsContent value="monitoring" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>System Performance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>CPU Usage</span>
-                        <span>{systemMetrics?.cpu_usage ? Math.round(systemMetrics.cpu_usage) : 0}%</span>
-                      </div>
-                      <Progress value={systemMetrics?.cpu_usage || 0} />
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Memory Usage</span>
-                        <span>{systemMetrics?.memory_usage ? Math.round(systemMetrics.memory_usage) : 0}%</span>
-                      </div>
-                      <Progress value={systemMetrics?.memory_usage || 0} />
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Disk Usage</span>
-                        <span>{systemMetrics?.disk_usage ? Math.round(systemMetrics.disk_usage) : 0}%</span>
-                      </div>
-                      <Progress value={systemMetrics?.disk_usage || 0} />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Application Metrics</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between">
-                      <span>Active Conversions</span>
-                      <span className="font-medium">{systemMetrics?.active_conversions || 0}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Queue Length</span>
-                      <span className="font-medium">{systemMetrics?.queue_length || 0}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Cache Hit Rate</span>
-                      <span className="font-medium">{systemMetrics?.cache_hit_rate ? Math.round(systemMetrics.cache_hit_rate) : 0}%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Avg Response Time</span>
-                      <span className="font-medium">{systemMetrics?.average_response_time ? Math.round(systemMetrics.average_response_time) : 0}ms</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
           </TabsContent>
         </Tabs>
       </div>

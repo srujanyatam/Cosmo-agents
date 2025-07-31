@@ -27,25 +27,11 @@ export interface UserProfile {
 }
 
 export interface MigrationStats {
+  total_users: number;
   total_migrations: number;
   total_files: number;
   successful_conversions: number;
-  failed_conversions: number;
-  pending_conversions: number;
-  total_users: number;
   active_users_today: number;
-  active_users_week: number;
-  active_users_month: number;
-}
-
-export interface SystemMetrics {
-  cpu_usage: number;
-  memory_usage: number;
-  disk_usage: number;
-  active_conversions: number;
-  queue_length: number;
-  cache_hit_rate: number;
-  average_response_time: number;
 }
 
 export interface AdminAction {

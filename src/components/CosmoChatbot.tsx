@@ -27,12 +27,13 @@ const getSimulatedResponse = (userMessage: string): string => {
   // React questions
   if (message.includes('react')) {
     if (message.includes('hook') || message.includes('use')) {
-      return `**React Hooks** are functions for functional components:
+      return `**React Hooks** - Functions that let you use state and other React features in functional components.
 
-• **useState** - Component state
-• **useEffect** - Side effects & lifecycle
-• **useContext** - React context access
-• **useRef** - Mutable references
+**Core Hooks:**
+• **useState** - Manage component state
+• **useEffect** - Handle side effects and lifecycle
+• **useContext** - Access React context
+• **useRef** - Create mutable references
 
 \`\`\`jsx
 const [count, setCount] = useState(0);
@@ -41,31 +42,32 @@ useEffect(() => {
 }, [count]);
 \`\`\`
 
-Used extensively in your project for state management and UI interactions.`;
+**What it is:** A way to add stateful logic to functional components without classes.`;
     }
-    return `**React.js** - JavaScript library for building UIs.
+    return `**React.js** - JavaScript library for building user interfaces.
 
-**Key Features in Your Project:**
-• Component architecture with TypeScript
-• State management with hooks
-• Routing with React Router DOM
-• Styling with Tailwind CSS + shadcn/ui
+**What it is:** A declarative, efficient library for creating interactive UIs using components.
 
-**Project Setup:**
-- React 18.3.1 with TypeScript
-- Functional components with hooks
-- Type-safe development`;
+**Key Concepts:**
+• **Components** - Reusable UI pieces
+• **Virtual DOM** - Efficient rendering
+• **JSX** - JavaScript syntax extension
+• **Unidirectional Data Flow** - Predictable state management
+
+**Used in this project for:** Building the web interface with TypeScript and modern hooks.`;
   }
   
   // TypeScript questions
   if (message.includes('typescript')) {
     return `**TypeScript** - JavaScript with static typing.
 
-**Benefits in Your Project:**
-• Type safety at compile time
-• Better IDE support & IntelliSense
-• Interface definitions for data structures
-• Safer refactoring
+**What it is:** A superset of JavaScript that adds optional static types, classes, and modules.
+
+**Key Features:**
+• **Static Typing** - Catch errors at compile time
+• **Better IDE Support** - Enhanced autocomplete and IntelliSense
+• **Interfaces** - Define object shapes and contracts
+• **Generics** - Reusable type-safe code
 
 \`\`\`typescript
 interface Message {
@@ -76,455 +78,297 @@ interface Message {
 }
 \`\`\`
 
-**Version:** TypeScript 5.8.3`;
+**Used in this project for:** Type-safe development and better code quality.`;
   }
   
   // Supabase questions
   if (message.includes('supabase')) {
     return `**Supabase** - Open-source Firebase alternative.
 
+**What it is:** A backend-as-a-service platform built on PostgreSQL with real-time capabilities.
+
 **Core Features:**
-• PostgreSQL database with real-time
-• Authentication with multiple providers
-• File storage and management
-• Row-level security (RLS)
+• **PostgreSQL Database** - Full SQL database with real-time
+• **Authentication** - Built-in auth with multiple providers
+• **File Storage** - Manage and serve files
+• **Row-Level Security** - Fine-grained access control
+• **Real-time Subscriptions** - Live data updates
 
-**In Your Project:**
-- User authentication (sign up/login)
-- Database for conversion logs
-- Real-time deployment updates
-- File management
-
-**Configuration:**
-- Project URL: \`VITE_SUPABASE_URL\`
-- Anonymous Key: \`VITE_SUPABASE_ANON_KEY\`
-- Real-time subscriptions for live updates`;
+**Used in this project for:** User authentication, database storage, and real-time features.`;
   }
 
   // AI/ML questions
   if (message.includes('ai') || message.includes('machine learning') || message.includes('langchain')) {
-    return `AI and Machine Learning technologies in your Cosmo Agents project:
+    return `**Artificial Intelligence (AI)** - Computer systems that can perform tasks requiring human intelligence.
 
-• **Google Generative AI** - Powers the chatbot and code analysis
-• **LangChain** - Framework for building AI applications
-• **OpenRouter** - Provides access to multiple AI models
-• **Code Analysis** - AI-powered code explanation and rewriting
+**What it is:** Technology that enables machines to learn, reason, and make decisions.
 
-**How it works:**
-- Chatbot uses Gemini 1.5 Flash for conversations
-- AI Rewrite uses Qwen Coder for code conversion
-- AI Explain uses Qwen Coder for code explanation
-- All AI functions are deployed as Netlify serverless functions
+**Key Areas:**
+• **Machine Learning** - Algorithms that learn from data
+• **Natural Language Processing** - Understanding human language
+• **Computer Vision** - Interpreting visual information
+• **Generative AI** - Creating new content (text, images, code)
 
-**API Keys Required:**
-- \`CHATBOT_GEMINI_API_KEY\` for chatbot
-- \`OPENROUTER_API_KEY\` for code analysis and rewriting`;
+**Used in this project for:** Chatbot conversations, code analysis, and automated code conversion.`;
   }
 
   // Database questions
   if (message.includes('oracle') || message.includes('sybase') || message.includes('database')) {
-    return `Database technologies supported in Cosmo Agents:
+    return `**Database** - Organized collection of structured information stored electronically.
 
-• **Oracle Database** - Enterprise database with PL/SQL
-• **Sybase Database** - Legacy database system
-• **PostgreSQL** - Modern relational database (via Supabase)
+**What it is:** A system for storing, managing, and retrieving data efficiently.
+
+**Types:**
+• **Relational Databases** - Oracle, PostgreSQL, MySQL (structured data)
+• **NoSQL Databases** - MongoDB, Redis (flexible schemas)
+• **Cloud Databases** - AWS RDS, Google Cloud SQL (managed)
+
+**Key Features:**
+• **ACID Properties** - Atomicity, Consistency, Isolation, Durability
 • **SQL** - Standard query language
+• **Indexing** - Fast data retrieval
+• **Backup & Recovery** - Data protection
 
-**Migration Features:**
-- Convert Oracle PL/SQL to other languages
-- Migrate Sybase procedures to modern databases
-- Code analysis and optimization
-- Batch processing for multiple files
-
-**Supported Conversions:**
-- Oracle → TypeScript/JavaScript
-- Sybase → TypeScript/JavaScript
-- SQL → TypeScript/JavaScript
-- Any language ↔ Any language`;
+**Used in this project for:** Storing user data, conversion logs, and file metadata.`;
   }
 
   // Code conversion questions
   if (message.includes('convert') || message.includes('migration') || message.includes('rewrite')) {
-    return `**🔄 Code Conversion & Migration Features in Cosmo Agents:**
+    return `**Code Conversion** - Process of translating code from one programming language to another.
 
-**✨ AI-Powered Features:**
-• **AI Rewrite** - Convert code between any programming languages
-• **AI Explain** - Get detailed explanations of complex code
-• **Batch Processing** - Handle multiple files simultaneously
-• **Performance Analysis** - Optimize code efficiency
+**What it is:** Automated or manual translation of source code while preserving functionality and logic.
 
-**🎯 How to Use:**
-1. **Upload Files** - Drag & drop or select your code files
-2. **Choose Target** - Select the language/framework you want to convert to
-3. **AI Processing** - Let AI analyze and convert your code
-4. **Review & Download** - Check results and download converted code
+**Types:**
+• **Language Migration** - Python to JavaScript, Java to C#
+• **Framework Migration** - Angular to React, Vue to Svelte
+• **Platform Migration** - Web to mobile, desktop to cloud
+• **Version Migration** - Legacy to modern syntax
 
-**📋 Supported Conversions:**
-• **Oracle PL/SQL** → **TypeScript/JavaScript**
-• **Sybase Procedures** → **Modern SQL/PL/SQL**
-• **Any Language** ↔ **Any Language**
-• **Framework Migration** - React, Vue, Angular, etc.
+**Challenges:**
+• **Syntax Differences** - Language-specific features
+• **Library Mapping** - Finding equivalent libraries
+• **Performance Optimization** - Adapting to new platforms
+• **Testing** - Ensuring functionality preservation
 
-**🔧 Advanced Features:**
-• **Code Analysis** - Understand complex logic
-• **Performance Metrics** - Measure conversion improvements
-• **Error Detection** - Identify potential issues
-• **Best Practices** - Apply modern coding standards
-
-**💡 Pro Tips:**
-- Use batch processing for large projects
-- Review AI explanations for better understanding
-- Check performance metrics for optimization
-- Download both original and converted code for comparison`;
+**Used in this project for:** Converting Oracle/Sybase code to modern languages.`;
   }
 
   // Vite questions
   if (message.includes('vite')) {
-    return `Vite is a modern build tool used in your Cosmo Agents project:
+    return `**Vite** - Modern build tool for web development.
 
-• **Fast Development** - Instant hot module replacement
-• **Optimized Builds** - Efficient production builds
+**What it is:** A fast build tool that provides instant hot module replacement and optimized builds.
+
+**Key Features:**
+• **Fast Dev Server** - Instant hot module replacement
+• **Optimized Builds** - Efficient production bundles
 • **TypeScript Support** - Native TypeScript compilation
-• **Plugin System** - Extensible with plugins
-
-**Configuration in your project:**
-- Development server with hot reload
-- Build optimization for production
-- Asset handling and bundling
-- Environment variable support
+• **Plugin System** - Extensible architecture
 
 **Benefits:**
-- Faster development experience
-- Smaller bundle sizes
-- Better developer experience
-- Modern ES modules support`;
+• **Speed** - Lightning-fast development experience
+• **Modern** - ES modules and modern browser features
+• **Flexible** - Works with React, Vue, Svelte, and more
+
+**Used in this project for:** Fast development server and optimized production builds.`;
   }
 
   // Tailwind CSS questions
   if (message.includes('tailwind') || message.includes('css')) {
-    return `**🎨 Tailwind CSS in Cosmo Agents:**
+    return `**Tailwind CSS** - Utility-first CSS framework.
 
-**✨ Key Features:**
-• **Utility-First** - Rapid UI development with pre-built classes
-• **Responsive Design** - Mobile-first approach with breakpoints
-• **Custom Configuration** - Tailored to project needs
-• **Component Integration** - Works seamlessly with shadcn/ui
+**What it is:** A CSS framework that provides low-level utility classes for rapid UI development.
 
-**🔧 Usage in Your Project:**
-- **Modern UI** - Clean, professional interface
-- **Responsive Layout** - Works on all devices
-- **Consistent Design** - Unified design system
-- **Fast Development** - Rapid prototyping and iteration
+**Key Features:**
+• **Utility-First** - Pre-built classes for common styles
+• **Responsive Design** - Mobile-first breakpoint system
+• **Customizable** - Configurable design system
+• **JIT Compilation** - Only generates used styles
 
-  **📱 Responsive Breakpoints:**
-  - sm: - Small devices (640px+)
-  - md: - Medium devices (768px+)
-  - lg: - Large devices (1024px+)
-  - xl: - Extra large (1280px+)
+**Benefits:**
+• **Speed** - Rapid UI development
+• **Consistency** - Unified design system
+• **Maintainability** - No custom CSS needed
+• **Performance** - Optimized bundle sizes
 
-**🎯 Benefits:**
-- No custom CSS needed for most components
-- Consistent spacing and typography
-- Easy dark mode implementation
-- Optimized for production builds`;
+**Used in this project for:** Styling the user interface with modern, responsive design.`;
   }
 
   // Git and GitHub questions
   if (message.includes('git') || message.includes('github')) {
     if (message.includes('difference') || message.includes('vs') || message.includes('compare')) {
-      return `**Git vs GitHub Comparison:**
+      return `**Git vs GitHub:**
 
-| Feature | Git | GitHub |
-|---------|-----|--------|
-| **Type** | Version control system | Web-based hosting platform |
-| **Purpose** | Local code version management | Remote repository hosting |
-| **Functionality** | Tracks changes, creates branches, merges code | Provides Git hosting with collaboration features |
-| **Location** | Installed on your computer | Cloud-based service |
-| **Features** | Commit, branch, merge, log | Issues, pull requests, wikis, actions |
-| **Collaboration** | Basic merging capabilities | Advanced team collaboration tools |
-| **Cost** | Free and open source | Free for public repos, paid for private |
+**Git** - Version control system (installed locally)
+**GitHub** - Web platform for hosting Git repositories
 
-**In Cosmo Agents:**
-- **Git** is used for local version control
-- **GitHub** hosts the project repository
-- Both work together for seamless development workflow`;
+**Key Differences:**
+• **Git** tracks code changes on your computer
+• **GitHub** hosts repositories in the cloud with collaboration tools
+• **Git** handles version control
+• **GitHub** adds issues, pull requests, and team features
+
+**Used in this project for:** Local version control (Git) and cloud hosting (GitHub).`;
     }
     
     if (message.includes('git')) {
-      return `**Git - Version Control System:**
+      return `**Git** - Distributed version control system.
 
-**🎯 What is Git?**
-Git is a distributed version control system that tracks changes in your code files. It's essential for modern software development.
+**What it is:** A system that tracks changes in your code files over time.
 
-**✨ Key Features:**
-• **Version Tracking** - Keep history of all code changes
-• **Branching** - Work on features without affecting main code
-• **Merging** - Combine changes from different branches
-• **Collaboration** - Multiple developers can work together
-• **Backup** - Your code is safely stored with full history
+**Key Features:**
+• **Version Tracking** - History of all code changes
+• **Branching** - Work on features separately
+• **Merging** - Combine changes from branches
+• **Collaboration** - Multiple developers working together
 
-**🔧 Basic Git Commands:**
+**Basic Commands:**
 \`\`\`bash
-git init          # Start a new repository
-git add .         # Stage files for commit
-git commit -m "message"  # Save changes with message
-git push          # Upload changes to remote repository
-git pull          # Download changes from remote
-git branch        # List all branches
-git checkout -b feature  # Create and switch to new branch
+git init          # Start repository
+git add .         # Stage files
+git commit -m "message"  # Save changes
+git push          # Upload to remote
+git pull          # Download changes
 \`\`\`
 
-**💡 In Cosmo Agents Project:**
-- Git tracks all your code changes
-- Each feature is developed in separate branches
-- Changes are committed with descriptive messages
-- Code is pushed to GitHub for backup and collaboration
-
-**🚀 Benefits:**
-- Never lose your work
-- Work on multiple features simultaneously
-- Collaborate with team members
-- Roll back to previous versions if needed`;
+**Used in this project for:** Tracking code changes and collaboration.`;
     }
     
     if (message.includes('github')) {
-      return `**GitHub - Code Hosting Platform:**
+      return `**GitHub** - Web-based platform for hosting Git repositories.
 
-**🎯 What is GitHub?**
-GitHub is a web-based platform that hosts Git repositories and provides collaboration tools for developers.
+**What it is:** A cloud service that hosts Git repositories with collaboration tools.
 
-**✨ Key Features:**
-• **Repository Hosting** - Store your code in the cloud
-• **Collaboration Tools** - Work with teams effectively
-• **Issue Tracking** - Manage bugs and feature requests
-• **Pull Requests** - Review code before merging
-• **GitHub Actions** - Automate workflows and deployments
-• **Wikis & Documentation** - Project documentation
+**Key Features:**
+• **Repository Hosting** - Store code in the cloud
+• **Collaboration** - Team tools and workflows
+• **Issue Tracking** - Manage bugs and features
+• **Pull Requests** - Code review system
+• **Actions** - Automated workflows
 
-**🔧 GitHub Workflow:**
-1. **Create Repository** - Start a new project
-2. **Clone Repository** - Download to your computer
-3. **Make Changes** - Edit code locally
-4. **Commit & Push** - Upload changes to GitHub
-5. **Create Pull Request** - Request code review
-6. **Merge Changes** - Integrate approved code
-
-**💡 In Cosmo Agents Project:**
-- Repository: \`https://github.com/srujanyatam/Cosmo-agents\`
-- Used for version control and collaboration
-- GitHub Actions for automated deployment
-- Issues for bug tracking and feature requests
-
-**🚀 Benefits:**
-- Free hosting for public repositories
-- Excellent collaboration tools
-- Integration with CI/CD pipelines
-- Large developer community`;
+**Used in this project for:** Hosting the repository and team collaboration.`;
     }
   }
 
   // Python questions
   if (message.includes('python')) {
-    return `**Python in Cosmo Agents:**
+    return `**Python** - High-level, interpreted programming language.
 
-**🎯 What is Python?**
-Python is a high-level, interpreted programming language known for its simplicity and readability.
+**What it is:** A versatile language known for its simple syntax and readability.
 
-**✨ Key Features:**
-• **Easy to Learn** - Simple syntax and clear structure
-• **Versatile** - Web development, data science, automation
+**Key Features:**
+• **Easy to Learn** - Simple, readable syntax
+• **Versatile** - Web dev, data science, automation
 • **Rich Ecosystem** - Extensive libraries and frameworks
-• **Cross-platform** - Runs on Windows, macOS, Linux
+• **Cross-platform** - Runs on all major operating systems
 
-**🔧 In Cosmo Agents Project:**
-- **AI Integration** - Python scripts for AI model processing
-- **Data Processing** - Handle large datasets and conversions
-- **Automation** - Automated testing and deployment scripts
-- **Backend Services** - API development and data analysis
+**Common Uses:**
+• **Web Development** - Django, Flask
+• **Data Science** - Pandas, NumPy, Matplotlib
+• **AI/ML** - TensorFlow, PyTorch, scikit-learn
+• **Automation** - Scripts and tools
 
-**💡 Common Use Cases:**
-- Data analysis and visualization
-- Web development with Django/Flask
-- Machine learning and AI
-- Automation and scripting
-- API development
-
-**🚀 Benefits:**
-- Rapid development and prototyping
-- Excellent for beginners
-- Strong community support
-- Extensive library ecosystem`;
+**Used in this project for:** AI integration and data processing.`;
   }
 
   // SQL questions
   if (message.includes('sql')) {
-    return `**SQL - Structured Query Language:**
+    return `**SQL** - Structured Query Language.
 
-**🎯 What is SQL?**
-SQL is a standard language for managing and manipulating relational databases.
+**What it is:** Standard language for managing and manipulating relational databases.
 
-**✨ Key Features:**
+**Key Features:**
 • **Data Querying** - Retrieve data from databases
 • **Data Manipulation** - Insert, update, delete records
 • **Data Definition** - Create and modify database structures
-• **Data Control** - Manage user permissions and security
+• **Data Control** - Manage permissions and security
 
-**🔧 In Cosmo Agents Project:**
-- **Supabase Database** - PostgreSQL with SQL queries
-- **Data Storage** - Store user data and conversion logs
-- **Real-time Queries** - Live data updates and subscriptions
-- **Performance Optimization** - Efficient database queries
-
-**💡 Common SQL Commands:**
+**Common Commands:**
 \`\`\`sql
 SELECT * FROM users WHERE id = 1;
-INSERT INTO conversions (file_name, status) VALUES ('test.sql', 'completed');
-UPDATE users SET last_login = NOW() WHERE id = 1;
-DELETE FROM logs WHERE created_at < '2024-01-01';
+INSERT INTO table (column) VALUES (value);
+UPDATE table SET column = value WHERE condition;
+DELETE FROM table WHERE condition;
 \`\`\`
 
-**🚀 Benefits:**
-- Standard language across all databases
-- Powerful data manipulation capabilities
-- Excellent performance for large datasets
-- Strong data integrity and consistency`;
+**Used in this project for:** Database operations and data management.`;
   }
 
   // Comments feature questions
   if (message.includes('comment') || message.includes('note')) {
-    return `**💬 Comments Feature in Cosmo Agents:**
+    return `**Comments** - Notes and annotations for code.
 
-**✨ What You Can Do:**
-• **Add Comments** - Write notes about your code conversions
-• **Edit Comments** - Update your notes anytime
+**What it is:** A way to add notes and explanations to your code for future reference.
+
+**Features:**
+• **Add Comments** - Write notes about code
+• **Edit Comments** - Update notes anytime
 • **View Comments** - See all comments in history
 • **Delete Comments** - Remove unwanted notes
 
-**🎯 How to Use:**
-1. **In Dev Review Mode:**
-   - Look for the comment input box above action buttons
-   - Type your notes and click "Save Comment"
-   - Comments are automatically linked to the file
-
-2. **In History Page:**
-   - Click the small comment button (💬) next to file names
-   - View, edit, or delete your comments
-   - See comment count and timestamps
-
-**💡 Pro Tips:**
-- Add comments during code review for future reference
-- Use comments to track important decisions
-- Comments help team collaboration
-- All comments are private to your account
-
-**🔒 Privacy:**
-- Comments are stored securely in your main Supabase database
-- Only you can see your comments
-- Comments are linked to specific file conversions`;
+**Used in this project for:** Adding notes to code conversions and tracking decisions.`;
   }
 
   // General programming questions
   if (message.includes('programming') || message.includes('coding') || message.includes('development')) {
-    return `**💻 Programming & Development:**
+    return `**Programming** - Creating instructions for computers.
 
-**🎯 What is Programming?**
-Programming is the process of creating instructions for computers to follow. It involves writing code in programming languages to solve problems and build applications.
+**What it is:** The process of writing code to solve problems and build applications.
 
-**✨ Key Concepts:**
-• **Algorithms** - Step-by-step problem-solving procedures
-• **Data Structures** - Ways to organize and store data
-• **Logic** - Making decisions and controlling program flow
-• **Debugging** - Finding and fixing errors in code
+**Key Concepts:**
+• **Algorithms** - Step-by-step problem-solving
+• **Data Structures** - Organizing and storing data
+• **Logic** - Making decisions in code
+• **Debugging** - Finding and fixing errors
 
-**🔧 Popular Programming Languages:**
-• **Python** - Great for beginners, data science, AI
-• **JavaScript** - Web development, frontend and backend
-• **Java** - Enterprise applications, Android development
-• **C++** - System programming, game development
-• **C#** - Windows applications, game development with Unity
+**Popular Languages:**
+• **Python** - Beginners, data science, AI
+• **JavaScript** - Web development
+• **Java** - Enterprise applications
+• **C++** - System programming
 
-**💡 Getting Started:**
-1. Choose a language based on your goals
-2. Learn basic syntax and concepts
-3. Practice with small projects
-4. Build a portfolio of work
-5. Join coding communities
-
-**🚀 Best Practices:**
-- Write clean, readable code
-- Use meaningful variable names
-- Comment your code
-- Test thoroughly
-- Keep learning and practicing`;
+**Used in this project for:** Building the web application and AI features.`;
   }
 
   // General technology questions
   if (message.includes('technology') || message.includes('tech') || message.includes('software')) {
-    return `**🔧 Technology & Software:**
+    return `**Technology** - Tools and systems for solving problems.
 
-**🎯 What is Technology?**
-Technology refers to tools, systems, and methods used to solve problems and improve human life. In software, it includes programming languages, frameworks, and tools.
+**What it is:** The application of scientific knowledge to create tools and systems.
 
-**✨ Key Areas:**
-• **Web Development** - Building websites and web applications
-• **Mobile Development** - Creating apps for smartphones
+**Key Areas:**
+• **Web Development** - Building websites and applications
+• **Mobile Development** - Creating smartphone apps
 • **Data Science** - Analyzing and interpreting data
 • **Artificial Intelligence** - Creating intelligent systems
 • **Cloud Computing** - Using remote servers and services
 
-**🔧 Modern Tech Stack:**
-• **Frontend** - React, Vue, Angular (user interfaces)
-• **Backend** - Node.js, Python, Java (server-side logic)
-• **Databases** - MySQL, PostgreSQL, MongoDB (data storage)
-• **Cloud** - AWS, Google Cloud, Azure (hosting and services)
-
-**💡 Learning Path:**
-1. Start with fundamentals (HTML, CSS, JavaScript)
-2. Learn a framework (React, Vue, etc.)
-3. Explore backend development
-4. Understand databases and APIs
-5. Learn about DevOps and deployment
-
-**🚀 Industry Trends:**
-- Artificial Intelligence and Machine Learning
-- Cloud-native applications
-- Mobile-first development
-- Cybersecurity and privacy
-- Sustainable technology`;
+**Used in this project for:** Building modern web applications and AI features.`;
   }
   
   // Default response
   return `I'm Cosmo Agents, your AI assistant! 🚀
 
-I can help you with any programming, technology, or general questions you might have. Feel free to ask me about:
+I can help you with any programming, technology, or general questions. Ask me about:
 
 **Programming & Development:**
 • Any programming language (Python, JavaScript, Java, C++, etc.)
 • Web development frameworks and libraries
 • Database technologies and SQL
 • Cloud platforms and services
-• DevOps and deployment strategies
 
 **Technology & Tools:**
 • Software development methodologies
 • Best practices and design patterns
 • Debugging and troubleshooting
 • Performance optimization
-• Security best practices
 
 **General Questions:**
 • Technology concepts and explanations
 • Learning resources and tutorials
 • Industry trends and insights
-• Problem-solving approaches
 
-**Project-Specific Help:**
-• React, TypeScript, and modern web development
-• Database migration and conversion
-• AI/ML integration and implementation
-• Code analysis and optimization
-
-What would you like to know about? I'm here to help with anything! 💡`;
+What would you like to know about? 💡`;
 };
 
 interface Message {
@@ -580,7 +424,7 @@ const CosmoChatbot = () => {
       role: 'assistant',
       content: `👋 **Hi! I'm your AI assistant.**
 
-I can help with React, TypeScript, Supabase, and all technologies used in this project.
+I can help with any programming, technology, or general questions.
 
 Ask me anything! 🚀`,
       timestamp: new Date(),

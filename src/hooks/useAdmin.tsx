@@ -298,6 +298,125 @@ export const useAdmin = () => {
     return true;
   };
 
+  const getUserMigrations = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('migrations')
+      .select(`
+        *,
+        migration_files (
+          id,
+          file_name,
+          file_path,
+          file_type,
+          conversion_status,
+          error_message,
+          created_at,
+          updated_at
+        )
+      `)
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching user migrations:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch user migrations",
+        variant: "destructive",
+      });
+      return [];
+    }
+
+    return data || [];
+  };
+
+  const getUserPerformanceMetrics = async (userId: string) => {
+    // Get user's migration statistics
+    const { data: migrations } = await supabase
+      .from('migrations')
+      .select('id')
+      .eq('user_id', userId);
+
+    const { data: files } = await supabase
+      .from('migration_files')
+      .select('conversion_status, created_at, updated_at')
+      .in('migration_id', migrations?.map(m => m.id) || []);
+
+    if (!files || files.length === 0) {
+      return {
+        total_migrations: 0,
+        total_files: 0,
+        successful_conversions: 0,
+        failed_conversions: 0,
+        pending_conversions: 0,
+        success_rate: 0,
+        average_processing_time: 0,
+        recent_activity: []
+      };
+    }
+
+    const totalMigrations = migrations?.length || 0;
+    const totalFiles = files.length;
+    const successfulConversions = files.filter(f => f.conversion_status === 'success').length;
+    const failedConversions = files.filter(f => f.conversion_status === 'failed').length;
+    const pendingConversions = files.filter(f => f.conversion_status === 'pending').length;
+    const successRate = totalFiles > 0 ? (successfulConversions / totalFiles) * 100 : 0;
+
+    // Calculate average processing time for successful conversions
+    const successfulFiles = files.filter(f => f.conversion_status === 'success');
+    let totalProcessingTime = 0;
+    successfulFiles.forEach(file => {
+      const created = new Date(file.created_at);
+      const updated = new Date(file.updated_at);
+      totalProcessingTime += updated.getTime() - created.getTime();
+    });
+    const averageProcessingTime = successfulFiles.length > 0 
+      ? totalProcessingTime / successfulFiles.length 
+      : 0;
+
+    // Get recent activity (last 10 files)
+    const recentActivity = files
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 10)
+      .map(file => ({
+        status: file.conversion_status,
+        date: file.created_at
+      }));
+
+    return {
+      total_migrations: totalMigrations,
+      total_files: totalFiles,
+      successful_conversions: successfulConversions,
+      failed_conversions: failedConversions,
+      pending_conversions: pendingConversions,
+      success_rate: Math.round(successRate),
+      average_processing_time: Math.round(averageProcessingTime / 1000), // Convert to seconds
+      recent_activity: recentActivity
+    };
+  };
+
+  const getUserDetails = async (userId: string) => {
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (profileError) {
+      console.error('Error fetching user profile:', profileError);
+      return null;
+    }
+
+    const migrations = await getUserMigrations(userId);
+    const performanceMetrics = await getUserPerformanceMetrics(userId);
+
+    return {
+      profile,
+      migrations,
+      performanceMetrics
+    };
+  };
+
   return {
     isAdmin,
     loading,
@@ -311,5 +430,8 @@ export const useAdmin = () => {
     getMigrationStats,
     getSystemMetrics,
     checkAdminStatus,
+    getUserMigrations,
+    getUserPerformanceMetrics,
+    getUserDetails,
   };
 }; 

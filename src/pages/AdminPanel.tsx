@@ -21,7 +21,13 @@ import {
   RefreshCw,
   AlertTriangle,
   CheckCircle,
-  Clock
+  Clock,
+  Eye,
+  Calendar,
+  TrendingUp,
+  FileCode,
+  User,
+  History
 } from 'lucide-react';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useAuth } from '@/hooks/useAuth';
@@ -43,7 +49,8 @@ const AdminPanel = () => {
     updateSystemSetting,
     getAdminLogs,
     getMigrationStats,
-    getSystemMetrics
+    getSystemMetrics,
+    getUserDetails
   } = useAdmin();
 
   const [activeTab, setActiveTab] = useState('overview');
@@ -57,6 +64,12 @@ const AdminPanel = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [editingSetting, setEditingSetting] = useState<SystemSetting | null>(null);
   const [showSettingDialog, setShowSettingDialog] = useState(false);
+  const [showUserDetailsDialog, setShowUserDetailsDialog] = useState(false);
+  const [userDetails, setUserDetails] = useState<any>(null);
+  const [loadingUserDetails, setLoadingUserDetails] = useState(false);
+  const [showUserHistoryDialog, setShowUserHistoryDialog] = useState(false);
+  const [userHistory, setUserHistory] = useState<any>(null);
+  const [loadingUserHistory, setLoadingUserHistory] = useState(false);
 
   useEffect(() => {
     if (!loading && !isAdmin) {
@@ -129,6 +142,36 @@ const AdminPanel = () => {
       );
       setShowSettingDialog(false);
       setEditingSetting(null);
+    }
+  };
+
+  const handleViewUserDetails = async (user: UserProfile) => {
+    setSelectedUser(user);
+    setShowUserDetailsDialog(true);
+    setLoadingUserDetails(true);
+    
+    try {
+      const details = await getUserDetails(user.id);
+      setUserDetails(details);
+    } catch (error) {
+      console.error('Error loading user details:', error);
+    } finally {
+      setLoadingUserDetails(false);
+    }
+  };
+
+  const handleViewUserHistory = async (user: UserProfile) => {
+    setSelectedUser(user);
+    setShowUserHistoryDialog(true);
+    setLoadingUserHistory(true);
+    
+    try {
+      const details = await getUserDetails(user.id);
+      setUserHistory(details);
+    } catch (error) {
+      console.error('Error loading user history:', error);
+    } finally {
+      setLoadingUserHistory(false);
     }
   };
 
@@ -386,6 +429,20 @@ const AdminPanel = () => {
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             )}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleViewUserDetails(user)}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleViewUserHistory(user)}
+                            >
+                              <History className="h-4 w-4" />
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -601,6 +658,463 @@ const AdminPanel = () => {
               }}
             >
               Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showUserDetailsDialog} onOpenChange={setShowUserDetailsDialog}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              User Details: {selectedUser?.full_name}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {loadingUserDetails ? (
+            <div className="flex items-center justify-center py-8">
+              <RefreshCw className="h-8 w-8 animate-spin mr-2" />
+              <span>Loading user details...</span>
+            </div>
+          ) : userDetails ? (
+            <Tabs defaultValue="profile" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="profile">Profile</TabsTrigger>
+                <TabsTrigger value="migrations">Migration History</TabsTrigger>
+                <TabsTrigger value="performance">Performance Metrics</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="profile" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Basic Information</CardTitle>
+                  </CardHeader>
+                  <CardContent className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm font-medium">User ID</Label>
+                      <p className="text-sm text-muted-foreground font-mono">{userDetails.profile.id}</p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium">Email</Label>
+                      <p className="text-sm text-muted-foreground">{userDetails.profile.email}</p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium">Full Name</Label>
+                      <p className="text-sm text-muted-foreground">{userDetails.profile.full_name}</p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium">Role</Label>
+                      <Badge className={getRoleBadgeColor(userDetails.profile.role)}>
+                        {userDetails.profile.role}
+                      </Badge>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium">Joined Date</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(userDetails.profile.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium">Last Updated</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(userDetails.profile.updated_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="migrations" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <FileText className="h-5 w-5" />
+                      Migration Projects ({userDetails.migrations.length})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {userDetails.migrations.length === 0 ? (
+                      <p className="text-muted-foreground">No migration projects found.</p>
+                    ) : (
+                      <div className="space-y-4">
+                        {userDetails.migrations.map((migration: any) => (
+                          <div key={migration.id} className="border rounded-lg p-4">
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="font-medium">{migration.project_name}</h4>
+                              <Badge variant="outline">
+                                {new Date(migration.created_at).toLocaleDateString()}
+                              </Badge>
+                            </div>
+                            <div className="grid grid-cols-3 gap-4 text-sm">
+                              <div>
+                                <span className="font-medium">Total Files:</span> {migration.migration_files.length}
+                              </div>
+                              <div>
+                                <span className="font-medium">Successful:</span> 
+                                <span className="text-green-600 ml-1">
+                                  {migration.migration_files.filter((f: any) => f.conversion_status === 'success').length}
+                                </span>
+                              </div>
+                              <div>
+                                <span className="font-medium">Failed:</span> 
+                                <span className="text-red-600 ml-1">
+                                  {migration.migration_files.filter((f: any) => f.conversion_status === 'failed').length}
+                                </span>
+                              </div>
+                            </div>
+                            {migration.migration_files.length > 0 && (
+                              <div className="mt-3">
+                                <details className="text-sm">
+                                  <summary className="cursor-pointer font-medium">View Files</summary>
+                                  <div className="mt-2 space-y-1">
+                                    {migration.migration_files.map((file: any) => (
+                                      <div key={file.id} className="flex items-center justify-between py-1">
+                                        <span className="font-mono text-xs">{file.file_name}</span>
+                                        <Badge 
+                                          variant={file.conversion_status === 'success' ? 'default' : 
+                                                  file.conversion_status === 'failed' ? 'destructive' : 'secondary'}
+                                          className="text-xs"
+                                        >
+                                          {file.conversion_status}
+                                        </Badge>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </details>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="performance" className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <BarChart3 className="h-5 w-5" />
+                        Conversion Statistics
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-blue-600">
+                            {userDetails.performanceMetrics.total_migrations}
+                          </div>
+                          <div className="text-sm text-muted-foreground">Total Projects</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-green-600">
+                            {userDetails.performanceMetrics.total_files}
+                          </div>
+                          <div className="text-sm text-muted-foreground">Total Files</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-green-600">
+                            {userDetails.performanceMetrics.successful_conversions}
+                          </div>
+                          <div className="text-sm text-muted-foreground">Successful</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-red-600">
+                            {userDetails.performanceMetrics.failed_conversions}
+                          </div>
+                          <div className="text-sm text-muted-foreground">Failed</div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span>Success Rate</span>
+                          <span>{userDetails.performanceMetrics.success_rate}%</span>
+                        </div>
+                        <Progress value={userDetails.performanceMetrics.success_rate} />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <TrendingUp className="h-5 w-5" />
+                        Performance Metrics
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-3">
+                        <div className="flex justify-between">
+                          <span className="text-sm">Average Processing Time</span>
+                          <span className="text-sm font-medium">
+                            {userDetails.performanceMetrics.average_processing_time}s
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm">Pending Conversions</span>
+                          <span className="text-sm font-medium">
+                            {userDetails.performanceMetrics.pending_conversions}
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Activity className="h-5 w-5" />
+                      Recent Activity
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {userDetails.performanceMetrics.recent_activity.length === 0 ? (
+                      <p className="text-muted-foreground">No recent activity.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {userDetails.performanceMetrics.recent_activity.map((activity: any, index: number) => (
+                          <div key={index} className="flex items-center justify-between py-1">
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm">
+                                {new Date(activity.date).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <Badge 
+                              variant={activity.status === 'success' ? 'default' : 
+                                      activity.status === 'failed' ? 'destructive' : 'secondary'}
+                              className="text-xs"
+                            >
+                              {activity.status}
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          ) : (
+            <p className="text-muted-foreground">Failed to load user details.</p>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowUserDetailsDialog(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showUserHistoryDialog} onOpenChange={setShowUserHistoryDialog}>
+        <DialogContent className="max-w-5xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <History className="h-5 w-5" />
+              User History: {selectedUser?.full_name}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {loadingUserHistory ? (
+            <div className="flex items-center justify-center py-8">
+              <RefreshCw className="h-8 w-8 animate-spin mr-2" />
+              <span>Loading user history...</span>
+            </div>
+          ) : userHistory ? (
+            <div className="space-y-6">
+              
+              {/* User Summary */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="h-5 w-5" />
+                    User Summary
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-600">
+                        {userHistory.performanceMetrics.total_migrations}
+                      </div>
+                      <div className="text-sm text-muted-foreground">Total Projects</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-600">
+                        {userHistory.performanceMetrics.total_files}
+                      </div>
+                      <div className="text-sm text-muted-foreground">Total Files</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-600">
+                        {userHistory.performanceMetrics.successful_conversions}
+                      </div>
+                      <div className="text-sm text-muted-foreground">Successful</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-red-600">
+                        {userHistory.performanceMetrics.failed_conversions}
+                      </div>
+                      <div className="text-sm text-muted-foreground">Failed</div>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Success Rate</span>
+                      <span>{userHistory.performanceMetrics.success_rate}%</span>
+                    </div>
+                    <Progress value={userHistory.performanceMetrics.success_rate} />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Migration Timeline */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Migration Timeline
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {userHistory.migrations.length === 0 ? (
+                    <p className="text-muted-foreground">No migration projects found.</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {userHistory.migrations.map((migration: any, index: number) => (
+                        <div key={migration.id} className="border-l-4 border-blue-500 pl-4 relative">
+                          <div className="absolute -left-2 top-0 w-4 h-4 bg-blue-500 rounded-full"></div>
+                          <div className="mb-2">
+                            <h4 className="font-medium text-lg">{migration.project_name}</h4>
+                            <p className="text-sm text-muted-foreground">
+                              {new Date(migration.created_at).toLocaleDateString()} at {new Date(migration.created_at).toLocaleTimeString()}
+                            </p>
+                          </div>
+                          <div className="grid grid-cols-3 gap-4 text-sm mb-3">
+                            <div>
+                              <span className="font-medium">Files:</span> {migration.migration_files.length}
+                            </div>
+                            <div>
+                              <span className="font-medium">Success:</span> 
+                              <span className="text-green-600 ml-1">
+                                {migration.migration_files.filter((f: any) => f.conversion_status === 'success').length}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="font-medium">Failed:</span> 
+                              <span className="text-red-600 ml-1">
+                                {migration.migration_files.filter((f: any) => f.conversion_status === 'failed').length}
+                              </span>
+                            </div>
+                          </div>
+                          {migration.migration_files.length > 0 && (
+                            <div className="bg-gray-50 rounded-lg p-3">
+                              <details className="text-sm">
+                                <summary className="cursor-pointer font-medium mb-2">View Files ({migration.migration_files.length})</summary>
+                                <div className="space-y-1">
+                                  {migration.migration_files.map((file: any) => (
+                                    <div key={file.id} className="flex items-center justify-between py-1 px-2 bg-white rounded">
+                                      <div className="flex items-center gap-2">
+                                        <FileCode className="h-3 w-3 text-muted-foreground" />
+                                        <span className="font-mono text-xs">{file.file_name}</span>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <Badge 
+                                          variant={file.conversion_status === 'success' ? 'default' : 
+                                                  file.conversion_status === 'failed' ? 'destructive' : 'secondary'}
+                                          className="text-xs"
+                                        >
+                                          {file.conversion_status}
+                                        </Badge>
+                                        <span className="text-xs text-muted-foreground">
+                                          {new Date(file.created_at).toLocaleTimeString()}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </details>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Performance Metrics */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5" />
+                    Performance Metrics
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div className="flex justify-between">
+                        <span className="text-sm">Average Processing Time</span>
+                        <span className="text-sm font-medium">
+                          {userHistory.performanceMetrics.average_processing_time}s
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm">Pending Conversions</span>
+                        <span className="text-sm font-medium">
+                          {userHistory.performanceMetrics.pending_conversions}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm">Success Rate</span>
+                        <span className="text-sm font-medium">
+                          {userHistory.performanceMetrics.success_rate}%
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-2">Recent Activity</h4>
+                      {userHistory.performanceMetrics.recent_activity.length === 0 ? (
+                        <p className="text-muted-foreground text-sm">No recent activity.</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {userHistory.performanceMetrics.recent_activity.slice(0, 5).map((activity: any, index: number) => (
+                            <div key={index} className="flex items-center justify-between py-1">
+                              <div className="flex items-center gap-2">
+                                <Calendar className="h-3 w-3 text-muted-foreground" />
+                                <span className="text-xs">
+                                  {new Date(activity.date).toLocaleDateString()}
+                                </span>
+                              </div>
+                              <Badge 
+                                variant={activity.status === 'success' ? 'default' : 
+                                        activity.status === 'failed' ? 'destructive' : 'secondary'}
+                                className="text-xs"
+                              >
+                                {activity.status}
+                              </Badge>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            <p className="text-muted-foreground">Failed to load user history.</p>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowUserHistoryDialog(false)}>
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>

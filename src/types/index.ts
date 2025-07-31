@@ -91,3 +91,6 @@ export type ConversionStep = 'connection' | 'upload' | 'review' | 'report';
 
 // Re-export unreviewed files types
 export * from './unreviewedFiles';
+
+// Re-export chatbot types
+export * from './chatbot';

@@ -11,6 +11,7 @@ This project is an AI-powered migration tool that helps convert Sybase database 
 - Comprehensive migration reports
 - Direct Oracle deployment option
 - Batch file downloading
+- **🤖 AI Chatbot Assistant** - Get help with migration questions, code explanations, and best practices
 
 ## What technologies are used for this project?
 
@@ -31,6 +32,17 @@ This project is built with:
 4. Review the converted code and resolve any issues
 5. Generate a comprehensive migration report
 6. Download or deploy the Oracle-compatible code
+
+### Using the AI Chatbot
+
+The application includes an intelligent AI chatbot to help with your migration:
+
+- **Access**: Click the chat icon in the bottom-right corner
+- **Ask Questions**: Get help with migration strategies, code explanations, and best practices
+- **Code Analysis**: Upload code snippets for detailed analysis and conversion guidance
+- **Quick Suggestions**: Use pre-built questions for common migration scenarios
+
+For detailed chatbot documentation, see [CHATBOT_README.md](./CHATBOT_README.md)
 
 ## Docker
 

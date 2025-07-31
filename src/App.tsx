@@ -14,6 +14,8 @@ import NotFound from "./pages/NotFound";
 import ReportPage from "./pages/ReportPage";
 import AdminPanel from "./pages/AdminPanel";
 import { CodeEditorThemeProvider } from "@/contexts/CodeEditorThemeContext";
+import { ChatbotProvider } from "@/contexts/ChatbotContext";
+import { ChatbotToggle } from "@/components/ChatbotToggle";
 
 const queryClient = new QueryClient();
 
@@ -22,21 +24,24 @@ const App = () => (
     <TooltipProvider>
       <AuthProvider>
         <CodeEditorThemeProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/migration" element={<Dashboard />} />
-              <Route path="/history" element={<History />} />
-              <Route path="/legacy" element={<Index />} />
-              <Route path="/report/:reportId" element={<ReportPage />} />
-              <Route path="/admin" element={<AdminPanel />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
+          <ChatbotProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/migration" element={<Dashboard />} />
+                <Route path="/history" element={<History />} />
+                <Route path="/legacy" element={<Index />} />
+                <Route path="/report/:reportId" element={<ReportPage />} />
+                <Route path="/admin" element={<AdminPanel />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+            <ChatbotToggle />
+          </ChatbotProvider>
         </CodeEditorThemeProvider>
       </AuthProvider>
     </TooltipProvider>

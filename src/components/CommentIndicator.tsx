@@ -149,23 +149,24 @@ const CommentIndicator: React.FC<CommentIndicatorProps> = ({ fileId, fileName })
     }
   };
 
-  if (comments.length === 0) {
-    return null;
-  }
+  // Always show the button, even when there are no comments
+  // This allows users to add comments from the History page
 
   return (
     <>
       <Button
         size="sm"
-        variant="outline"
+        variant={comments.length === 0 ? "ghost" : "outline"}
         onClick={() => setShowComments(true)}
-        className="flex items-center gap-1 h-6 px-2"
-        title={`${comments.length} comment${comments.length !== 1 ? 's' : ''}`}
+        className={`flex items-center gap-1 h-6 px-2 ${comments.length === 0 ? 'text-gray-500 hover:text-gray-700' : ''}`}
+        title={comments.length === 0 ? "Add comments" : `${comments.length} comment${comments.length !== 1 ? 's' : ''}`}
       >
         <MessageSquare className="h-3 w-3" />
-        <Badge variant="secondary" className="text-xs">
-          {comments.length}
-        </Badge>
+        {comments.length > 0 && (
+          <Badge variant="secondary" className="text-xs">
+            {comments.length}
+          </Badge>
+        )}
       </Button>
 
       <Dialog open={showComments} onOpenChange={setShowComments}>

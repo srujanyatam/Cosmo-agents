@@ -147,24 +147,37 @@ Configuration:
 
   // Code conversion questions
   if (message.includes('convert') || message.includes('migration') || message.includes('rewrite')) {
-    return `Code conversion and migration features in Cosmo Agents:
+    return `**🔄 Code Conversion & Migration Features in Cosmo Agents:**
 
-• **AI-Powered Rewriting** - Convert code between languages
-• **Batch Processing** - Handle multiple files at once
-• **Code Analysis** - Understand and explain code
-• **Performance Optimization** - Improve code efficiency
+**✨ AI-Powered Features:**
+• **AI Rewrite** - Convert code between any programming languages
+• **AI Explain** - Get detailed explanations of complex code
+• **Batch Processing** - Handle multiple files simultaneously
+• **Performance Analysis** - Optimize code efficiency
 
-**How to use:**
-1. Upload your code files
-2. Select target language/framework
-3. Use AI rewrite for conversion
-4. Review and download results
+**🎯 How to Use:**
+1. **Upload Files** - Drag & drop or select your code files
+2. **Choose Target** - Select the language/framework you want to convert to
+3. **AI Processing** - Let AI analyze and convert your code
+4. **Review & Download** - Check results and download converted code
 
-**Supported Languages:**
-- JavaScript, TypeScript, Python, Java, C#, PHP
-- SQL, PL/SQL, T-SQL
-- React, Vue, Angular components
-- Any programming language`;
+**📋 Supported Conversions:**
+• **Oracle PL/SQL** → **TypeScript/JavaScript**
+• **Sybase Procedures** → **Modern SQL/PL/SQL**
+• **Any Language** ↔ **Any Language**
+• **Framework Migration** - React, Vue, Angular, etc.
+
+**🔧 Advanced Features:**
+• **Code Analysis** - Understand complex logic
+• **Performance Metrics** - Measure conversion improvements
+• **Error Detection** - Identify potential issues
+• **Best Practices** - Apply modern coding standards
+
+**💡 Pro Tips:**
+- Use batch processing for large projects
+- Review AI explanations for better understanding
+- Check performance metrics for optimization
+- Download both original and converted code for comparison`;
   }
 
   // Vite questions
@@ -191,36 +204,108 @@ Configuration:
 
   // Tailwind CSS questions
   if (message.includes('tailwind') || message.includes('css')) {
-    return `Tailwind CSS is a utility-first CSS framework used in your project:
+    return `**🎨 Tailwind CSS in Cosmo Agents:**
 
-• **Utility Classes** - Rapid UI development
-• **Responsive Design** - Mobile-first approach
-• **Custom Configuration** - Tailored to your needs
-• **Component Library** - shadcn/ui integration
+**✨ Key Features:**
+• **Utility-First** - Rapid UI development with pre-built classes
+• **Responsive Design** - Mobile-first approach with breakpoints
+• **Custom Configuration** - Tailored to project needs
+• **Component Integration** - Works seamlessly with shadcn/ui
 
-**Key Features:**
-- Pre-built utility classes
-- Responsive breakpoints
-- Dark mode support
-- Custom color schemes
+**🔧 Usage in Your Project:**
+- **Modern UI** - Clean, professional interface
+- **Responsive Layout** - Works on all devices
+- **Consistent Design** - Unified design system
+- **Fast Development** - Rapid prototyping and iteration
 
-**Usage in Cosmo Agents:**
-- Modern, responsive UI
-- Consistent design system
-- Fast development workflow
-- Beautiful component library`;
+**📱 Responsive Breakpoints:**
+- `sm:` - Small devices (640px+)
+- `md:` - Medium devices (768px+)
+- `lg:` - Large devices (1024px+)
+- `xl:` - Extra large (1280px+)
+
+**🎯 Benefits:**
+- No custom CSS needed for most components
+- Consistent spacing and typography
+- Easy dark mode implementation
+- Optimized for production builds`;
+  }
+
+  // Comments feature questions
+  if (message.includes('comment') || message.includes('note')) {
+    return `**💬 Comments Feature in Cosmo Agents:**
+
+**✨ What You Can Do:**
+• **Add Comments** - Write notes about your code conversions
+• **Edit Comments** - Update your notes anytime
+• **View Comments** - See all comments in history
+• **Delete Comments** - Remove unwanted notes
+
+**🎯 How to Use:**
+1. **In Dev Review Mode:**
+   - Look for the comment input box above action buttons
+   - Type your notes and click "Save Comment"
+   - Comments are automatically linked to the file
+
+2. **In History Page:**
+   - Click the small comment button (💬) next to file names
+   - View, edit, or delete your comments
+   - See comment count and timestamps
+
+**💡 Pro Tips:**
+- Add comments during code review for future reference
+- Use comments to track important decisions
+- Comments help team collaboration
+- All comments are private to your account
+
+**🔒 Privacy:**
+- Comments are stored securely in your main Supabase database
+- Only you can see your comments
+- Comments are linked to specific file conversions`;
   }
   
   // Default response
-  return `I'm Cosmo Agents, your AI assistant for all technologies used in this platform. I can help with:
+  return `I'm Cosmo Agents, your AI assistant for all technologies used in this platform! 🚀
 
-• **Frontend**: React, TypeScript, Vite, Tailwind CSS
-• **Backend**: Supabase, Netlify Functions, PostgreSQL
-• **AI/ML**: Google Generative AI, LangChain
-• **Tools**: Git, GitHub, Docker, ESLint
-• **Databases**: Oracle, Sybase, PostgreSQL
+**🛠️ Technologies I can help you with:**
 
-Please ask me about any of these technologies or any programming language/framework you're working with!`;
+**Frontend Development:**
+• React.js (v18.3.1) - Components, hooks, state management
+• TypeScript (v5.8.3) - Type safety, interfaces, generics
+• Vite (v5.4.1) - Build tool, development server, optimization
+• Tailwind CSS (v3.4.11) - Utility-first CSS, responsive design
+• shadcn/ui - Component library, accessible UI components
+
+**Backend & Database:**
+• Supabase (v2.50.2) - PostgreSQL database, authentication, real-time
+• Netlify Functions - Serverless backend, API endpoints
+• PostgreSQL - Database engine, SQL queries, performance
+
+**AI & Machine Learning:**
+• Google Generative AI - Gemini models, AI-powered features
+• LangChain (v0.3.66) - AI/ML integration, prompt engineering
+• OpenRouter - Multiple AI model access
+
+**Development Tools:**
+• Git & GitHub - Version control, collaboration
+• Docker - Containerization, deployment
+• ESLint - Code quality, linting
+• React Query - Server state management
+
+**Database Technologies:**
+• Oracle Database - Enterprise database, PL/SQL
+• Sybase Database - Legacy database system
+• SQL - Standard query language
+
+**Ask me about:**
+- How to use React hooks and components
+- TypeScript type safety and interfaces
+- Supabase authentication and database setup
+- Code conversion and migration strategies
+- Any programming language or framework
+- Best practices and optimization techniques
+
+What would you like to know about? 💡`;
 };
 
 interface Message {
@@ -316,7 +401,6 @@ Just ask me anything! 🚀`,
       });
 
       console.log('Chatbot response status:', response.status);
-      console.log('Chatbot response headers:', Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -348,42 +432,8 @@ Just ask me anything! 🚀`,
     } catch (error) {
       console.error('Error in chatbot:', error);
       
-      // Only use fallback for genuine errors, not when AI is working
-      let fallbackContent = '';
-      
-      if (error.message.includes('API key') || 
-          error.message.includes('not configured') ||
-          error.message.includes('rate limit') ||
-          error.message.includes('quota') ||
-          error.message.includes('network') ||
-          error.message.includes('fetch')) {
-        // Use simulated response for API/network errors
-        fallbackContent = getSimulatedResponse(userMessage.content);
-        
-        // If no specific response found, provide a general helpful response
-        if (!fallbackContent || fallbackContent.includes('I\'m Cosmo Agents')) {
-          fallbackContent = `I'm here to help you with all the technologies used in this platform! 
-
-**I can assist with:**
-• **Frontend**: React, TypeScript, Vite, Tailwind CSS
-• **Backend**: Supabase, Netlify Functions, PostgreSQL  
-• **AI/ML**: Google Generative AI, LangChain
-• **Tools**: Git, GitHub, Docker, ESLint
-• **Databases**: Oracle, Sybase, PostgreSQL
-
-**Ask me about:**
-- How to use React hooks and components
-- TypeScript type safety and interfaces
-- Supabase authentication and database
-- Code conversion and migration
-- Any programming language or framework
-
-What would you like to know about?`;
-        }
-      } else {
-        // For other errors, show a more specific error message
-        fallbackContent = `I apologize, but I encountered an error: ${error.message}. Please try again or contact support if the issue persists.`;
-      }
+      // Always use simulated response for any error
+      const fallbackContent = getSimulatedResponse(userMessage.content);
       
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),

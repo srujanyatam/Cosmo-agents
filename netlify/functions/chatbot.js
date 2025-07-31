@@ -1,4 +1,4 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const fetch = require('node-fetch');
 
 exports.handler = async (event, context) => {
   // Enable CORS
@@ -38,27 +38,23 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Get the chatbot API key
-    const apiKey = process.env.CHATBOT_GEMINI_API_KEY;
+    // Get the OpenRouter API key
+    const apiKey = process.env.OPENROUTER_API_KEY;
     
     console.log('Chatbot function called with message:', message.substring(0, 100) + '...');
-    console.log('API key present:', !!apiKey);
+    console.log('OpenRouter API key present:', !!apiKey);
     console.log('API key length:', apiKey ? apiKey.length : 0);
     
     if (!apiKey) {
-      console.error('Chatbot API key not configured');
+      console.error('OpenRouter API key not configured');
       return {
         statusCode: 500,
         headers,
         body: JSON.stringify({ 
-          error: 'Chatbot API key not configured. Please set CHATBOT_GEMINI_API_KEY environment variable.' 
+          error: 'OpenRouter API key not configured. Please set OPENROUTER_API_KEY environment variable.' 
         })
       };
     }
-
-    // Initialize Google Generative AI
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     // Create a comprehensive system prompt for the chatbot
     const systemPrompt = `You are Cosmo Agents, an expert AI assistant specializing in ALL technologies and features used in the Cosmo Agents website. You have deep knowledge of:
@@ -163,17 +159,49 @@ exports.handler = async (event, context) => {
 
 Remember: You're here to help users understand and work with ALL technologies that power the Cosmo Agents platform. You can answer questions about any programming language, framework, library, or technology - not just the ones listed above.`;
 
-    // Generate response
+    // Generate response using OpenRouter API
     console.log('Generating response for message:', message.substring(0, 100) + '...');
     
-    const result = await model.generateContent([
-      { role: "user", parts: [{ text: systemPrompt }] },
-      { role: "model", parts: [{ text: "I understand. I'm Cosmo Agents, your expert AI assistant for all the technologies and features used in this platform. I'm ready to help with Git, GitHub, Oracle, Sybase, Supabase, Python, React, TypeScript, LangChain, APIs, and everything else related to this website. What would you like to know?" }] },
-      { role: "user", parts: [{ text: message }] }
-    ]);
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://cosmoagents.netlify.app',
+        'X-Title': 'Cosmo Agents Chatbot'
+      },
+      body: JSON.stringify({
+        model: 'qwen/qwen3-coder:free',
+        messages: [
+          {
+            role: 'system',
+            content: systemPrompt
+          },
+          {
+            role: 'user',
+            content: message
+          }
+        ],
+        max_tokens: 1000,
+        temperature: 0.7
+      })
+    });
 
-    const response = await result.response;
-    const text = response.text();
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('OpenRouter API error:', response.status, errorText);
+      throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('OpenRouter response received');
+    
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error('Invalid response format from OpenRouter');
+      throw new Error('Invalid response format from AI model');
+    }
+
+    const text = data.choices[0].message.content;
     
     console.log('Response generated successfully, length:', text.length);
     console.log('Response preview:', text.substring(0, 200) + '...');
@@ -204,15 +232,15 @@ Remember: You're here to help users understand and work with ALL technologies th
     console.error('Error details:', {
       message: error.message,
       stack: error.stack,
-      apiKey: process.env.CHATBOT_GEMINI_API_KEY ? 'Present' : 'Missing',
-      model: 'gemini-1.5-flash'
+      apiKey: process.env.OPENROUTER_API_KEY ? 'Present' : 'Missing',
+      model: 'qwen/qwen3-coder:free'
     });
     
     // Return a more specific error message
     let errorMessage = 'An error occurred while processing your request. Please try again.';
     
     if (error.message.includes('API key')) {
-      errorMessage = 'API key configuration error. Please check your CHATBOT_GEMINI_API_KEY.';
+      errorMessage = 'API key configuration error. Please check your OPENROUTER_API_KEY.';
     } else if (error.message.includes('quota') || error.message.includes('rate limit')) {
       errorMessage = 'API rate limit exceeded. Please try again later.';
     } else if (error.message.includes('model')) {

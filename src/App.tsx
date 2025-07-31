@@ -12,6 +12,7 @@ import History from "./pages/History";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ReportPage from "./pages/ReportPage";
+import AdminPanel from "./pages/AdminPanel";
 import { CodeEditorThemeProvider } from "@/contexts/CodeEditorThemeContext";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
               <Route path="/history" element={<History />} />
               <Route path="/legacy" element={<Index />} />
               <Route path="/report/:reportId" element={<ReportPage />} />
+              <Route path="/admin" element={<AdminPanel />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

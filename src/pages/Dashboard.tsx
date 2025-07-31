@@ -71,6 +71,7 @@ const Dashboard = () => {
     deleteUnreviewedFile,
     updateUnreviewedFile
   } = useUnreviewedFiles();
+
   const {
     isConverting,
     convertingFileIds,
@@ -97,6 +98,8 @@ const Dashboard = () => {
       return;
     }
   }, [user, loading, navigate]);
+
+
 
   useEffect(() => {
     if (files.length > 0 && !selectedFile) {

@@ -105,15 +105,28 @@
 }
 
 .chatbot-message table {
-  @apply w-full border-collapse border border-gray-300 my-4;
+  @apply w-full border-collapse border border-gray-300 my-4 text-sm;
+  border-spacing: 0;
 }
 
 .chatbot-message th {
-  @apply bg-gray-100 border border-gray-300 px-3 py-2 text-left font-semibold;
+  @apply bg-gray-100 border border-gray-300 px-3 py-2 text-left font-semibold text-gray-800;
 }
 
 .chatbot-message td {
-  @apply border border-gray-300 px-3 py-2;
+  @apply border border-gray-300 px-3 py-2 text-gray-700;
+}
+
+/* Ensure table borders are visible */
+.chatbot-message table,
+.chatbot-message th,
+.chatbot-message td {
+  border: 1px solid #d1d5db !important;
+}
+
+/* Table header styling */
+.chatbot-message thead th {
+  @apply bg-blue-50 text-blue-900 font-bold;
 }
 
 .chatbot-message ul {

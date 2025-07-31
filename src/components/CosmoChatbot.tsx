@@ -218,11 +218,11 @@ Configuration:
 - **Consistent Design** - Unified design system
 - **Fast Development** - Rapid prototyping and iteration
 
-**📱 Responsive Breakpoints:**
-- `sm:` - Small devices (640px+)
-- `md:` - Medium devices (768px+)
-- `lg:` - Large devices (1024px+)
-- `xl:` - Extra large (1280px+)
+  **📱 Responsive Breakpoints:**
+  - sm: - Small devices (640px+)
+  - md: - Medium devices (768px+)
+  - lg: - Large devices (1024px+)
+  - xl: - Extra large (1280px+)
 
 **🎯 Benefits:**
 - No custom CSS needed for most components

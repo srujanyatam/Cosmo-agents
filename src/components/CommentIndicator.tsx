@@ -3,9 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { MessageSquare, Eye, Edit, Save, X, Trash2 } from 'lucide-react';
+import { MessageSquare, Eye, Edit, Save, X, Trash2, Plus } from 'lucide-react';
 import { commentUtils } from '@/utils/commentUtils';
-import { ConversionComment } from '@/types/conversionComments';
+import { ConversionComment, CreateCommentData } from '@/types/conversionComments';
 import { formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 
@@ -22,13 +22,15 @@ const CommentIndicator: React.FC<CommentIndicatorProps> = ({ fileId, fileName })
   const [editText, setEditText] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [newComment, setNewComment] = useState('');
+  const [isAddingComment, setIsAddingComment] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     loadComments();
-  }, [fileId]);
+  }, [fileId, loadComments]);
 
-  const loadComments = async () => {
+  const loadComments = React.useCallback(async () => {
     try {
       setIsLoading(true);
       const fileComments = await commentUtils.getCommentsForFile(fileId);
@@ -38,7 +40,7 @@ const CommentIndicator: React.FC<CommentIndicatorProps> = ({ fileId, fileName })
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [fileId]);
 
   const handleEditComment = (comment: ConversionComment) => {
     setEditingCommentId(comment.id);
@@ -105,6 +107,48 @@ const CommentIndicator: React.FC<CommentIndicatorProps> = ({ fileId, fileName })
     setEditText('');
   };
 
+  const handleAddComment = async () => {
+    if (!newComment.trim()) {
+      toast({
+        title: "Comment Required",
+        description: "Please enter a comment before saving.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsAddingComment(true);
+    try {
+      const commentData: CreateCommentData = {
+        file_id: fileId,
+        file_name: fileName,
+        comment: newComment.trim(),
+        is_public: false
+      };
+
+      const result = await commentUtils.createComment(commentData);
+      if (result) {
+        setComments(prev => [result, ...prev]);
+        setNewComment('');
+        toast({
+          title: "Comment Added",
+          description: "Your comment has been saved successfully.",
+        });
+      } else {
+        throw new Error('Failed to create comment');
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save comment. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAddingComment(false);
+    }
+  };
+
   if (comments.length === 0) {
     return null;
   }
@@ -129,7 +173,38 @@ const CommentIndicator: React.FC<CommentIndicatorProps> = ({ fileId, fileName })
           <DialogHeader>
             <DialogTitle>Comments for {fileName}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3 overflow-y-auto max-h-[60vh]">
+          
+          {/* Add Comment Section */}
+          <div className="mb-4 p-4 bg-gray-50 rounded-lg border">
+            <div className="flex items-start gap-3">
+              <Plus className="h-5 w-5 text-gray-500 mt-1 flex-shrink-0" />
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Add New Comment
+                </label>
+                <Textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Add your notes, reminders, or comments about this conversion..."
+                  rows={2}
+                  className="resize-none"
+                />
+                <div className="flex justify-end mt-2">
+                  <Button
+                    onClick={handleAddComment}
+                    disabled={isAddingComment || !newComment.trim()}
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    {isAddingComment ? 'Saving...' : 'Save Comment'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Comments List */}
+          <div className="space-y-3 overflow-y-auto max-h-[40vh]">
             {isLoading ? (
               <div className="text-center py-4">
                 <p className="text-gray-500">Loading comments...</p>
@@ -139,77 +214,91 @@ const CommentIndicator: React.FC<CommentIndicatorProps> = ({ fileId, fileName })
                 <p className="text-gray-500">No comments found</p>
               </div>
             ) : (
-              comments.map((comment) => (
-                <div key={comment.id} className="border-l-4 border-l-blue-500 bg-gray-50 p-4 rounded">
-                  <div className="flex justify-between items-start mb-2">
-                    <Badge variant="secondary" className="text-xs">
-                      {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
-                    </Badge>
-                    <div className="flex gap-1">
-                      {comment.updated_at !== comment.created_at && (
-                        <Badge variant="outline" className="text-xs">
-                          Edited
-                        </Badge>
-                      )}
-                      {editingCommentId === comment.id ? (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={handleSaveEdit}
-                            disabled={isSaving}
-                            className="h-6 w-6 p-0"
-                          >
-                            <Save className="h-3 w-3" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={handleCancelEdit}
-                            className="h-6 w-6 p-0"
-                          >
-                            <X className="h-3 w-3" />
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleEditComment(comment)}
-                            className="h-6 w-6 p-0"
-                          >
-                            <Edit className="h-3 w-3" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleDeleteComment(comment.id)}
-                            disabled={isDeleting === comment.id}
-                            className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  {editingCommentId === comment.id ? (
-                    <Textarea
-                      value={editText}
-                      onChange={(e) => setEditText(e.target.value)}
-                      rows={3}
-                      className="resize-none"
-                    />
-                  ) : (
-                    <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                      {comment.comment}
-                    </p>
-                  )}
-                </div>
-              ))
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="text-sm font-medium text-blue-900 mb-3 flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Comments ({comments.length})
+                </h4>
+                <ul className="space-y-2">
+                  {comments.map((comment) => (
+                    <li key={comment.id} className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-start mb-1">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary" className="text-xs">
+                              {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                            </Badge>
+                            {comment.updated_at !== comment.created_at && (
+                              <Badge variant="outline" className="text-xs">
+                                Edited
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex gap-1">
+                            {editingCommentId === comment.id ? (
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={handleSaveEdit}
+                                  disabled={isSaving}
+                                  className="h-6 w-6 p-0"
+                                >
+                                  <Save className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={handleCancelEdit}
+                                  className="h-6 w-6 p-0"
+                                >
+                                  <X className="h-3 w-3" />
+                                </Button>
+                              </>
+                            ) : (
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => handleEditComment(comment)}
+                                  className="h-6 w-6 p-0"
+                                >
+                                  <Edit className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => handleDeleteComment(comment.id)}
+                                  disabled={isDeleting === comment.id}
+                                  className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        {editingCommentId === comment.id ? (
+                          <Textarea
+                            value={editText}
+                            onChange={(e) => setEditText(e.target.value)}
+                            rows={3}
+                            className="resize-none"
+                          />
+                        ) : (
+                          <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                            {comment.comment}
+                          </p>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
           </div>
+          
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowComments(false)}>
               Close

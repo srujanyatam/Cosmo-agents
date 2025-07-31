@@ -44,16 +44,16 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
   // Load comments on component mount
   useEffect(() => {
     loadComments();
-  }, [fileId]);
+  }, [fileId, loadComments]);
 
-  const loadComments = async () => {
+  const loadComments = React.useCallback(async () => {
     try {
       const fileComments = await commentUtils.getCommentsForFile(fileId);
       setComments(fileComments);
     } catch (error) {
       console.error('Error loading comments:', error);
     }
-  };
+  }, [fileId]);
 
   const handleAddComment = async () => {
     if (!newComment.trim()) {
@@ -223,45 +223,54 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
       {/* Comments List (in dev review) */}
       {isDevReview && comments.length > 0 && (
         <div className="space-y-3">
-          {comments.map((comment) => (
-            <Card key={comment.id} className="border-l-4 border-l-blue-500">
-              <CardContent className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="text-xs">
-                      {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
-                    </Badge>
-                    {comment.updated_at !== comment.created_at && (
-                      <Badge variant="outline" className="text-xs">
-                        Edited
-                      </Badge>
-                    )}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 className="text-sm font-medium text-blue-900 mb-3 flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Your Comments ({comments.length})
+            </h4>
+            <ul className="space-y-2">
+              {comments.map((comment) => (
+                <li key={comment.id} className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start mb-1">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="text-xs">
+                          {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                        </Badge>
+                        {comment.updated_at !== comment.created_at && (
+                          <Badge variant="outline" className="text-xs">
+                            Edited
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="flex gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => startEditing(comment)}
+                          className="h-6 w-6 p-0"
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDeleteComment(comment.id)}
+                          className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                      {comment.comment}
+                    </p>
                   </div>
-                  <div className="flex gap-1">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => startEditing(comment)}
-                      className="h-6 w-6 p-0"
-                    >
-                      <Edit className="h-3 w-3" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleDeleteComment(comment.id)}
-                      className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                  {comment.comment}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
 

@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import CodeEditor from './CodeEditor'; // Added import for CodeEditor
 import { commentUtils } from '@/utils/commentUtils'; // Import commentUtils
+import CommentsSection from './CommentsSection';
 
 interface DataTypeMapping {
   sybaseType: string;
@@ -124,8 +125,6 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
   const [showExplainDialog, setShowExplainDialog] = useState(false);
   const [explanation, setExplanation] = useState('');
   const [isExplaining, setIsExplaining] = useState(false);
-  const [newComment, setNewComment] = useState('');
-  const [isAddingComment, setIsAddingComment] = useState(false);
 
   // Calculate dynamic height based on content length
   const getDynamicHeight = (content: string) => {
@@ -149,7 +148,7 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
     if (!aiCode || !finalCode) return 0;
     const diff = diffChars(aiCode, finalCode);
     let changed = 0;
-    let total = aiCode.length;
+    const total = aiCode.length;
     diff.forEach(part => {
       if (part.added || part.removed) {
         changed += part.count || part.value.length;
@@ -157,7 +156,7 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
     });
     return total > 0 ? Math.min(100, Math.round((changed / total) * 100)) : 0;
   }
-  const aiCode = (file as any).aiGeneratedCode || file.convertedContent || '';
+  const aiCode = (file as FileItem & { aiGeneratedCode?: string }).aiGeneratedCode || file.convertedContent || '';
   const finalCode = file.convertedContent || '';
   const humanEditPercent = getEditPercentage(aiCode, finalCode);
 
@@ -201,46 +200,7 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
     }
   };
 
-  const handleAddComment = async () => {
-    if (!newComment.trim()) {
-      toast({
-        title: "Comment Required",
-        description: "Please enter a comment before saving.",
-        variant: "destructive",
-      });
-      return;
-    }
 
-    setIsAddingComment(true);
-    try {
-      const commentData = {
-        file_id: file.id,
-        file_name: file.name,
-        comment: newComment.trim(),
-        is_public: false
-      };
-
-      const result = await commentUtils.createComment(commentData);
-      if (result) {
-        setNewComment('');
-        toast({
-          title: "Comment Added",
-          description: "Your comment has been saved successfully.",
-        });
-      } else {
-        throw new Error('Failed to create comment');
-      }
-    } catch (error) {
-      console.error('Error adding comment:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save comment. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsAddingComment(false);
-    }
-  };
 
   // Add color helpers:
   const getScalabilityColor = (score) => {
@@ -797,34 +757,14 @@ This appears to be Oracle PL/SQL code that has been converted from Sybase.
         
       </Tabs>
 
-      {/* Comment Input Section - Only show in dev review mode */}
+      {/* Comments Section - Only show in dev review mode */}
       {!hideEdit && (
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
-          <div className="flex items-start gap-3">
-            <MessageSquare className="h-5 w-5 text-gray-500 mt-1 flex-shrink-0" />
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Add Comment for this conversion
-              </label>
-              <Textarea
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Add your notes, reminders, or comments about this conversion..."
-                rows={2}
-                className="resize-none"
-              />
-              <div className="flex justify-end mt-2">
-                <Button
-                  onClick={handleAddComment}
-                  disabled={isAddingComment || !newComment.trim()}
-                  size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  {isAddingComment ? 'Saving...' : 'Save Comment'}
-                </Button>
-              </div>
-            </div>
-          </div>
+        <div className="mt-6">
+          <CommentsSection 
+            fileId={file.id}
+            fileName={file.name}
+            isDevReview={true}
+          />
         </div>
       )}
 

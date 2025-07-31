@@ -172,13 +172,22 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
     }
   }, [isOpen]);
 
+  // Debug effect to log conversation changes
+  useEffect(() => {
+    console.log('Current conversation updated:', currentConversation);
+    console.log('Messages count:', currentConversation?.messages.length);
+  }, [currentConversation]);
+
   const handleSendMessage = async (messageText: string) => {
     if (!messageText.trim() || isLoading) return;
 
+    // Create conversation if needed
     if (!currentConversation) {
       createConversation('New Conversation');
-      // Wait for conversation to be created
-      setTimeout(() => handleSendMessage(messageText), 100);
+      // Use a small delay to ensure state is updated
+      setTimeout(() => {
+        handleSendMessage(messageText);
+      }, 100);
       return;
     }
 
@@ -196,15 +205,20 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
     setError(null);
 
     try {
+      console.log('Sending message to chatbot:', messageText);
+      console.log('Current conversation:', currentConversation);
+      
       const response = await sendChatMessage({
         message: messageText,
         conversationHistory: currentConversation.messages,
         model: 'qwen'
       });
 
+      console.log('Chatbot response:', response);
       addMessage(currentConversation.id, response.message);
       setSuggestions(response.suggestions || []);
     } catch (err) {
+      console.error('Chatbot error:', err);
       setError('Failed to send message');
       toast({
         title: 'Error',

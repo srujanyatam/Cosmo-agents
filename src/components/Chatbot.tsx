@@ -123,17 +123,23 @@ const SuggestionButton: React.FC<{
     }
   };
 
+  const handleClick = () => {
+    if (!disabled) {
+      onClick(suggestion.text);
+    }
+  };
+
   return (
     <Button
       variant="outline"
       size="sm"
-      onClick={() => onClick(suggestion.text)}
+      onClick={handleClick}
       disabled={disabled}
-      className="h-auto p-2 text-left whitespace-normal"
+      className="h-auto p-2 text-left whitespace-normal hover:bg-primary hover:text-primary-foreground transition-colors"
     >
       <div className="flex items-start gap-2">
         {getIcon(suggestion.icon)}
-        <span className="text-xs">{suggestion.text}</span>
+        <span className="text-xs leading-relaxed">{suggestion.text}</span>
       </div>
     </Button>
   );
@@ -344,49 +350,67 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
         </div>
       </div>
 
-      {/* Messages */}
-      {!isMinimized && (
-        <ScrollArea className="flex-1 p-4">
-        {!currentConversation ? (
-          <div className="text-center py-8">
-            <Bot className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <h4 className="font-medium mb-2">Welcome to Migration Assistant</h4>
-            <p className="text-sm text-muted-foreground mb-4">
-              I'm here to help you with your Sybase to Oracle migration. Ask me anything!
-            </p>
-            <div className="space-y-2">
-              {quickSuggestions.map((suggestion) => (
-                <SuggestionButton
-                  key={suggestion.id}
-                  suggestion={suggestion}
-                  onClick={handleSuggestionClick}
-                />
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div>
-            {currentConversation.messages.map((message) => (
-              <MessageBubble key={message.id} message={message} />
-            ))}
-            {isLoading && (
-              <div className="flex gap-3 mb-4">
-                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                  <Bot className="w-4 h-4" />
-                </div>
-                <div className="bg-muted rounded-lg px-4 py-2">
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span className="text-sm">Thinking...</span>
-                  </div>
-                </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-        )}
-        </ScrollArea>
-      )}
+             {/* Messages */}
+       {!isMinimized && (
+         <ScrollArea className="flex-1 p-4">
+         {!currentConversation ? (
+           <div className="text-center py-8">
+             <Bot className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+             <h4 className="font-medium mb-2">Welcome to Migration Assistant</h4>
+             <p className="text-sm text-muted-foreground mb-4">
+               I'm here to help you with your Sybase to Oracle migration. Ask me anything!
+             </p>
+             <div className="space-y-2">
+               {quickSuggestions.map((suggestion) => (
+                 <SuggestionButton
+                   key={suggestion.id}
+                   suggestion={suggestion}
+                   onClick={handleSuggestionClick}
+                   disabled={isLoading}
+                 />
+               ))}
+             </div>
+           </div>
+         ) : (
+           <div>
+             {currentConversation.messages.map((message) => (
+               <MessageBubble key={message.id} message={message} />
+             ))}
+             {isLoading && (
+               <div className="flex gap-3 mb-4">
+                 <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                   <Bot className="w-4 h-4" />
+                 </div>
+                 <div className="bg-muted rounded-lg px-4 py-2">
+                   <div className="flex items-center gap-2">
+                     <Loader2 className="w-4 h-4 animate-spin" />
+                     <span className="text-sm">Thinking...</span>
+                   </div>
+                 </div>
+               </div>
+             )}
+             <div ref={messagesEndRef} />
+           </div>
+         )}
+         </ScrollArea>
+       )}
+
+       {/* Quick Suggestions - Always visible when no conversation or empty conversation */}
+       {!isMinimized && (!currentConversation || currentConversation.messages.length === 0) && (
+         <div className="p-4 border-t">
+           <p className="text-xs text-muted-foreground mb-2">Quick Start:</p>
+           <div className="grid grid-cols-2 gap-2">
+             {quickSuggestions.map((suggestion) => (
+               <SuggestionButton
+                 key={suggestion.id}
+                 suggestion={suggestion}
+                 onClick={handleSuggestionClick}
+                 disabled={isLoading}
+               />
+             ))}
+           </div>
+         </div>
+       )}
 
       {/* Suggestions */}
       {!isMinimized && suggestions.length > 0 && (

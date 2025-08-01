@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Database, FileText, Home, Eye, Download, Trash2, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Database, FileText, Home, Eye, Download, Trash2, CheckCircle, XCircle, AlertCircle, History, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +13,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@
 import { useToast } from '@/hooks/use-toast';
 import { useUnreviewedFiles } from '@/hooks/useUnreviewedFiles';
 import ReportViewer from '@/components/ReportViewer';
+import { ChatbotToggle } from '@/components/ChatbotToggle';
+import Help from '@/components/Help';
 
 interface Migration {
   id: string;
@@ -59,6 +61,7 @@ const History = () => {
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [showGeneratedReport, setShowGeneratedReport] = useState(false);
   const [generatedReport, setGeneratedReport] = useState<any>(null);
+  const [showHelp, setShowHelp] = useState(false);
 
   // Get the return tab from location state
   const returnTab = location.state?.returnTab || 'upload';
@@ -540,31 +543,42 @@ const History = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4">
+      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center space-x-3">
               <button onClick={handleBack} className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100">
-                <ArrowLeft className="h-5 w-5" />
+                <ArrowLeft className="h-4 w-4" />
                 Back
               </button>
               <HomeButton onClick={handleGoHome} />
-              <Button 
-                variant="ghost" 
-                onClick={handleBack}
-                className="flex items-center gap-2"
-                style={{ display: 'none' }} // Hide duplicate back button
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Back to Dashboard
-              </Button>
               <div className="flex items-center">
-                <Database className="h-8 w-8 text-primary mr-3" />
-                <h1 className="text-2xl font-bold text-gray-900">Migration History</h1>
+                <Database className="h-6 w-6 text-primary mr-2" />
+                <h1 className="text-xl font-bold text-gray-900">Migration History</h1>
               </div>
             </div>
-            
-            <UserDropdown />
+            <div className="flex items-center space-x-3">
+              <ChatbotToggle variant="header" isVisible={true} isCollapsed={false} />
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate('/migration')}
+                className="flex items-center gap-2"
+              >
+                <Database className="h-4 w-4" />
+                Migration
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowHelp(true)}
+                className="flex items-center gap-2"
+              >
+                <HelpCircle className="h-4 w-4" />
+                Help
+              </Button>
+              <UserDropdown />
+            </div>
           </div>
         </div>
       </header>
@@ -836,6 +850,9 @@ const History = () => {
           </Dialog>
         )}
       </main>
+      
+      {/* Help Modal */}
+      {showHelp && <Help onClose={() => setShowHelp(false)} />}
     </div>
   );
 };

@@ -12,12 +12,9 @@ export const useAdmin = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        console.log('No user found');
         setIsAdmin(false);
         return;
       }
-
-      console.log('Checking admin status for user:', user.id);
 
       const { data: profile, error } = await supabase
         .from('profiles')
@@ -31,9 +28,7 @@ export const useAdmin = () => {
         return;
       }
 
-      console.log('User role:', profile?.role);
       const isAdminUser = profile?.role === 'admin' || profile?.role === 'moderator';
-      console.log('Is admin:', isAdminUser);
       setIsAdmin(isAdminUser);
     } catch (error) {
       console.error('Error checking admin status:', error);
@@ -48,7 +43,6 @@ export const useAdmin = () => {
   }, []);
 
   const getUsers = async (): Promise<UserProfile[]> => {
-    console.log('Fetching all users...');
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -64,8 +58,6 @@ export const useAdmin = () => {
       return [];
     }
 
-    console.log('Fetched users:', data);
-    console.log('Number of users:', data?.length || 0);
     return data || [];
   };
 

@@ -126,7 +126,7 @@ export const ChatbotToggle: React.FC<ChatbotToggleProps> = ({
           'transition-all duration-200',
           variant === 'floating' 
             ? 'bg-primary hover:bg-primary/90 text-primary-foreground' 
-            : 'bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 hover:border-gray-400',
+            : 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-600 hover:border-blue-700',
           variant === 'floating' && isDragging ? 'shadow-2xl scale-110 rotate-12' : '',
           variant === 'floating' && isDragging ? 'cursor-grabbing' : variant === 'floating' ? 'cursor-grab' : 'cursor-pointer',
           variant === 'floating' && isCollapsed ? 'w-12 h-12' : variant === 'floating' ? 'w-14 h-14' : 'w-8 h-8',

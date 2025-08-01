@@ -214,21 +214,48 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
 
 
 
-  const handleSendMessage = async (messageText: string) => {
+    const handleSendMessage = async (messageText: string) => {
     if (!messageText.trim() || isLoading) return;
 
     // Create conversation if needed
     if (!currentConversation) {
-      createConversation('New Conversation');
-      // Wait for the conversation to be created and set as current
-      setTimeout(() => {
-        const newConversation = conversations.find(conv => conv.isActive);
-        if (newConversation) {
-          setCurrentConversation(newConversation);
-          // Now send the message
-          setTimeout(() => handleSendMessage(messageText), 50);
-        }
-      }, 100);
+      const newConversationId = createConversation('New Conversation');
+      
+      // Create the user message first
+      const userMessage: ChatMessage = {
+        id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        content: messageText,
+        role: 'user',
+        timestamp: new Date(),
+        type: 'text'
+      };
+
+      // Add the message to the new conversation immediately
+      addMessage(newConversationId, userMessage);
+      setInputValue('');
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await sendChatMessage({
+          message: messageText,
+          conversationHistory: [userMessage], // Use the message we just created
+          model: 'gemini'
+        });
+
+        addMessage(newConversationId, response.message);
+        setSuggestions(response.suggestions || []);
+      } catch (err) {
+        console.error('Chatbot error:', err);
+        setError('Failed to send message');
+        toast({
+          title: 'Error',
+          description: 'Failed to send message. Please try again.',
+          variant: 'destructive'
+        });
+      } finally {
+        setLoading(false);
+      }
       return;
     }
 
@@ -247,10 +274,10 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
 
     try {
              const response = await sendChatMessage({
-         message: messageText,
-         conversationHistory: currentConversation.messages,
-         model: 'gemini'
-       });
+        message: messageText,
+        conversationHistory: currentConversation.messages,
+        model: 'gemini'
+      });
 
       addMessage(currentConversation.id, response.message);
       setSuggestions(response.suggestions || []);

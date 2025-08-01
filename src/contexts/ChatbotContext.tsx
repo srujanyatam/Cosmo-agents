@@ -19,7 +19,7 @@ interface ChatbotState {
 type ChatbotAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
-  | { type: 'CREATE_CONVERSATION'; payload: string }
+  | { type: 'CREATE_CONVERSATION'; payload: { id: string; title: string } }
   | { type: 'SET_CURRENT_CONVERSATION'; payload: ChatConversation | null }
   | { type: 'ADD_MESSAGE'; payload: { conversationId: string; message: ChatMessage } }
   | { type: 'UPDATE_CONVERSATION_TITLE'; payload: { conversationId: string; title: string } }
@@ -51,8 +51,8 @@ function chatbotReducer(state: ChatbotState, action: ChatbotAction): ChatbotStat
     
     case 'CREATE_CONVERSATION':
       const newConversation: ChatConversation = {
-        id: uuidv4(),
-        title: action.payload,
+        id: action.payload.id,
+        title: action.payload.title,
         messages: [],
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -153,8 +153,10 @@ interface ChatbotProviderProps {
 export const ChatbotProvider: React.FC<ChatbotProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(chatbotReducer, initialState);
 
-  const createConversation = (title: string) => {
-    dispatch({ type: 'CREATE_CONVERSATION', payload: title });
+  const createConversation = (title: string): string => {
+    const conversationId = uuidv4();
+    dispatch({ type: 'CREATE_CONVERSATION', payload: { id: conversationId, title } });
+    return conversationId;
   };
 
   const setCurrentConversation = (conversation: ChatConversation | null) => {

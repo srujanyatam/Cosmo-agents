@@ -36,8 +36,8 @@ const initialState: ChatbotState = {
   config: {
     model: 'gemini',
     temperature: 0.7,
-    maxTokens: 1000,
-    systemPrompt: 'You are an expert Oracle database migration assistant.'
+    maxTokens: 500,
+    systemPrompt: 'You are an expert Oracle database migration assistant. Provide concise, practical answers. Keep responses brief and to the point. Focus on actionable advice and clear explanations without unnecessary details.'
   }
 };
 

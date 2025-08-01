@@ -22,7 +22,8 @@ import {
   BookOpen,
   Settings,
   Minimize2,
-  Maximize2
+  Maximize2,
+  ExternalLink
 } from 'lucide-react';
 import { ChatbotSettings } from './ChatbotSettings';
 import { useToast } from '@/hooks/use-toast';

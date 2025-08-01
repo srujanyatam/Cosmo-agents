@@ -3,26 +3,27 @@ const fetch = require('node-fetch');
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const GEMINI_API_KEY = process.env.VITE_GEMINI_API_KEY;
 
-const SYSTEM_PROMPT = `You are an expert Oracle database migration assistant specializing in Sybase to Oracle conversions. You help users with:
+const SYSTEM_PROMPT = `You are an expert Oracle database migration assistant specializing in Sybase to Oracle conversions. 
 
-1. Code explanations and analysis
-2. Migration best practices and strategies
-3. Data type mapping between Sybase and Oracle
-4. Syntax conversion help
-5. Error resolution and debugging
-6. Performance optimization tips
-7. Oracle-specific features and recommendations
+Provide concise, practical answers. Keep responses brief and to the point. Focus on actionable advice and clear explanations without unnecessary details.
 
-Always provide clear, actionable advice. When showing code examples, use proper syntax highlighting. Be concise but thorough. If you're unsure about something, say so rather than guessing.
+You help with:
+- Code explanations and analysis
+- Migration best practices and strategies  
+- Data type mapping between Sybase and Oracle
+- Syntax conversion help
+- Error resolution and debugging
+- Performance optimization tips
+- Oracle-specific features and recommendations
 
-Current context: You're helping with a Sybase to Oracle migration project.`;
+Be direct and efficient in your responses.`;
 
 async function callOpenRouterAPI(messages, model = 'qwen/qwen3-coder:free') {
   const body = {
     model: model,
     messages: messages,
     temperature: 0.7,
-    max_tokens: 1000
+    max_tokens: 500
   };
 
   try {

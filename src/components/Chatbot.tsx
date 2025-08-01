@@ -66,39 +66,41 @@ const MessageBubble: React.FC<{ message: ChatMessage }> = ({ message }) => {
   
   return (
     <div className={cn(
-      'flex gap-3 mb-4',
+      'flex gap-3 mb-6 animate-in fade-in-0 slide-in-from-bottom-2 duration-300',
       isUser ? 'justify-end' : 'justify-start'
     )}>
       <div className={cn(
-        'flex gap-3 max-w-[80%]',
+        'flex gap-3 max-w-[85%]',
         isUser ? 'flex-row-reverse' : 'flex-row'
       )}>
         <div className={cn(
-          'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0',
-          isUser ? 'bg-primary text-primary-foreground' : 'bg-muted'
+          'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm',
+          isUser 
+            ? 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white' 
+            : 'bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800'
         )}>
           {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
         </div>
         
         <div className={cn(
-          'rounded-lg px-4 py-2',
+          'rounded-2xl px-4 py-3 shadow-sm border',
           isUser 
-            ? 'bg-primary text-primary-foreground' 
-            : 'bg-muted'
+            ? 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white' 
+            : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
         )}>
-          <div className="text-sm whitespace-pre-wrap">
+          <div className="text-sm whitespace-pre-wrap leading-relaxed">
             {message.content}
           </div>
           {message.metadata?.codeBlock && (
-            <div className="mt-2">
-              <pre className="bg-background text-foreground p-2 rounded text-xs overflow-x-auto">
+            <div className="mt-3">
+              <pre className="bg-gray-900 text-gray-100 p-3 rounded-lg text-xs overflow-x-auto border border-gray-700">
                 <code>{message.metadata.codeBlock}</code>
               </pre>
             </div>
           )}
           <div className={cn(
-            'text-xs mt-1 opacity-70',
-            isUser ? 'text-primary-foreground' : 'text-muted-foreground'
+            'text-xs mt-2 opacity-60',
+            isUser ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'
           )}>
             {message.timestamp.toLocaleTimeString()}
           </div>
@@ -135,11 +137,13 @@ const SuggestionButton: React.FC<{
       size="sm"
       onClick={handleClick}
       disabled={disabled}
-      className="h-auto p-2 text-left whitespace-normal hover:bg-primary hover:text-primary-foreground transition-colors"
+      className="h-auto p-3 text-left whitespace-normal hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:border-blue-300 dark:hover:from-blue-950/30 dark:hover:to-indigo-950/30 dark:hover:border-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
     >
-      <div className="flex items-start gap-2">
-        {getIcon(suggestion.icon)}
-        <span className="text-xs leading-relaxed">{suggestion.text}</span>
+      <div className="flex items-start gap-3">
+        <div className="p-1 rounded-md bg-blue-100 dark:bg-blue-900/30">
+          {getIcon(suggestion.icon)}
+        </div>
+        <span className="text-xs leading-relaxed font-medium">{suggestion.text}</span>
       </div>
     </Button>
   );
@@ -336,77 +340,95 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
       }}
       ref={resizeRef}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
-        <div className="flex items-center gap-2">
-          <Bot className="w-5 h-5 text-primary" />
-          <h3 className="font-semibold">Migration Assistant</h3>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowSettings(true)}
-            title="Settings"
-          >
-            <Settings className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleNewConversation}
-            title="New conversation"
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleToggleMinimize}
-            title={isMinimized ? "Maximize" : "Minimize"}
-          >
-            {isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            title="Close"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
+             {/* Header */}
+       <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
+         <div className="flex items-center gap-3">
+           <div className="relative">
+             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg">
+               <Bot className="w-5 h-5 text-white" />
+             </div>
+             <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
+           </div>
+           <div>
+             <h3 className="font-bold text-gray-900 dark:text-gray-100">Migration Assistant</h3>
+             <p className="text-xs text-gray-500 dark:text-gray-400">AI-Powered Oracle Migration</p>
+           </div>
+         </div>
+         <div className="flex items-center gap-1">
+           <Button
+             variant="ghost"
+             size="sm"
+             onClick={() => setShowSettings(true)}
+             title="Settings"
+             className="hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+           >
+             <Settings className="w-4 h-4" />
+           </Button>
+           <Button
+             variant="ghost"
+             size="sm"
+             onClick={handleNewConversation}
+             title="New conversation"
+             className="hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+           >
+             <Plus className="w-4 h-4" />
+           </Button>
+           <Button
+             variant="ghost"
+             size="sm"
+             onClick={handleToggleMinimize}
+             title={isMinimized ? "Maximize" : "Minimize"}
+             className="hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+           >
+             {isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
+           </Button>
+           <Button
+             variant="ghost"
+             size="sm"
+             onClick={onClose}
+             title="Close"
+             className="hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+           >
+             <X className="w-4 h-4" />
+           </Button>
+         </div>
+       </div>
 
                            {/* Messages */}
         {!isMinimized && (
           <ScrollArea className="flex-1 p-4">
-          {!currentConversation || currentConversation.messages.length === 0 ? (
-            <div className="text-center py-8">
-              <Bot className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h4 className="font-medium mb-2">Welcome to Migration Assistant</h4>
-              <p className="text-sm text-muted-foreground mb-4">
-                I'm here to help you with your Sybase to Oracle migration. Ask me anything!
-              </p>
-            </div>
+                     {!currentConversation || currentConversation.messages.length === 0 ? (
+             <div className="text-center py-8">
+               <h4 className="font-bold text-xl mb-3 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                 Welcome to Migration Assistant
+               </h4>
+               <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 max-w-sm mx-auto">
+                 I'm here to help you with your Sybase to Oracle migration. Ask me anything!
+               </p>
+               <div className="w-12 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mx-auto"></div>
+             </div>
           ) : (
             <div>
               {currentConversation.messages.map((message) => (
                 <MessageBubble key={message.id} message={message} />
               ))}
-              {isLoading && (
-                <div className="flex gap-3 mb-4">
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                    <Bot className="w-4 h-4" />
-                  </div>
-                  <div className="bg-muted rounded-lg px-4 py-2">
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span className="text-sm">Thinking...</span>
-                    </div>
-                  </div>
-                </div>
-              )}
+                           {isLoading && (
+               <div className="flex gap-3 mb-6 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center shadow-sm">
+                   <Bot className="w-4 h-4" />
+                 </div>
+                 <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 shadow-sm">
+                   <div className="flex items-center gap-3">
+                     <div className="flex space-x-1">
+                       <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                       <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                       <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                     </div>
+                     <span className="text-sm text-gray-600 dark:text-gray-300">Thinking...</span>
+                   </div>
+                 </div>
+               </div>
+             )}
               <div ref={messagesEndRef} />
             </div>
           )}
@@ -450,29 +472,30 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
          </div>
        )}
 
-      {/* Input */}
-      {!isMinimized && (
-        <div className="p-4 border-t">
-        <div className="flex gap-2">
-          <Input
-            ref={inputRef}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Ask about migration, code, or best practices..."
-            disabled={isLoading}
-            className="flex-1"
-          />
-          <Button
-            onClick={() => handleSendMessage(inputValue)}
-            disabled={!inputValue.trim() || isLoading}
-            size="icon"
-          >
-            <Send className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
-      )}
+             {/* Input */}
+       {!isMinimized && (
+         <div className="p-4 border-t bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-900/50 dark:to-blue-950/20">
+         <div className="flex gap-3">
+           <Input
+             ref={inputRef}
+             value={inputValue}
+             onChange={(e) => setInputValue(e.target.value)}
+             onKeyPress={handleKeyPress}
+             placeholder="Ask about migration, code, or best practices..."
+             disabled={isLoading}
+             className="flex-1 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 rounded-xl shadow-sm"
+           />
+           <Button
+             onClick={() => handleSendMessage(inputValue)}
+             disabled={!inputValue.trim() || isLoading}
+             size="icon"
+             className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
+           >
+             <Send className="w-4 h-4" />
+           </Button>
+         </div>
+       </div>
+       )}
 
       {/* Resize handle */}
       {!isMinimized && (

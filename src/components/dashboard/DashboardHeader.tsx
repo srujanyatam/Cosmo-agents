@@ -5,6 +5,7 @@ import { Database, History, HelpCircle } from 'lucide-react';
 import UserDropdown from '@/components/UserDropdown';
 import HomeButton from '@/components/HomeButton';
 import { ChatbotToggle } from '@/components/ChatbotToggle';
+import { useAuth } from '@/hooks/useAuth';
 // import { CodeEditorThemeContext } from '@/contexts/CodeEditorThemeContext';
 
 interface DashboardHeaderProps {
@@ -20,6 +21,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   onShowHelp,
   title = "Migration Dashboard"
 }) => {
+  const { user } = useAuth();
   // const { isDarkMode, toggleDarkMode } = useContext(CodeEditorThemeContext);
   return (
     <header className="bg-white shadow-sm border-b">
@@ -33,7 +35,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <ChatbotToggle variant="header" isVisible={true} isCollapsed={false} />
+            {user && <ChatbotToggle variant="header" isVisible={true} isCollapsed={false} />}
             <Button 
               variant="outline" 
               size="sm"

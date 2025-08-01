@@ -40,7 +40,7 @@ const Landing = () => {
               <h1 className="text-xl font-bold text-gray-900">Sybase to Oracle Migration</h1>
             </div>
             <div className="flex items-center space-x-3">
-              <ChatbotToggle variant="header" isVisible={true} isCollapsed={false} />
+              {user && <ChatbotToggle variant="header" isVisible={true} isCollapsed={false} />}
               {user ? (
                 <>
                   <Button 

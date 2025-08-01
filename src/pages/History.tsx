@@ -558,7 +558,7 @@ const History = () => {
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <ChatbotToggle variant="header" isVisible={true} isCollapsed={false} />
+              {user && <ChatbotToggle variant="header" isVisible={true} isCollapsed={false} />}
               <Button 
                 variant="outline" 
                 size="sm"

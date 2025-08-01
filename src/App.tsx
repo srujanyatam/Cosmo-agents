@@ -17,11 +17,13 @@ import { CodeEditorThemeProvider } from "@/contexts/CodeEditorThemeContext";
 import { ChatbotProvider } from "@/contexts/ChatbotContext";
 import { ChatbotToggle } from "@/components/ChatbotToggle";
 import { useLocation } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
   const location = useLocation();
+  const { user } = useAuth();
   
   // Determine if we're on the home page (Landing)
   const isHomePage = location.pathname === '/';
@@ -41,7 +43,7 @@ const AppContent = () => {
       </Routes>
       
       {/* Show floating chatbot toggle for pages that don't have it in header */}
-      {!isHomePage && location.pathname !== '/migration' && location.pathname !== '/history' && !location.pathname.startsWith('/report/') && location.pathname !== '/admin' && location.pathname !== '/auth' && (
+      {user && !isHomePage && location.pathname !== '/migration' && location.pathname !== '/history' && !location.pathname.startsWith('/report/') && location.pathname !== '/admin' && location.pathname !== '/auth' && (
         <ChatbotToggle 
           isVisible={true}
           isCollapsed={true}

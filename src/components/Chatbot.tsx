@@ -192,9 +192,7 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
   const [showSettings, setShowSettings] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
   const [size, setSize] = useState({ width: 600, height: 500 });
-  const [position, setPosition] = useState({ x: 0, y: 0 });
 
   const [inputValue, setInputValue] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -202,7 +200,6 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const resizeRef = useRef<HTMLDivElement>(null);
-  const dragRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -219,10 +216,6 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
     // Reset minimize state when chatbot opens
     if (isOpen) {
       setIsMinimized(false);
-      // Set default position (bottom-right)
-      const defaultX = window.innerWidth - 616; // 600 + 16 padding
-      const defaultY = window.innerHeight - 516; // 500 + 16 padding
-      setPosition({ x: defaultX, y: defaultY });
     }
   }, [isOpen]);
 
@@ -231,39 +224,7 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
     console.log('Minimize state changed to:', isMinimized);
   }, [isMinimized]);
 
-  // Handle drag functionality
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isDragging && dragRef.current) {
-        const rect = dragRef.current.getBoundingClientRect();
-        const newX = e.clientX - rect.width / 2;
-        const newY = e.clientY - rect.height / 2;
-        
-        // Keep chatbot within viewport bounds
-        const maxX = window.innerWidth - rect.width;
-        const maxY = window.innerHeight - rect.height;
-        
-        setPosition({
-          x: Math.max(0, Math.min(newX, maxX)),
-          y: Math.max(0, Math.min(newY, maxY))
-        });
-      }
-    };
 
-    const handleMouseUp = () => {
-      setIsDragging(false);
-    };
-
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging]);
 
   // Handle resize
   useEffect(() => {
@@ -530,17 +491,7 @@ What would you like to know about your migration project?`;
     setIsResizing(true);
   };
 
-  const handleDragStart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
 
-  const handleDoubleClick = () => {
-    // Reset to default position (bottom-right)
-    const defaultX = window.innerWidth - (isMinimized ? 320 : size.width) - 16;
-    const defaultY = window.innerHeight - (isMinimized ? 64 : size.height) - 16;
-    setPosition({ x: defaultX, y: defaultY });
-  };
 
   // Copy message to clipboard
   const copyMessage = async (content: string, messageId: string) => {
@@ -566,32 +517,21 @@ What would you like to know about your migration project?`;
   return (
     <div 
       className={cn(
-        'fixed bg-background border rounded-lg shadow-lg flex flex-col z-50 transition-all duration-300 ease-in-out',
+        'fixed bottom-4 right-4 bg-background border rounded-lg shadow-lg flex flex-col z-50 transition-all duration-300 ease-in-out',
         isMinimized ? 'w-80 h-16' : 'min-w-[320px] max-w-[800px] min-h-[400px] max-h-[800px]',
-        isDragging ? 'shadow-2xl' : 'shadow-lg',
         className
       )}
       style={{
         width: isMinimized ? '320px' : `${size.width}px`,
         height: isMinimized ? '64px' : `${size.height}px`,
-        left: `${position.x}px`,
-        top: `${position.y}px`,
-        cursor: isResizing ? 'nw-resize' : isDragging ? 'grabbing' : 'default'
+        cursor: isResizing ? 'nw-resize' : 'default'
       }}
-      ref={dragRef}
+      ref={resizeRef}
     >
              {/* Header */}
                 <div 
-           className={cn(
-             "flex items-center justify-between p-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 cursor-grab relative",
-             isDragging && "cursor-grabbing"
-           )}
-           onMouseDown={handleDragStart}
-           onDoubleClick={handleDoubleClick}
-           ref={resizeRef}
+           className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20"
          >
-           {/* Drag indicator */}
-           <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-gray-300 dark:bg-gray-600 rounded-full opacity-30"></div>
          <div className="flex items-center gap-3">
            <div className="relative">
              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg">

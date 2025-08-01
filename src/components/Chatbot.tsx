@@ -435,8 +435,8 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
           </ScrollArea>
         )}
 
-               {/* Quick Suggestions - Always visible when no conversation or empty conversation */}
-        {!isMinimized && (!currentConversation || (currentConversation && currentConversation.messages.length === 0)) && (
+               {/* Quick Suggestions - Only visible when no conversation exists */}
+        {!isMinimized && !currentConversation && (
          <div className="p-4 border-t">
            <p className="text-xs text-muted-foreground mb-2">Quick Start:</p>
            <div className="grid grid-cols-2 gap-2">

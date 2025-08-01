@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MessageSquare, X } from 'lucide-react';
+import { Bot, X } from 'lucide-react';
 import { Chatbot } from './Chatbot';
 import { cn } from '@/lib/utils';
 
@@ -106,7 +106,7 @@ export const ChatbotToggle: React.FC<ChatbotToggleProps> = ({
         }}
         size="icon"
       >
-        <MessageSquare className="w-6 h-6" />
+        <Bot className="w-6 h-6" />
         {showNotification && (
           <Badge 
             className="absolute -top-1 -right-1 w-5 h-5 rounded-full p-0 text-xs"

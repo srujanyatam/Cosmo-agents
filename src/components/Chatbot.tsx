@@ -22,7 +22,13 @@ import {
   BookOpen,
   Settings,
   Minimize2,
-  Maximize2
+  Maximize2,
+  Copy,
+  Check,
+  RefreshCw,
+  Zap,
+  Clock,
+  Star
 } from 'lucide-react';
 import { ChatbotSettings } from './ChatbotSettings';
 import { useToast } from '@/hooks/use-toast';
@@ -61,7 +67,11 @@ const quickSuggestions: ChatbotSuggestion[] = [
   }
 ];
 
-const MessageBubble: React.FC<{ message: ChatMessage }> = ({ message }) => {
+const MessageBubble: React.FC<{ 
+  message: ChatMessage; 
+  onCopy?: (content: string, messageId: string) => void;
+  copiedMessageId?: string | null;
+}> = ({ message, onCopy, copiedMessageId }) => {
   const isUser = message.role === 'user';
   
   return (
@@ -98,11 +108,27 @@ const MessageBubble: React.FC<{ message: ChatMessage }> = ({ message }) => {
               </pre>
             </div>
           )}
-          <div className={cn(
-            'text-xs mt-2 opacity-60',
-            isUser ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'
-          )}>
-            {message.timestamp.toLocaleTimeString()}
+          <div className="flex items-center justify-between mt-2">
+            <div className={cn(
+              'text-xs opacity-60',
+              isUser ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'
+            )}>
+              {message.timestamp.toLocaleTimeString()}
+            </div>
+            {!isUser && onCopy && (
+              <Button
+                onClick={() => onCopy(message.content, message.id)}
+                variant="ghost"
+                size="sm"
+                className="h-5 w-5 p-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                {copiedMessageId === message.id ? (
+                  <Check className="h-3 w-3" />
+                ) : (
+                  <Copy className="h-3 w-3" />
+                )}
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -170,6 +196,7 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
 
   const [inputValue, setInputValue] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const resizeRef = useRef<HTMLDivElement>(null);
@@ -186,7 +213,16 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
     if (isOpen && inputRef.current) {
       inputRef.current.focus();
     }
+    // Reset minimize state when chatbot opens
+    if (isOpen) {
+      setIsMinimized(false);
+    }
   }, [isOpen]);
+
+  // Debug minimize state changes
+  useEffect(() => {
+    console.log('Minimize state changed to:', isMinimized);
+  }, [isMinimized]);
 
   // Handle resize
   useEffect(() => {
@@ -288,9 +324,23 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
     } catch (err) {
       console.error('Chatbot error:', err);
       setError('Failed to send message');
+      
+      // Fallback response for common migration questions
+      const fallbackResponse = getFallbackResponse(messageText);
+      
+      const fallbackMessage: ChatMessage = {
+        id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        content: fallbackResponse,
+        role: 'assistant',
+        timestamp: new Date(),
+        type: 'text'
+      };
+      
+      addMessage(currentConversation.id, fallbackMessage);
+      
       toast({
-        title: 'Error',
-        description: 'Failed to send message. Please try again.',
+        title: 'AI Service Unavailable',
+        description: 'Using fallback response. Please try again later.',
         variant: 'destructive'
       });
     } finally {
@@ -315,8 +365,123 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
     setInputValue('');
   };
 
+  // Fallback responses for when AI is unavailable
+  const getFallbackResponse = (userMessage: string): string => {
+    const message = userMessage.toLowerCase();
+    
+    if (message.includes('conversion') || message.includes('process')) {
+      return `**Migration Conversion Process:**
+
+This project uses a multi-step conversion process:
+
+1. **File Upload**: SQL files are uploaded through the web interface
+2. **AI Analysis**: Google Gemini AI analyzes the Sybase code structure
+3. **Code Conversion**: AI converts Sybase syntax to Oracle syntax
+4. **Validation**: Converted code is validated for Oracle compatibility
+5. **Download**: Users can download the converted Oracle code
+
+**Key Features:**
+- Supports stored procedures, functions, and DDL statements
+- Handles data type mappings automatically
+- Preserves business logic during conversion
+- Provides detailed conversion reports
+
+The process is designed to be accurate and efficient for Oracle migration projects.`;
+    }
+    
+    if (message.includes('architecture') || message.includes('structure')) {
+      return `**Project Architecture:**
+
+**Frontend (React/TypeScript):**
+- Built with Vite for fast development
+- Uses Tailwind CSS for styling
+- shadcn/ui components for UI consistency
+- Monaco Editor for code editing
+
+**Backend (Netlify Functions):**
+- Serverless API endpoints
+- AI integration with Google Gemini
+- File processing and conversion logic
+
+**Database (Supabase):**
+- PostgreSQL-based database
+- User authentication and data storage
+- Real-time features and subscriptions
+
+**AI Integration:**
+- Google Gemini for code analysis
+- OpenRouter as fallback AI service
+- Custom prompts for migration context
+
+This architecture ensures scalability, performance, and reliability.`;
+    }
+    
+    if (message.includes('ai') || message.includes('features')) {
+      return `**AI Conversion Features:**
+
+**Core AI Capabilities:**
+- **Code Analysis**: Understands Sybase syntax and structure
+- **Syntax Conversion**: Converts to Oracle-compatible syntax
+- **Data Type Mapping**: Automatically maps Sybase types to Oracle
+- **Error Detection**: Identifies potential conversion issues
+
+**Advanced Features:**
+- **Context Awareness**: Understands your specific project
+- **Smart Suggestions**: Provides follow-up questions and suggestions
+- **Code Optimization**: Suggests Oracle-specific optimizations
+- **Documentation**: Generates conversion notes and explanations
+
+**Integration:**
+- Seamless integration with the web interface
+- Real-time processing and feedback
+- Batch processing for multiple files
+- Export capabilities for converted code
+
+The AI is specifically trained for Oracle migration scenarios.`;
+    }
+    
+    if (message.includes('file') || message.includes('format')) {
+      return `**Supported File Formats:**
+
+**Input Formats:**
+- **SQL Files** (.sql): Sybase stored procedures and functions
+- **DDL Scripts**: Database schema definitions
+- **DML Scripts**: Data manipulation statements
+- **Text Files**: Plain text with SQL code
+
+**Conversion Types:**
+- **Stored Procedures**: Convert Sybase procedures to Oracle PL/SQL
+- **Functions**: Transform Sybase functions to Oracle functions
+- **Data Types**: Map Sybase data types to Oracle equivalents
+- **Syntax**: Convert Sybase-specific syntax to Oracle syntax
+
+**Output Formats:**
+- **Oracle SQL**: Ready-to-execute Oracle code
+- **PL/SQL**: Oracle procedural language code
+- **Documentation**: Conversion notes and explanations
+- **Reports**: Detailed conversion analysis
+
+All conversions maintain the original business logic while adapting to Oracle's syntax and features.`;
+    }
+    
+    return `I'm the Migration Assistant, your AI-powered Oracle migration expert! 
+
+I can help you with:
+- **Code Conversion**: Sybase to Oracle migration
+- **Architecture**: Project structure and setup
+- **AI Features**: Understanding AI capabilities
+- **File Formats**: Supported input/output types
+
+Currently, I'm using a fallback response system. For the best experience, please try again when the AI service is available.
+
+What would you like to know about your migration project?`;
+  };
+
   const handleToggleMinimize = () => {
-    setIsMinimized(!isMinimized);
+    console.log('Toggle minimize clicked, current state:', isMinimized);
+    const newMinimizedState = !isMinimized;
+    console.log('Setting minimized to:', newMinimizedState);
+    setIsMinimized(newMinimizedState);
   };
 
   const handleResizeStart = (e: React.MouseEvent) => {
@@ -324,12 +489,31 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
     setIsResizing(true);
   };
 
+  // Copy message to clipboard
+  const copyMessage = async (content: string, messageId: string) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedMessageId(messageId);
+      toast({
+        title: 'Copied!',
+        description: 'Message copied to clipboard.',
+      });
+      setTimeout(() => setCopiedMessageId(null), 2000);
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to copy message.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
     <div 
       className={cn(
-        'fixed bottom-4 right-4 bg-background border rounded-lg shadow-lg flex flex-col z-50',
+        'fixed bottom-4 right-4 bg-background border rounded-lg shadow-lg flex flex-col z-50 transition-all duration-300 ease-in-out',
         isMinimized ? 'w-80 h-16' : 'min-w-[320px] max-w-[800px] min-h-[400px] max-h-[800px]',
         className
       )}
@@ -347,11 +531,21 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg">
                <Bot className="w-5 h-5 text-white" />
              </div>
-             <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
+             <div className={cn(
+               "absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white transition-all duration-300",
+               isMinimized ? "bg-yellow-400" : "bg-green-400 animate-pulse"
+             )}></div>
            </div>
            <div>
-             <h3 className="font-bold text-gray-900 dark:text-gray-100">Migration Assistant</h3>
-             <p className="text-xs text-gray-500 dark:text-gray-400">AI-Powered Oracle Migration</p>
+             <h3 className="font-bold text-gray-900 dark:text-gray-100">
+               {isMinimized ? 'Migration Assistant' : 'Migration Assistant'}
+             </h3>
+             <p className={cn(
+               'text-xs text-gray-500 dark:text-gray-400 transition-opacity duration-300',
+               isMinimized ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100 h-auto'
+             )}>
+               AI-Powered Oracle Migration
+             </p>
            </div>
          </div>
          <div className="flex items-center gap-1">
@@ -377,10 +571,20 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
              variant="ghost"
              size="sm"
              onClick={handleToggleMinimize}
-             title={isMinimized ? "Maximize" : "Minimize"}
-             className="hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+             title={isMinimized ? "Maximize Chatbot" : "Minimize Chatbot"}
+             aria-label={isMinimized ? "Maximize chatbot" : "Minimize chatbot"}
+             className={cn(
+               "transition-all duration-200",
+               isMinimized 
+                 ? "hover:bg-green-100 dark:hover:bg-green-900/30 text-green-600" 
+                 : "hover:bg-blue-100 dark:hover:bg-blue-900/30"
+             )}
            >
-             {isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
+             {isMinimized ? (
+               <Maximize2 className="w-4 h-4" />
+             ) : (
+               <Minimize2 className="w-4 h-4" />
+             )}
            </Button>
            <Button
              variant="ghost"
@@ -394,6 +598,35 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
          </div>
        </div>
 
+       {/* Quick Actions Bar */}
+       {!isMinimized && currentConversation && (
+         <div className="flex items-center justify-between px-4 py-2 border-b bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-900/50 dark:to-blue-950/20">
+           <div className="flex items-center gap-2">
+             <Button
+               onClick={handleNewConversation}
+               variant="ghost"
+               size="sm"
+               className="text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/30 h-6 px-2"
+             >
+               <Plus className="h-3 w-3 mr-1" />
+               New Chat
+             </Button>
+             <Button
+               onClick={() => handleSendMessage("How does the conversion process work in this project?")}
+               variant="ghost"
+               size="sm"
+               className="text-xs text-green-600 hover:text-green-700 hover:bg-green-100 dark:hover:bg-green-900/30 h-6 px-2"
+             >
+               <Zap className="h-3 w-3 mr-1" />
+               Migration Help
+             </Button>
+           </div>
+           <div className="text-xs text-gray-500 dark:text-gray-400">
+             {currentConversation.messages.length} messages
+           </div>
+         </div>
+       )}
+
                            {/* Messages */}
         {!isMinimized && (
           <ScrollArea className="flex-1 p-4">
@@ -405,13 +638,55 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
                <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 max-w-sm mx-auto">
                  I'm here to help you with your Sybase to Oracle migration. Ask me anything!
                </p>
+               
+               {/* Quick Question Buttons */}
+               <div className="flex flex-wrap gap-2 mb-4 justify-center">
+                 <Button
+                   onClick={() => handleSendMessage("How does the conversion process work in this project?")}
+                   variant="outline"
+                   size="sm"
+                   className="text-xs h-7 px-2"
+                 >
+                   Conversion Process
+                 </Button>
+                 <Button
+                   onClick={() => handleSendMessage("Explain the project architecture and file structure")}
+                   variant="outline"
+                   size="sm"
+                   className="text-xs h-7 px-2"
+                 >
+                   Architecture
+                 </Button>
+                 <Button
+                   onClick={() => handleSendMessage("How to use the AI conversion features in this app?")}
+                   variant="outline"
+                   size="sm"
+                   className="text-xs h-7 px-2"
+                 >
+                   AI Features
+                 </Button>
+                 <Button
+                   onClick={() => handleSendMessage("What are the supported file formats and conversion types?")}
+                   variant="outline"
+                   size="sm"
+                   className="text-xs h-7 px-2"
+                 >
+                   File Formats
+                 </Button>
+               </div>
+               
                <div className="w-12 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mx-auto"></div>
              </div>
           ) : (
-            <div>
-              {currentConversation.messages.map((message) => (
-                <MessageBubble key={message.id} message={message} />
-              ))}
+                         <div>
+               {currentConversation.messages.map((message) => (
+                 <MessageBubble 
+                   key={message.id} 
+                   message={message} 
+                   onCopy={copyMessage}
+                   copiedMessageId={copiedMessageId}
+                 />
+               ))}
                            {isLoading && (
                <div className="flex gap-3 mb-6 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center shadow-sm">

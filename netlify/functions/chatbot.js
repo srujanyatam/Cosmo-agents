@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const GOOGLE_API_KEY = process.env.VITE_GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+const GEMINI_API_KEY = process.env.VITE_GEMINI_API_KEY;
 
 const SYSTEM_PROMPT = `You are an expert Oracle database migration assistant specializing in Sybase to Oracle conversions. You help users with:
 
@@ -62,7 +62,7 @@ async function callGeminiAPI(messages) {
   };
 
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GOOGLE_API_KEY}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -165,7 +165,7 @@ exports.handler = async function(event, context) {
         status: 'ok',
         timestamp: new Date().toISOString(),
         hasOpenRouterKey: !!OPENROUTER_API_KEY,
-        hasGoogleKey: !!GOOGLE_API_KEY
+        hasGeminiKey: !!GEMINI_API_KEY
       })
     };
   }
@@ -179,7 +179,7 @@ exports.handler = async function(event, context) {
   }
 
   // Check if API keys are configured
-  if (!OPENROUTER_API_KEY && !GOOGLE_API_KEY) {
+  if (!OPENROUTER_API_KEY && !GEMINI_API_KEY) {
     return {
       statusCode: 500,
       headers,
@@ -190,7 +190,7 @@ exports.handler = async function(event, context) {
   }
 
   try {
-    const { message, conversationHistory = [], model = 'qwen' } = JSON.parse(event.body);
+    const { message, conversationHistory = [], model = 'gemini' } = JSON.parse(event.body);
     
     if (!message) {
       return { 
@@ -216,16 +216,20 @@ exports.handler = async function(event, context) {
     // Call appropriate API based on model preference
     let response;
     try {
-      if (model === 'gemini' && GOOGLE_API_KEY) {
+      if (GEMINI_API_KEY) {
+        // Use Gemini as primary choice
         response = await callGeminiAPI(messages);
-      } else {
+      } else if (OPENROUTER_API_KEY) {
+        // Fallback to OpenRouter if Gemini key not available
         response = await callOpenRouterAPI(messages);
+      } else {
+        throw new Error('No API keys available');
       }
     } catch (error) {
-      // If OpenRouter fails (rate limit), try Gemini as fallback
-      if (error.message.includes('429') && GOOGLE_API_KEY) {
-        console.log('OpenRouter rate limited, falling back to Gemini');
-        response = await callGeminiAPI(messages);
+      // If Gemini fails, try OpenRouter as fallback
+      if (OPENROUTER_API_KEY && error.message.includes('Gemini API error')) {
+        console.log('Gemini failed, falling back to OpenRouter');
+        response = await callOpenRouterAPI(messages);
       } else {
         throw error;
       }

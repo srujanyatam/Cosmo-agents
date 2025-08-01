@@ -208,11 +208,11 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
     setError(null);
 
     try {
-      const response = await sendChatMessage({
-        message: messageText,
-        conversationHistory: currentConversation.messages,
-        model: 'qwen'
-      });
+             const response = await sendChatMessage({
+         message: messageText,
+         conversationHistory: currentConversation.messages,
+         model: 'gemini'
+       });
 
       addMessage(currentConversation.id, response.message);
       setSuggestions(response.suggestions || []);

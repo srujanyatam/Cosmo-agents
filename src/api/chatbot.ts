@@ -75,7 +75,7 @@ export const analyzeCodeWithChatbot = async (
   return sendChatMessage({
     message,
     conversationHistory: [],
-    model: 'qwen',
+    model: 'gemini',
   });
 };
 
@@ -85,6 +85,6 @@ export const getMigrationHelp = async (topic: string): Promise<ChatbotResponse> 
   return sendChatMessage({
     message,
     conversationHistory: [],
-    model: 'qwen',
+    model: 'gemini',
   });
 }; 

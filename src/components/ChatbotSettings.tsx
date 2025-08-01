@@ -53,16 +53,16 @@ export const ChatbotSettings: React.FC<ChatbotSettingsProps> = ({ isOpen, onClos
                 <SelectValue placeholder="Select AI model" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="qwen">
-                  <div className="flex items-center gap-2">
-                    <Bot className="w-4 h-4" />
-                    Qwen (Recommended)
-                  </div>
-                </SelectItem>
                 <SelectItem value="gemini">
                   <div className="flex items-center gap-2">
                     <Zap className="w-4 h-4" />
-                    Gemini
+                    Gemini (Recommended)
+                  </div>
+                </SelectItem>
+                <SelectItem value="qwen">
+                  <div className="flex items-center gap-2">
+                    <Bot className="w-4 h-4" />
+                    Qwen
                   </div>
                 </SelectItem>
               </SelectContent>

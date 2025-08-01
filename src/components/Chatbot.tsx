@@ -20,7 +20,9 @@ import {
   Code,
   Lightbulb,
   BookOpen,
-  Settings
+  Settings,
+  Minimize2,
+  Maximize2
 } from 'lucide-react';
 import { ChatbotSettings } from './ChatbotSettings';
 import { useToast } from '@/hooks/use-toast';
@@ -152,11 +154,15 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
   } = useChatbot();
 
   const [showSettings, setShowSettings] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [size, setSize] = useState({ width: 600, height: 500 });
 
   const [inputValue, setInputValue] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const resizeRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -171,6 +177,32 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
       inputRef.current.focus();
     }
   }, [isOpen]);
+
+  // Handle resize
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isResizing && resizeRef.current) {
+        const rect = resizeRef.current.getBoundingClientRect();
+        const newWidth = Math.max(320, Math.min(800, e.clientX - rect.left));
+        const newHeight = Math.max(400, Math.min(800, e.clientY - rect.top));
+        setSize({ width: newWidth, height: newHeight });
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing]);
 
 
 
@@ -245,13 +277,31 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
     setSuggestions([]);
   };
 
+  const handleToggleMinimize = () => {
+    setIsMinimized(!isMinimized);
+  };
+
+  const handleResizeStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className={cn(
-      'fixed bottom-4 right-4 w-96 h-[600px] bg-background border rounded-lg shadow-lg flex flex-col z-50',
-      className
-    )}>
+    <div 
+      className={cn(
+        'fixed bottom-4 right-4 bg-background border rounded-lg shadow-lg flex flex-col z-50',
+        isMinimized ? 'w-80 h-16' : 'min-w-[320px] max-w-[800px] min-h-[400px] max-h-[800px]',
+        className
+      )}
+      style={{
+        width: isMinimized ? '320px' : `${size.width}px`,
+        height: isMinimized ? '64px' : `${size.height}px`,
+        cursor: isResizing ? 'nw-resize' : 'default'
+      }}
+      ref={resizeRef}
+    >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b">
         <div className="flex items-center gap-2">
@@ -278,6 +328,14 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
           <Button
             variant="ghost"
             size="sm"
+            onClick={handleToggleMinimize}
+            title={isMinimized ? "Maximize" : "Minimize"}
+          >
+            {isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={onClose}
             title="Close"
           >
@@ -287,7 +345,8 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4">
+      {!isMinimized && (
+        <ScrollArea className="flex-1 p-4">
         {!currentConversation ? (
           <div className="text-center py-8">
             <Bot className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
@@ -326,10 +385,11 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
             <div ref={messagesEndRef} />
           </div>
         )}
-      </ScrollArea>
+        </ScrollArea>
+      )}
 
       {/* Suggestions */}
-      {suggestions.length > 0 && (
+      {!isMinimized && suggestions.length > 0 && (
         <div className="p-4 border-t">
           <p className="text-xs text-muted-foreground mb-2">Suggestions:</p>
           <div className="flex flex-wrap gap-2">
@@ -349,7 +409,8 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
       )}
 
       {/* Input */}
-      <div className="p-4 border-t">
+      {!isMinimized && (
+        <div className="p-4 border-t">
         <div className="flex gap-2">
           <Input
             ref={inputRef}
@@ -369,6 +430,20 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
           </Button>
         </div>
       </div>
+      )}
+
+      {/* Resize handle */}
+      {!isMinimized && (
+        <div
+          className="absolute bottom-0 left-0 w-4 h-4 cursor-nw-resize opacity-50 hover:opacity-100 transition-opacity"
+          onMouseDown={handleResizeStart}
+          style={{ cursor: 'nw-resize' }}
+        >
+          <div className="w-full h-full flex items-end justify-start">
+            <div className="w-2 h-2 border-l-2 border-b-2 border-muted-foreground rounded-bl-sm"></div>
+          </div>
+        </div>
+      )}
 
       <ChatbotSettings 
         isOpen={showSettings} 

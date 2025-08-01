@@ -152,7 +152,6 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
   } = useChatbot();
 
   const [showSettings, setShowSettings] = useState(false);
-  const [forceUpdate, setForceUpdate] = useState(0);
 
   const [inputValue, setInputValue] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -183,10 +182,15 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
     // Create conversation if needed
     if (!currentConversation) {
       createConversation('New Conversation');
-      // Wait a bit and try again
+      // Wait for the conversation to be created and set as current
       setTimeout(() => {
-        handleSendMessage(messageText);
-      }, 200);
+        const newConversation = conversations.find(conv => conv.isActive);
+        if (newConversation) {
+          setCurrentConversation(newConversation);
+          // Now send the message
+          setTimeout(() => handleSendMessage(messageText), 50);
+        }
+      }, 100);
       return;
     }
 
@@ -197,6 +201,7 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
       timestamp: new Date(),
       type: 'text'
     };
+    
     addMessage(currentConversation.id, userMessage);
     setInputValue('');
     setLoading(true);
@@ -211,7 +216,6 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
 
       addMessage(currentConversation.id, response.message);
       setSuggestions(response.suggestions || []);
-      setForceUpdate(prev => prev + 1);
     } catch (err) {
       console.error('Chatbot error:', err);
       setError('Failed to send message');

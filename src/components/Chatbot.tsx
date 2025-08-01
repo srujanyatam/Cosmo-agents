@@ -430,25 +430,25 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
          </div>
        )}
 
-      {/* Suggestions */}
-      {!isMinimized && suggestions.length > 0 && (
-        <div className="p-4 border-t">
-          <p className="text-xs text-muted-foreground mb-2">Suggestions:</p>
-          <div className="flex flex-wrap gap-2">
-            {suggestions.map((suggestion, index) => (
-              <Button
-                key={index}
-                variant="outline"
-                size="sm"
-                onClick={() => handleSuggestionClick(suggestion)}
-                className="text-xs"
-              >
-                {suggestion}
-              </Button>
-            ))}
-          </div>
-        </div>
-      )}
+             {/* Suggestions - Only show when there are messages and suggestions */}
+       {!isMinimized && suggestions.length > 0 && currentConversation && currentConversation.messages.length > 0 && (
+         <div className="p-4 border-t">
+           <p className="text-xs text-muted-foreground mb-2">Suggestions:</p>
+           <div className="flex flex-wrap gap-2">
+             {suggestions.map((suggestion, index) => (
+               <Button
+                 key={index}
+                 variant="outline"
+                 size="sm"
+                 onClick={() => handleSuggestionClick(suggestion)}
+                 className="text-xs"
+               >
+                 {suggestion}
+               </Button>
+             ))}
+           </div>
+         </div>
+       )}
 
       {/* Input */}
       {!isMinimized && (

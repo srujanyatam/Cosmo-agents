@@ -105,10 +105,10 @@ export const ChatbotToggle: React.FC<ChatbotToggleProps> = ({
         setIsOpen(true);
         setLastClickTime(currentTime);
       }
-    } else if (variant === 'header') {
-      // Simple click for header variant
-      setIsOpen(true);
-    }
+          } else if (variant === 'header') {
+        // Toggle chatbot for header variant
+        setIsOpen(!isOpen);
+      }
   };
 
   // Don't render if not visible
@@ -122,10 +122,12 @@ export const ChatbotToggle: React.FC<ChatbotToggleProps> = ({
         onMouseDown={handleDragStart}
         className={cn(
           variant === 'floating' ? 'fixed' : 'inline-flex',
-          variant === 'floating' ? 'w-14 h-14 rounded-full shadow-lg z-40' : 'w-8 h-8 rounded-md',
+          variant === 'floating' ? 'w-14 h-14 rounded-full z-40' : 'w-8 h-8 rounded-md',
           'transition-all duration-200',
-          variant === 'floating' ? 'bg-primary hover:bg-primary/90 text-primary-foreground' : 'bg-primary hover:bg-primary/90 text-white',
-          variant === 'floating' && isDragging ? 'shadow-2xl scale-110 rotate-12' : 'shadow-lg',
+          variant === 'floating' 
+            ? 'bg-primary hover:bg-primary/90 text-primary-foreground' 
+            : 'bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 hover:border-gray-400',
+          variant === 'floating' && isDragging ? 'shadow-2xl scale-110 rotate-12' : '',
           variant === 'floating' && isDragging ? 'cursor-grabbing' : variant === 'floating' ? 'cursor-grab' : 'cursor-pointer',
           variant === 'floating' && isCollapsed ? 'w-12 h-12' : variant === 'floating' ? 'w-14 h-14' : 'w-8 h-8',
           className
@@ -136,7 +138,7 @@ export const ChatbotToggle: React.FC<ChatbotToggleProps> = ({
         } : {}}
         size="icon"
       >
-        <Bot className={variant === 'header' ? "w-4 h-4" : isCollapsed ? "w-5 h-5" : "w-6 h-6"} />
+        <Bot className={variant === 'header' ? "w-5 h-5" : isCollapsed ? "w-5 h-5" : "w-6 h-6"} />
         {showNotification && (
           <Badge 
             className="absolute -top-1 -right-1 w-5 h-5 rounded-full p-0 text-xs"

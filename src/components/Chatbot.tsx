@@ -37,26 +37,26 @@ interface ChatbotProps {
 const quickSuggestions: ChatbotSuggestion[] = [
   {
     id: '1',
-    text: 'How do I convert Sybase stored procedures to Oracle?',
+    text: 'How does the conversion process work in this project?',
     intent: 'migration_help',
     icon: 'Code'
   },
   {
     id: '2',
-    text: 'What are the data type mappings between Sybase and Oracle?',
-    intent: 'data_type_mapping',
+    text: 'Explain the project architecture and file structure',
+    intent: 'code_explanation',
     icon: 'BookOpen'
   },
   {
     id: '3',
-    text: 'How can I optimize Oracle performance?',
+    text: 'How to use the AI conversion features in this app?',
     intent: 'best_practices',
     icon: 'Lightbulb'
   },
   {
     id: '4',
-    text: 'Explain this code and suggest improvements',
-    intent: 'code_explanation',
+    text: 'What are the supported file formats and conversion types?',
+    intent: 'data_type_mapping',
     icon: 'MessageSquare'
   }
 ];

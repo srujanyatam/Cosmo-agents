@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import Help from '@/components/Help';
 import UserDropdown from '@/components/UserDropdown';
+import { ChatbotToggle } from '@/components/ChatbotToggle';
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -31,27 +32,34 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Database className="h-8 w-8 text-primary" />
-              <h1 className="text-2xl font-bold text-gray-900">Sybase to Oracle Migration</h1>
+              <Database className="h-6 w-6 text-primary" />
+              <h1 className="text-xl font-bold text-gray-900">Sybase to Oracle Migration</h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <Button 
-                variant="ghost" 
-                onClick={() => setShowHelp(true)}
-                className="flex items-center space-x-2"
-              >
-                <HelpCircle className="h-4 w-4" />
-                <span>Help</span>
-              </Button>
+            <div className="flex items-center space-x-3">
+              <ChatbotToggle variant="header" isVisible={true} isCollapsed={false} />
               {user ? (
                 <>
-                  <Button variant="ghost" onClick={handleGoToHistory}>
-                    <History className="h-4 w-4 mr-2" />
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={handleGoToHistory}
+                    className="flex items-center gap-2"
+                  >
+                    <History className="h-4 w-4" />
                     History
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setShowHelp(true)}
+                    className="flex items-center gap-2"
+                  >
+                    <HelpCircle className="h-4 w-4" />
+                    Help
                   </Button>
                   <UserDropdown />
                 </>

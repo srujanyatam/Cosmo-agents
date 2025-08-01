@@ -224,6 +224,8 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
     console.log('Minimize state changed to:', isMinimized);
   }, [isMinimized]);
 
+
+
   // Handle resize
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -489,6 +491,8 @@ What would you like to know about your migration project?`;
     setIsResizing(true);
   };
 
+
+
   // Copy message to clipboard
   const copyMessage = async (content: string, messageId: string) => {
     try {
@@ -525,7 +529,9 @@ What would you like to know about your migration project?`;
       ref={resizeRef}
     >
              {/* Header */}
-       <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
+                <div 
+           className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20"
+         >
          <div className="flex items-center gap-3">
            <div className="relative">
              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg">
@@ -775,12 +781,12 @@ What would you like to know about your migration project?`;
       {/* Resize handle */}
       {!isMinimized && (
         <div
-          className="absolute bottom-0 left-0 w-4 h-4 cursor-nw-resize opacity-50 hover:opacity-100 transition-opacity"
+          className="absolute bottom-0 right-0 w-4 h-4 cursor-nw-resize opacity-50 hover:opacity-100 transition-opacity"
           onMouseDown={handleResizeStart}
           style={{ cursor: 'nw-resize' }}
         >
-          <div className="w-full h-full flex items-end justify-start">
-            <div className="w-2 h-2 border-l-2 border-b-2 border-muted-foreground rounded-bl-sm"></div>
+          <div className="w-full h-full flex items-end justify-end">
+            <div className="w-2 h-2 border-r-2 border-b-2 border-muted-foreground rounded-br-sm"></div>
           </div>
         </div>
       )}

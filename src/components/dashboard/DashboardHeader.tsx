@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Database, History, HelpCircle } from 'lucide-react';
 import UserDropdown from '@/components/UserDropdown';
 import HomeButton from '@/components/HomeButton';
+import { ChatbotToggle } from '@/components/ChatbotToggle';
 // import { CodeEditorThemeContext } from '@/contexts/CodeEditorThemeContext';
 
 interface DashboardHeaderProps {
@@ -32,6 +33,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <ChatbotToggle variant="header" isVisible={true} isCollapsed={false} />
             <Button 
               variant="outline" 
               size="sm"

@@ -16,36 +16,59 @@ import AdminPanel from "./pages/AdminPanel";
 import { CodeEditorThemeProvider } from "@/contexts/CodeEditorThemeContext";
 import { ChatbotProvider } from "@/contexts/ChatbotContext";
 import { ChatbotToggle } from "@/components/ChatbotToggle";
+import { useLocation } from "react-router-dom";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <CodeEditorThemeProvider>
-          <ChatbotProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/migration" element={<Dashboard />} />
-                <Route path="/history" element={<History />} />
-                <Route path="/legacy" element={<Index />} />
-                <Route path="/report/:reportId" element={<ReportPage />} />
-                <Route path="/admin" element={<AdminPanel />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-            <ChatbotToggle />
-          </ChatbotProvider>
-        </CodeEditorThemeProvider>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const AppContent = () => {
+  const location = useLocation();
+  
+  // Determine if we're on the home page (Landing)
+  const isHomePage = location.pathname === '/';
+  
+  return (
+    <>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/migration" element={<Dashboard />} />
+        <Route path="/history" element={<History />} />
+        <Route path="/legacy" element={<Index />} />
+        <Route path="/report/:reportId" element={<ReportPage />} />
+        <Route path="/admin" element={<AdminPanel />} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      
+      {/* Show floating chatbot toggle for pages that don't have it in header */}
+      {!isHomePage && location.pathname !== '/migration' && location.pathname !== '/history' && !location.pathname.startsWith('/report/') && location.pathname !== '/admin' && (
+        <ChatbotToggle 
+          isVisible={true}
+          isCollapsed={true}
+        />
+      )}
+    </>
+  );
+};
+
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider>
+          <CodeEditorThemeProvider>
+            <ChatbotProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <AppContent />
+              </BrowserRouter>
+            </ChatbotProvider>
+          </CodeEditorThemeProvider>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

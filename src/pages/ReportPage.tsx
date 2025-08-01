@@ -8,6 +8,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Database, History as HistoryIcon, HelpCircle, Home } from 'lucide-react';
 import UserDropdown from '@/components/UserDropdown';
 import Help from '@/components/Help';
+import { ChatbotToggle } from '@/components/ChatbotToggle';
 
 const ReportPage: React.FC = () => {
   const { reportId } = useParams<{ reportId: string }>();
@@ -87,26 +88,41 @@ const ReportPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation Bar */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button onClick={() => navigate('/')} className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100">
-              <Home className="h-5 w-5" />
-              Home
-            </button>
-            <Database className="h-8 w-8 text-primary mr-2" />
-            <h1 className="text-2xl font-bold text-gray-900">Migration Report</h1>
-          </div>
-          <div className="flex items-center gap-4">
-            <button onClick={() => navigate('/history', { state: { previousReportId: reportId, backToResults: lastBackState.current || { activeTab: 'conversion', recentReport: report } } })} className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100">
-              <HistoryIcon className="h-5 w-5" />
-              History
-            </button>
-            <button onClick={() => setShowHelp(true)} className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100">
-              <HelpCircle className="h-5 w-5" />
-              Help
-            </button>
-            <UserDropdown />
+      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <button onClick={() => navigate('/')} className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100">
+                <Home className="h-4 w-4" />
+                Home
+              </button>
+              <div className="flex items-center">
+                <Database className="h-6 w-6 text-primary mr-2" />
+                <h1 className="text-xl font-bold text-gray-900">Migration Report</h1>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <ChatbotToggle variant="header" isVisible={true} isCollapsed={false} />
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate('/history', { state: { previousReportId: reportId, backToResults: lastBackState.current || { activeTab: 'conversion', recentReport: report } } })}
+                className="flex items-center gap-2"
+              >
+                <HistoryIcon className="h-4 w-4" />
+                History
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowHelp(true)}
+                className="flex items-center gap-2"
+              >
+                <HelpCircle className="h-4 w-4" />
+                Help
+              </Button>
+              <UserDropdown />
+            </div>
           </div>
         </div>
       </header>

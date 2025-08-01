@@ -41,7 +41,7 @@ const AppContent = () => {
       </Routes>
       
       {/* Show floating chatbot toggle for pages that don't have it in header */}
-      {!isHomePage && location.pathname !== '/migration' && location.pathname !== '/history' && !location.pathname.startsWith('/report/') && location.pathname !== '/admin' && (
+      {!isHomePage && location.pathname !== '/migration' && location.pathname !== '/history' && !location.pathname.startsWith('/report/') && location.pathname !== '/admin' && location.pathname !== '/auth' && (
         <ChatbotToggle 
           isVisible={true}
           isCollapsed={true}

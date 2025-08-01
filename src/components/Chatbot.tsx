@@ -308,6 +308,7 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
   const handleNewConversation = () => {
     createConversation('New Conversation');
     setSuggestions([]);
+    setInputValue('');
   };
 
   const handleToggleMinimize = () => {
@@ -380,7 +381,7 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
                            {/* Messages */}
         {!isMinimized && (
           <ScrollArea className="flex-1 p-4">
-          {!currentConversation ? (
+          {!currentConversation || currentConversation.messages.length === 0 ? (
             <div className="text-center py-8">
               <Bot className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <h4 className="font-medium mb-2">Welcome to Migration Assistant</h4>
@@ -412,8 +413,8 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, className }) 
           </ScrollArea>
         )}
 
-       {/* Quick Suggestions - Always visible when no conversation or empty conversation */}
-       {!isMinimized && (!currentConversation || currentConversation.messages.length === 0) && (
+               {/* Quick Suggestions - Always visible when no conversation or empty conversation */}
+        {!isMinimized && (!currentConversation || (currentConversation && currentConversation.messages.length === 0)) && (
          <div className="p-4 border-t">
            <p className="text-xs text-muted-foreground mb-2">Quick Start:</p>
            <div className="grid grid-cols-2 gap-2">

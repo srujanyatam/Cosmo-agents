@@ -35,7 +35,7 @@ export interface ChatbotContext {
   isLoading: boolean;
   error: string | null;
   config: ChatbotConfig;
-  createConversation: (title: string) => void;
+  createConversation: (title: string) => string;
   setCurrentConversation: (conversation: ChatConversation | null) => void;
   addMessage: (conversationId: string, message: ChatMessage) => void;
   updateConversationTitle: (conversationId: string, title: string) => void;

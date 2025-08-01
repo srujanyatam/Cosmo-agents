@@ -94,3 +94,6 @@ export * from './unreviewedFiles';
 
 // Re-export chatbot types
 export * from './chatbot';
+
+// Re-export comment types
+export * from './comments';

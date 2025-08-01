@@ -1,5 +1,6 @@
 
-import { DatabaseConnection } from '@/types';
+import { DatabaseConnection, Comment, CommentInsert, CommentUpdate } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
 
 // Simulated function to save database connection details
 export const saveConnection = (connection: DatabaseConnection): Promise<boolean> => {
@@ -48,4 +49,85 @@ export const deployToOracle = async (
     success,
     message: success ? 'Code deployed successfully!' : 'Deployment failed. Check the code and database connection.'
   };
+};
+
+// Comment-related database functions
+export const getComments = async (unreviewedFileId: string): Promise<Comment[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('comments')
+      .select(`
+        *,
+        profiles:user_id (
+          email,
+          full_name
+        )
+      `)
+      .eq('unreviewed_file_id', unreviewedFileId)
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    
+    // Transform the data to include user email
+    return (data || []).map(comment => ({
+      ...comment,
+      user_email: comment.profiles?.email || 'Unknown User',
+      user_name: comment.profiles?.full_name || 'Unknown User'
+    }));
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+    return [];
+  }
+};
+
+export const addComment = async (comment: CommentInsert): Promise<Comment | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('comments')
+      .insert(comment)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    return null;
+  }
+};
+
+export const updateComment = async (comment: CommentUpdate): Promise<Comment | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('comments')
+      .update({
+        content: comment.content,
+        line_number: comment.line_number,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', comment.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error updating comment:', error);
+    return null;
+  }
+};
+
+export const deleteComment = async (commentId: string): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from('comments')
+      .delete()
+      .eq('id', commentId);
+
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error('Error deleting comment:', error);
+    return false;
+  }
 };

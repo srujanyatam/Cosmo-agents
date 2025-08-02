@@ -6,8 +6,7 @@ export const checkEnvironmentVariables = () => {
   ];
 
   const optionalVars = [
-    'VITE_GEMINI_API_KEY',
-    'VITE_API_KEY'
+    'VITE_GEMINI_API_KEY'
   ];
 
   const missing = requiredVars.filter(varName => !import.meta.env[varName]);

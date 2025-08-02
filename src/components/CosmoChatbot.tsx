@@ -27,7 +27,7 @@ const getSimulatedResponse = (userMessage: string): string => {
   // React questions
   if (message.includes('react')) {
     if (message.includes('hook') || message.includes('use')) {
-      return `**React Hooks** - Functions that let you use state and other React features in functional components.
+      return `**React Hooks** are functions that let you use state and other React features in functional components.
 
 **Core Hooks:**
 • **useState** - Manage component state
@@ -40,28 +40,22 @@ const [count, setCount] = useState(0);
 useEffect(() => {
   document.title = \`Count: \${count}\`;
 }, [count]);
-\`\`\`
-
-**What it is:** A way to add stateful logic to functional components without classes.`;
+\`\`\``;
     }
-    return `**React.js** - JavaScript library for building user interfaces.
+    return `**React.js** is a JavaScript library for building user interfaces.
 
-**What it is:** A declarative, efficient library for creating interactive UIs using components.
-
-**Key Concepts:**
+**Key Features:**
 • **Components** - Reusable UI pieces
 • **Virtual DOM** - Efficient rendering
 • **JSX** - JavaScript syntax extension
 • **Unidirectional Data Flow** - Predictable state management
 
-**Used in this project for:** Building the web interface with TypeScript and modern hooks.`;
+Used in this project for building the web interface with TypeScript.`;
   }
   
   // TypeScript questions
   if (message.includes('typescript')) {
-    return `**TypeScript** - JavaScript with static typing.
-
-**What it is:** A superset of JavaScript that adds optional static types, classes, and modules.
+    return `**TypeScript** is JavaScript with static typing.
 
 **Key Features:**
 • **Static Typing** - Catch errors at compile time
@@ -78,14 +72,12 @@ interface Message {
 }
 \`\`\`
 
-**Used in this project for:** Type-safe development and better code quality.`;
+Used in this project for type-safe development.`;
   }
   
   // Supabase questions
   if (message.includes('supabase')) {
-    return `**Supabase** - Open-source Firebase alternative.
-
-**What it is:** A backend-as-a-service platform built on PostgreSQL with real-time capabilities.
+    return `**Supabase** is an open-source Firebase alternative built on PostgreSQL.
 
 **Core Features:**
 • **PostgreSQL Database** - Full SQL database with real-time
@@ -94,19 +86,16 @@ interface Message {
 • **Row-Level Security** - Fine-grained access control
 • **Real-time Subscriptions** - Live data updates
 
-**Used in this project for:** User authentication, database storage, and real-time features.`;
+Used in this project for user authentication, database storage, and real-time features.`;
   }
 
   // AI/ML questions
   if (message.includes('ai') || message.includes('machine learning') || message.includes('langchain')) {
-    return `**Artificial Intelligence (AI)** - Computer systems that can perform tasks requiring human intelligence.
-
-**What it is:** Technology that enables machines to learn, reason, and make decisions.
+    return `**Artificial Intelligence (AI)** enables machines to perform tasks requiring human intelligence.
 
 **Key Areas:**
 • **Machine Learning** - Algorithms that learn from data
 • **Natural Language Processing** - Understanding human language
-• **Computer Vision** - Interpreting visual information
 • **Generative AI** - Creating new content (text, images, code)
 
 **Used in this project for:** Chatbot conversations, code analysis, and automated code conversion.`;
@@ -114,50 +103,40 @@ interface Message {
 
   // Database questions
   if (message.includes('oracle') || message.includes('sybase') || message.includes('database')) {
-    return `**Database** - Organized collection of structured information stored electronically.
-
-**What it is:** A system for storing, managing, and retrieving data efficiently.
+    return `**Database** is an organized collection of structured information stored electronically.
 
 **Types:**
 • **Relational Databases** - Oracle, PostgreSQL, MySQL (structured data)
 • **NoSQL Databases** - MongoDB, Redis (flexible schemas)
-• **Cloud Databases** - AWS RDS, Google Cloud SQL (managed)
 
 **Key Features:**
 • **ACID Properties** - Atomicity, Consistency, Isolation, Durability
 • **SQL** - Standard query language
 • **Indexing** - Fast data retrieval
-• **Backup & Recovery** - Data protection
 
-**Used in this project for:** Storing user data, conversion logs, and file metadata.`;
+Used in this project for storing user data, conversion logs, and file metadata.`;
   }
 
   // Code conversion questions
   if (message.includes('convert') || message.includes('migration') || message.includes('rewrite')) {
-    return `**Code Conversion** - Process of translating code from one programming language to another.
-
-**What it is:** Automated or manual translation of source code while preserving functionality and logic.
+    return `**Code Conversion** is the process of translating code from one programming language to another.
 
 **Types:**
 • **Language Migration** - Python to JavaScript, Java to C#
 • **Framework Migration** - Angular to React, Vue to Svelte
 • **Platform Migration** - Web to mobile, desktop to cloud
-• **Version Migration** - Legacy to modern syntax
 
 **Challenges:**
 • **Syntax Differences** - Language-specific features
 • **Library Mapping** - Finding equivalent libraries
 • **Performance Optimization** - Adapting to new platforms
-• **Testing** - Ensuring functionality preservation
 
-**Used in this project for:** Converting Oracle/Sybase code to modern languages.`;
+Used in this project for converting Oracle/Sybase code to modern languages.`;
   }
 
   // Vite questions
   if (message.includes('vite')) {
-    return `**Vite** - Modern build tool for web development.
-
-**What it is:** A fast build tool that provides instant hot module replacement and optimized builds.
+    return `**Vite** is a modern build tool for web development.
 
 **Key Features:**
 • **Fast Dev Server** - Instant hot module replacement
@@ -165,19 +144,12 @@ interface Message {
 • **TypeScript Support** - Native TypeScript compilation
 • **Plugin System** - Extensible architecture
 
-**Benefits:**
-• **Speed** - Lightning-fast development experience
-• **Modern** - ES modules and modern browser features
-• **Flexible** - Works with React, Vue, Svelte, and more
-
-**Used in this project for:** Fast development server and optimized production builds.`;
+Used in this project for fast development server and optimized production builds.`;
   }
 
   // Tailwind CSS questions
   if (message.includes('tailwind') || message.includes('css')) {
-    return `**Tailwind CSS** - Utility-first CSS framework.
-
-**What it is:** A CSS framework that provides low-level utility classes for rapid UI development.
+    return `**Tailwind CSS** is a utility-first CSS framework.
 
 **Key Features:**
 • **Utility-First** - Pre-built classes for common styles
@@ -185,13 +157,7 @@ interface Message {
 • **Customizable** - Configurable design system
 • **JIT Compilation** - Only generates used styles
 
-**Benefits:**
-• **Speed** - Rapid UI development
-• **Consistency** - Unified design system
-• **Maintainability** - No custom CSS needed
-• **Performance** - Optimized bundle sizes
-
-**Used in this project for:** Styling the user interface with modern, responsive design.`;
+Used in this project for styling the user interface with modern, responsive design.`;
   }
 
   // Git and GitHub questions
@@ -208,13 +174,11 @@ interface Message {
 • **Git** handles version control
 • **GitHub** adds issues, pull requests, and team features
 
-**Used in this project for:** Local version control (Git) and cloud hosting (GitHub).`;
+Used in this project for local version control (Git) and cloud hosting (GitHub).`;
     }
     
     if (message.includes('git')) {
-      return `**Git** - Distributed version control system.
-
-**What it is:** A system that tracks changes in your code files over time.
+      return `**Git** is a distributed version control system.
 
 **Key Features:**
 • **Version Tracking** - History of all code changes
@@ -231,13 +195,11 @@ git push          # Upload to remote
 git pull          # Download changes
 \`\`\`
 
-**Used in this project for:** Tracking code changes and collaboration.`;
+Used in this project for tracking code changes and collaboration.`;
     }
     
     if (message.includes('github')) {
-      return `**GitHub** - Web-based platform for hosting Git repositories.
-
-**What it is:** A cloud service that hosts Git repositories with collaboration tools.
+      return `**GitHub** is a web-based platform for hosting Git repositories.
 
 **Key Features:**
 • **Repository Hosting** - Store code in the cloud
@@ -246,15 +208,13 @@ git pull          # Download changes
 • **Pull Requests** - Code review system
 • **Actions** - Automated workflows
 
-**Used in this project for:** Hosting the repository and team collaboration.`;
+Used in this project for hosting the repository and team collaboration.`;
     }
   }
 
   // Python questions
   if (message.includes('python')) {
-    return `**Python** - High-level, interpreted programming language.
-
-**What it is:** A versatile language known for its simple syntax and readability.
+    return `**Python** is a high-level, interpreted programming language.
 
 **Key Features:**
 • **Easy to Learn** - Simple, readable syntax
@@ -268,14 +228,12 @@ git pull          # Download changes
 • **AI/ML** - TensorFlow, PyTorch, scikit-learn
 • **Automation** - Scripts and tools
 
-**Used in this project for:** AI integration and data processing.`;
+Used in this project for AI integration and data processing.`;
   }
 
   // SQL questions
   if (message.includes('sql')) {
-    return `**SQL** - Structured Query Language.
-
-**What it is:** Standard language for managing and manipulating relational databases.
+    return `**SQL** is the standard language for managing and manipulating relational databases.
 
 **Key Features:**
 • **Data Querying** - Retrieve data from databases
@@ -291,14 +249,12 @@ UPDATE table SET column = value WHERE condition;
 DELETE FROM table WHERE condition;
 \`\`\`
 
-**Used in this project for:** Database operations and data management.`;
+Used in this project for database operations and data management.`;
   }
 
   // Comments feature questions
   if (message.includes('comment') || message.includes('note')) {
-    return `**Comments** - Notes and annotations for code.
-
-**What it is:** A way to add notes and explanations to your code for future reference.
+    return `**Comments** are notes and annotations for code.
 
 **Features:**
 • **Add Comments** - Write notes about code
@@ -306,14 +262,12 @@ DELETE FROM table WHERE condition;
 • **View Comments** - See all comments in history
 • **Delete Comments** - Remove unwanted notes
 
-**Used in this project for:** Adding notes to code conversions and tracking decisions.`;
+Used in this project for adding notes to code conversions and tracking decisions.`;
   }
 
   // General programming questions
   if (message.includes('programming') || message.includes('coding') || message.includes('development')) {
-    return `**Programming** - Creating instructions for computers.
-
-**What it is:** The process of writing code to solve problems and build applications.
+    return `**Programming** is creating instructions for computers.
 
 **Key Concepts:**
 • **Algorithms** - Step-by-step problem-solving
@@ -327,14 +281,12 @@ DELETE FROM table WHERE condition;
 • **Java** - Enterprise applications
 • **C++** - System programming
 
-**Used in this project for:** Building the web application and AI features.`;
+Used in this project for building the web application and AI features.`;
   }
 
   // General technology questions
   if (message.includes('technology') || message.includes('tech') || message.includes('software')) {
-    return `**Technology** - Tools and systems for solving problems.
-
-**What it is:** The application of scientific knowledge to create tools and systems.
+    return `**Technology** is the application of scientific knowledge to create tools and systems.
 
 **Key Areas:**
 • **Web Development** - Building websites and applications
@@ -343,32 +295,13 @@ DELETE FROM table WHERE condition;
 • **Artificial Intelligence** - Creating intelligent systems
 • **Cloud Computing** - Using remote servers and services
 
-**Used in this project for:** Building modern web applications and AI features.`;
+Used in this project for building modern web applications and AI features.`;
   }
   
   // Default response
-  return `I'm Cosmo Agents, your AI assistant! 🚀
+  return `I can help you with Cosmo Agents technologies like React, TypeScript, Supabase, Git, GitHub, Oracle, Sybase, Python, SQL, and related technologies. 
 
-I can help you with any programming, technology, or general questions. Ask me about:
-
-**Programming & Development:**
-• Any programming language (Python, JavaScript, Java, C++, etc.)
-• Web development frameworks and libraries
-• Database technologies and SQL
-• Cloud platforms and services
-
-**Technology & Tools:**
-• Software development methodologies
-• Best practices and design patterns
-• Debugging and troubleshooting
-• Performance optimization
-
-**General Questions:**
-• Technology concepts and explanations
-• Learning resources and tutorials
-• Industry trends and insights
-
-What would you like to know about? 💡`;
+Please ask me about these specific technologies or how they work in the Cosmo Agents platform!`;
 };
 
 interface Message {
@@ -538,24 +471,23 @@ Ask me anything! 🚀`,
     const welcomeMessage: Message = {
       id: Date.now().toString(),
       role: 'assistant',
-      content: `👋 **Welcome to Cosmo Agents!** 
+      content: `👋 **Welcome to Cosmo Agents!**
 
-I'm your AI assistant specializing in all the technologies used in this website. I can help you with:
+I'm your AI assistant for the Cosmo Agents platform. I can help you with:
 
-**🛠️ Technologies I know:**
+**Core Technologies:**
 • React.js, TypeScript, Vite, Tailwind CSS
 • Supabase, PostgreSQL, Netlify Functions
-• Google Generative AI, LangChain
-• Git, GitHub, Oracle, Sybase, Python
-• And much more!
+• Google AI, LangChain, Git/GitHub
+• Oracle, Sybase, Python, SQL
 
-**💡 What I can do:**
-• Answer questions about any technology
+**What I can do:**
+• Answer questions about these technologies
 • Explain code concepts and best practices
 • Help with debugging and troubleshooting
-• Provide guidance on features and implementation
+• Provide guidance on implementation
 
-Just ask me anything! 🚀`,
+Ask me anything about Cosmo Agents technologies! 🚀`,
       timestamp: new Date(),
     };
     setMessages([welcomeMessage]);
@@ -583,24 +515,23 @@ Just ask me anything! 🚀`,
     const welcomeMessage: Message = {
       id: Date.now().toString(),
       role: 'assistant',
-      content: `👋 **Welcome to Cosmo Agents!** 
+      content: `👋 **Welcome to Cosmo Agents!**
 
-I'm your AI assistant specializing in all the technologies used in this website. I can help you with:
+I'm your AI assistant for the Cosmo Agents platform. I can help you with:
 
-**🛠️ Technologies I know:**
+**Core Technologies:**
 • React.js, TypeScript, Vite, Tailwind CSS
 • Supabase, PostgreSQL, Netlify Functions
-• Google Generative AI, LangChain
-• Git, GitHub, Oracle, Sybase, Python
-• And much more!
+• Google AI, LangChain, Git/GitHub
+• Oracle, Sybase, Python, SQL
 
-**💡 What I can do:**
-• Answer questions about any technology
+**What I can do:**
+• Answer questions about these technologies
 • Explain code concepts and best practices
 • Help with debugging and troubleshooting
-• Provide guidance on features and implementation
+• Provide guidance on implementation
 
-Just ask me anything! 🚀`,
+Ask me anything about Cosmo Agents technologies! 🚀`,
       timestamp: new Date(),
     };
     setMessages([welcomeMessage]);

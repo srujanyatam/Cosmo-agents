@@ -127,6 +127,26 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
   const [isCommentsExpanded, setIsCommentsExpanded] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
 
+  // Fetch comment count when file changes
+  useEffect(() => {
+    const fetchCommentCount = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('conversion_comments')
+          .select('id')
+          .eq('file_id', file.id);
+        
+        if (!error && data !== null) {
+          setCommentCount(data.length);
+        }
+      } catch (error) {
+        console.error('Error fetching comment count:', error);
+      }
+    };
+
+    fetchCommentCount();
+  }, [file.id]);
+
   // Calculate dynamic height based on content length
   const getDynamicHeight = (content: string) => {
     const lineCount = content.split('\n').length;

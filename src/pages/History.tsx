@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Database, FileText, Home, Eye, Download, Trash2, CheckCircle, XCircle, AlertCircle, History, HelpCircle, MessageSquare } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -65,6 +66,7 @@ const History = () => {
   const [showHelp, setShowHelp] = useState(false);
   const [showCommentsDialog, setShowCommentsDialog] = useState(false);
   const [selectedFileForComments, setSelectedFileForComments] = useState<MigrationFile | null>(null);
+  const [fileCommentCounts, setFileCommentCounts] = useState<Record<string, number>>({});
 
   // Get the return tab from location state
   const returnTab = location.state?.returnTab || 'upload';
@@ -183,11 +185,54 @@ const History = () => {
       }));
       
       setMigrationFiles(typedFiles);
+      
+      // Fetch comment counts for all files
+      await fetchCommentCountsForFiles(typedFiles);
     } catch (err) {
       console.error('Error in fetchMigrationFiles:', err);
       setMigrationFiles([]);
     } finally {
       isFetchingFiles.current = false;
+    }
+  };
+
+  // Fetch comment counts for multiple files
+  const fetchCommentCountsForFiles = async (files: MigrationFile[]) => {
+    if (!user?.id || files.length === 0) return;
+    
+    try {
+      const commentCounts: Record<string, number> = {};
+      
+      // Get current user
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) return;
+      
+      for (const file of files) {
+        // First try to get count by file_id
+        let { data, error } = await supabase
+          .from('conversion_comments')
+          .select('id', { count: 'exact' })
+          .eq('file_id', file.id);
+        
+        // If no comments found by file_id, try by file_name and user_id
+        if ((!data || data.length === 0) && file.file_name) {
+          const { data: nameData, error: nameError } = await supabase
+            .from('conversion_comments')
+            .select('id', { count: 'exact' })
+            .eq('file_name', file.file_name)
+            .eq('user_id', currentUser.id);
+          
+          if (!nameError && nameData !== null) {
+            data = nameData;
+          }
+        }
+        
+        commentCounts[file.id] = data?.length || 0;
+      }
+      
+      setFileCommentCounts(prev => ({ ...prev, ...commentCounts }));
+    } catch (error) {
+      console.error('Error fetching comment counts:', error);
     }
   };
 
@@ -241,6 +286,14 @@ const History = () => {
     e.stopPropagation();
     setSelectedFileForComments(file);
     setShowCommentsDialog(true);
+  };
+
+  // Update comment count for a specific file
+  const updateCommentCount = (fileId: string, newCount: number) => {
+    setFileCommentCounts(prev => ({
+      ...prev,
+      [fileId]: newCount
+    }));
   };
 
   // Delete migration
@@ -773,16 +826,25 @@ const History = () => {
                                   </span>
                                 </div>
                               </td>
-                              <td className="px-4 py-2 text-center">
-                                <div className="flex gap-1 justify-center">
-                                  <Button 
-                                    size="sm" 
-                                    variant="ghost"
-                                    onClick={(e) => handleViewComments(e, file)}
-                                    title="View Comments"
-                                  >
-                                    <MessageSquare className="h-4 w-4" />
-                                  </Button>
+                                                             <td className="px-4 py-2 text-center">
+                                 <div className="flex gap-1 justify-center">
+                                   <Button 
+                                     size="sm" 
+                                     variant="ghost"
+                                     onClick={(e) => handleViewComments(e, file)}
+                                     title="View Comments"
+                                     className="relative"
+                                   >
+                                     <MessageSquare className="h-4 w-4" />
+                                     {fileCommentCounts[file.id] > 0 && (
+                                       <Badge 
+                                         variant="secondary" 
+                                         className="absolute -top-2 -right-2 h-5 w-5 p-0 text-xs flex items-center justify-center"
+                                       >
+                                         {fileCommentCounts[file.id]}
+                                       </Badge>
+                                     )}
+                                   </Button>
                                   <Button 
                                     size="sm" 
                                     variant="ghost"
@@ -875,15 +937,16 @@ const History = () => {
               <DialogTitle>Comments: {selectedFileForComments?.file_name}</DialogTitle>
               <DialogClose />
             </DialogHeader>
-            <div className="overflow-y-auto max-h-[calc(90vh-120px)]">
-              {selectedFileForComments && (
-                <CommentSection 
-                  fileId={selectedFileForComments.id} 
-                  fileName={selectedFileForComments.file_name} 
-                  conversionId={selectedFileForComments.migration_id}
-                />
-              )}
-            </div>
+                         <div className="overflow-y-auto max-h-[calc(90vh-120px)]">
+               {selectedFileForComments && (
+                 <CommentSection 
+                   fileId={selectedFileForComments.id} 
+                   fileName={selectedFileForComments.file_name} 
+                   conversionId={selectedFileForComments.migration_id}
+                   onCommentCountChange={(count) => updateCommentCount(selectedFileForComments.id, count)}
+                 />
+               )}
+             </div>
           </DialogContent>
         </Dialog>
       </main>

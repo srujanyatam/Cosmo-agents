@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { Edit, Save, X, ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
+import { Edit, Save, X, ArrowLeft, ArrowRight, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 import ConversionIssuesPanel from './ConversionIssuesPanel';
 import FileDownloader from './FileDownloader';
 import { supabase } from '@/integrations/supabase/client';
@@ -124,6 +124,8 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
   const [showExplainDialog, setShowExplainDialog] = useState(false);
   const [explanation, setExplanation] = useState('');
   const [isExplaining, setIsExplaining] = useState(false);
+  const [isCommentsExpanded, setIsCommentsExpanded] = useState(false);
+  const [commentCount, setCommentCount] = useState(0);
 
   // Calculate dynamic height based on content length
   const getDynamicHeight = (content: string) => {
@@ -215,12 +217,11 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
     <>
       {/* Removed top bar with filename, badges, and download button. Now only tabs and code sections remain. */}
       <Tabs defaultValue="code" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="code">Code</TabsTrigger>
           <TabsTrigger value="mapping">Data Types</TabsTrigger>
           <TabsTrigger value="issues">Issues {file.issues && file.issues.length > 0 && (<Badge variant="outline" className="ml-1">{file.issues.length}</Badge>)}</TabsTrigger>
           <TabsTrigger value="performance">Performance</TabsTrigger>
-          <TabsTrigger value="comments">Comments</TabsTrigger>
         </TabsList>
         
         <TabsContent value="code" className="space-y-4">
@@ -424,15 +425,42 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
           ) : (
             <div className="text-center text-gray-400">No code available.</div>
           )}
-          {file.errorMessage && (
-            <div>
-              <h3 className="text-sm font-medium mb-2 text-red-700">Error:</h3>
-              <div className="bg-red-50 p-4 rounded text-sm text-red-700">
-                {file.errorMessage}
-              </div>
-            </div>
-          )}
-        </TabsContent>
+                     {file.errorMessage && (
+             <div>
+               <h3 className="text-sm font-medium mb-2 text-red-700">Error:</h3>
+               <div className="bg-red-50 p-4 rounded text-sm text-red-700">
+                 {file.errorMessage}
+               </div>
+             </div>
+           )}
+
+           {/* Comments Section */}
+           <div className="mt-6 border-t pt-4">
+             <button
+               onClick={() => setIsCommentsExpanded(!isCommentsExpanded)}
+               className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+             >
+               {isCommentsExpanded ? (
+                 <ChevronUp className="h-4 w-4" />
+               ) : (
+                 <ChevronDown className="h-4 w-4" />
+               )}
+               Comments
+               <Badge variant="secondary" className="ml-1">{commentCount}</Badge>
+             </button>
+             
+             {isCommentsExpanded && (
+               <div className="mt-4">
+                 <CommentSection 
+                   fileId={file.id} 
+                   fileName={file.file_name} 
+                   conversionId={file.conversion_id}
+                   onCommentCountChange={setCommentCount}
+                 />
+               </div>
+             )}
+           </div>
+         </TabsContent>
         
         <TabsContent value="mapping" className="space-y-4">
           {file.dataTypeMapping && file.dataTypeMapping.length > 0 ? (
@@ -729,13 +757,7 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
           )}
         </TabsContent>
         
-        <TabsContent value="comments" className="space-y-4">
-          <CommentSection 
-            fileId={file.id} 
-            fileName={file.file_name} 
-            conversionId={file.conversion_id}
-          />
-        </TabsContent>
+        
       </Tabs>
 
       {/* Rewrite Dialog */}

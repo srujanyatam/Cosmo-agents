@@ -14,13 +14,15 @@ interface CommentSectionProps {
   fileName: string;
   conversionId?: string;
   className?: string;
+  onCommentCountChange?: (count: number) => void;
 }
 
 export const CommentSection: React.FC<CommentSectionProps> = ({
   fileId,
   fileName,
   conversionId,
-  className = ''
+  className = '',
+  onCommentCountChange
 }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
@@ -38,6 +40,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
     try {
       const fetchedComments = await getComments(fileId);
       setComments(fetchedComments);
+      onCommentCountChange?.(fetchedComments.length);
     } catch (error) {
       console.error('Error fetching comments:', error);
     } finally {
@@ -57,7 +60,9 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 
     const addedComment = await addComment(commentData);
     if (addedComment) {
-      setComments(prev => [...prev, { ...addedComment, user_email: user.user_metadata?.full_name || user.email || 'You' }]);
+      const newComments = [...comments, { ...addedComment, user_email: user.user_metadata?.full_name || user.email || 'You' }];
+      setComments(newComments);
+      onCommentCountChange?.(newComments.length);
       setNewComment('');
     }
   };
@@ -82,7 +87,9 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   const handleDeleteComment = async (commentId: string) => {
     const success = await deleteComment(commentId);
     if (success) {
-      setComments(prev => prev.filter(c => c.id !== commentId));
+      const newComments = comments.filter(c => c.id !== commentId);
+      setComments(newComments);
+      onCommentCountChange?.(newComments.length);
     }
   };
 
@@ -106,11 +113,6 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 
   return (
     <div className={`space-y-4 ${className}`}>
-      <div className="flex items-center gap-2">
-        <MessageSquare className="h-5 w-5" />
-        <h3 className="text-lg font-semibold">Comments</h3>
-        <Badge variant="secondary">{comments.length}</Badge>
-      </div>
 
       {/* Add new comment */}
       <Card>

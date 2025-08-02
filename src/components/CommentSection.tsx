@@ -6,8 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Trash2, Edit, MessageSquare, Plus } from 'lucide-react';
 import { Comment, CommentInsert } from '@/types';
-import { getComments, addComment, updateComment, deleteComment } from '@/utils/databaseUtils';
+import { addComment, updateComment, deleteComment } from '@/utils/databaseUtils';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CommentSectionProps {
   fileId: string;
@@ -38,11 +39,32 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   const fetchComments = async () => {
     setLoading(true);
     try {
-      const fetchedComments = await getComments(fileId, fileName);
-      setComments(fetchedComments);
-      onCommentCountChange?.(fetchedComments.length);
+      // Get current user for user email handling
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      // Only get comments by file_id - don't fall back to file_name
+      // This ensures re-uploaded files start with 0 comments
+      const { data, error } = await supabase
+        .from('conversion_comments')
+        .select('*')
+        .eq('file_id', fileId)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching comments:', error);
+        setComments([]);
+      } else {
+        // Transform the data to include user name from auth
+        const transformedComments = (data || []).map(comment => ({
+          ...comment,
+          user_email: comment.user_id === user?.id ? (user?.user_metadata?.full_name || user?.email || 'You') : 'Unknown User',
+          user_name: comment.user_id === user?.id ? (user?.user_metadata?.full_name || 'You') : 'Unknown User'
+        }));
+        setComments(transformedComments);
+      }
     } catch (error) {
       console.error('Error fetching comments:', error);
+      setComments([]);
     } finally {
       setLoading(false);
     }

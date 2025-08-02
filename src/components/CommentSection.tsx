@@ -38,7 +38,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   const fetchComments = async () => {
     setLoading(true);
     try {
-      const fetchedComments = await getComments(fileId);
+      const fetchedComments = await getComments(fileId, fileName);
       setComments(fetchedComments);
       onCommentCountChange?.(fetchedComments.length);
     } catch (error) {

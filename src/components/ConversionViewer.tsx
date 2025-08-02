@@ -131,10 +131,27 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
   useEffect(() => {
     const fetchCommentCount = async () => {
       try {
-        const { data, error } = await supabase
+        // First try to get count by file_id
+        let { data, error } = await supabase
           .from('conversion_comments')
           .select('id')
           .eq('file_id', file.id);
+        
+        // If no comments found by file_id, try by file_name and user_id
+        if ((!data || data.length === 0) && file.name) {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user?.id) {
+            const { data: nameData, error: nameError } = await supabase
+              .from('conversion_comments')
+              .select('id')
+              .eq('file_name', file.name)
+              .eq('user_id', user.id);
+            
+            if (!nameError && nameData !== null) {
+              data = nameData;
+            }
+          }
+        }
         
         if (!error && data !== null) {
           setCommentCount(data.length);
@@ -145,7 +162,7 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
     };
 
     fetchCommentCount();
-  }, [file.id]);
+  }, [file.id, file.name]);
 
   // Calculate dynamic height based on content length
   const getDynamicHeight = (content: string) => {

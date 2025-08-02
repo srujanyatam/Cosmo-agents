@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Database, FileText, Home, Eye, Download, Trash2, CheckCircle, XCircle, AlertCircle, History, HelpCircle } from 'lucide-react';
+import { ArrowLeft, Database, FileText, Home, Eye, Download, Trash2, CheckCircle, XCircle, AlertCircle, History, HelpCircle, MessageSquare } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,6 +15,7 @@ import { useUnreviewedFiles } from '@/hooks/useUnreviewedFiles';
 import ReportViewer from '@/components/ReportViewer';
 import { ChatbotToggle } from '@/components/ChatbotToggle';
 import Help from '@/components/Help';
+import { CommentSection } from '@/components/CommentSection';
 
 interface Migration {
   id: string;
@@ -62,6 +63,8 @@ const History = () => {
   const [showGeneratedReport, setShowGeneratedReport] = useState(false);
   const [generatedReport, setGeneratedReport] = useState<any>(null);
   const [showHelp, setShowHelp] = useState(false);
+  const [showCommentsDialog, setShowCommentsDialog] = useState(false);
+  const [selectedFileForComments, setSelectedFileForComments] = useState<MigrationFile | null>(null);
 
   // Get the return tab from location state
   const returnTab = location.state?.returnTab || 'upload';
@@ -231,6 +234,13 @@ const History = () => {
       title: "Downloaded",
       description: `${downloadName} has been downloaded`,
     });
+  };
+
+  // Handle comments view
+  const handleViewComments = (e: React.MouseEvent, file: MigrationFile) => {
+    e.stopPropagation();
+    setSelectedFileForComments(file);
+    setShowCommentsDialog(true);
   };
 
   // Delete migration
@@ -768,6 +778,14 @@ const History = () => {
                                   <Button 
                                     size="sm" 
                                     variant="ghost"
+                                    onClick={(e) => handleViewComments(e, file)}
+                                    title="View Comments"
+                                  >
+                                    <MessageSquare className="h-4 w-4" />
+                                  </Button>
+                                  <Button 
+                                    size="sm" 
+                                    variant="ghost"
                                     onClick={(e) => handleViewFile(e, file)}
                                     title="View Code"
                                   >
@@ -849,6 +867,25 @@ const History = () => {
             </DialogContent>
           </Dialog>
         )}
+
+        {/* Comments Dialog */}
+        <Dialog open={showCommentsDialog} onOpenChange={setShowCommentsDialog}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+            <DialogHeader>
+              <DialogTitle>Comments: {selectedFileForComments?.file_name}</DialogTitle>
+              <DialogClose />
+            </DialogHeader>
+            <div className="overflow-y-auto max-h-[calc(90vh-120px)]">
+              {selectedFileForComments && (
+                <CommentSection 
+                  fileId={selectedFileForComments.id} 
+                  fileName={selectedFileForComments.file_name} 
+                  conversionId={selectedFileForComments.migration_id}
+                />
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
       
       {/* Help Modal */}

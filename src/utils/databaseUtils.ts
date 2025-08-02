@@ -52,18 +52,37 @@ export const deployToOracle = async (
 };
 
 // Comment-related database functions
-export const getComments = async (fileId: string): Promise<Comment[]> => {
+export const getComments = async (fileId: string, fileName?: string): Promise<Comment[]> => {
   try {
     // Get current user for debugging
     const { data: { user } } = await supabase.auth.getUser();
     console.log('Current user:', user?.id);
-    console.log('Fetching comments for fileId:', fileId);
+    console.log('Fetching comments for fileId:', fileId, 'fileName:', fileName);
 
-    const { data, error } = await supabase
+    // First try to get comments by file_id
+    let { data, error } = await supabase
       .from('conversion_comments')
       .select('*')
       .eq('file_id', fileId)
       .order('created_at', { ascending: false });
+
+    // If no comments found by file_id and we have fileName, try to find by file_name and user_id
+    if ((!data || data.length === 0) && fileName && user?.id) {
+      console.log('No comments found by file_id, trying file_name and user_id');
+      const { data: nameData, error: nameError } = await supabase
+        .from('conversion_comments')
+        .select('*')
+        .eq('file_name', fileName)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      
+      if (nameError) {
+        console.error('Supabase error (file_name search):', nameError);
+      } else {
+        data = nameData;
+        error = nameError;
+      }
+    }
 
     if (error) {
       console.error('Supabase error:', error);

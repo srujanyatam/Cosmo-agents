@@ -9,11 +9,13 @@ import { Database, History as HistoryIcon, HelpCircle, Home } from 'lucide-react
 import UserDropdown from '@/components/UserDropdown';
 import Help from '@/components/Help';
 import { ChatbotToggle } from '@/components/ChatbotToggle';
+import { useAuth } from '@/hooks/useAuth';
 
 const ReportPage: React.FC = () => {
   const { reportId } = useParams<{ reportId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
   const [report, setReport] = useState<ConversionReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

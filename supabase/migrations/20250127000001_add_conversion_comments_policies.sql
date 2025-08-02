@@ -4,13 +4,10 @@ ALTER TABLE public.conversion_comments ENABLE ROW LEVEL SECURITY;
 -- Create policies for user access
 DO $$ 
 BEGIN
-    -- Users can view comments on their own files or public comments
-    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'conversion_comments' AND policyname = 'Users can view comments on their files or public comments') THEN
-        CREATE POLICY "Users can view comments on their files or public comments" ON public.conversion_comments
-        FOR SELECT USING (
-            auth.uid() = user_id OR 
-            is_public = true
-        );
+    -- Users can view their own comments
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'conversion_comments' AND policyname = 'Users can view their own comments') THEN
+        CREATE POLICY "Users can view their own comments" ON public.conversion_comments
+        FOR SELECT USING (auth.uid() = user_id);
     END IF;
 
     -- Users can insert their own comments

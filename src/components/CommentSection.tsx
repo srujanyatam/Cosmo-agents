@@ -4,7 +4,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Trash2, Edit, MessageSquare, Plus, Eye, EyeOff } from 'lucide-react';
+import { Trash2, Edit, MessageSquare, Plus } from 'lucide-react';
 import { Comment, CommentInsert } from '@/types';
 import { getComments, addComment, updateComment, deleteComment } from '@/utils/databaseUtils';
 import { useAuth } from '@/hooks/useAuth';
@@ -24,7 +24,6 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
-  const [isPublic, setIsPublic] = useState(false);
   const [editingComment, setEditingComment] = useState<string | null>(null);
   const [editText, setEditText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -53,15 +52,13 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
       file_id: fileId,
       file_name: fileName,
       comment: newComment.trim(),
-      conversion_id: conversionId,
-      is_public: isPublic
+      conversion_id: conversionId
     };
 
     const addedComment = await addComment(commentData);
     if (addedComment) {
       setComments(prev => [...prev, { ...addedComment, user_email: user.email || 'You' }]);
       setNewComment('');
-      setIsPublic(false);
     }
   };
 
@@ -70,8 +67,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 
     const updatedComment = await updateComment({
       id: commentId,
-      comment: editText.trim(),
-      is_public: isPublic
+      comment: editText.trim()
     });
 
     if (updatedComment) {
@@ -93,13 +89,11 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   const startEditing = (comment: Comment) => {
     setEditingComment(comment.id);
     setEditText(comment.comment);
-    setIsPublic(comment.is_public || false);
   };
 
   const cancelEditing = () => {
     setEditingComment(null);
     setEditText('');
-    setIsPublic(false);
   };
 
   const canEditComment = (comment: Comment) => {
@@ -130,19 +124,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
             onChange={(e) => setNewComment(e.target.value)}
             className="min-h-[100px]"
           />
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="isPublic"
-                checked={isPublic}
-                onChange={(e) => setIsPublic(e.target.checked)}
-                className="rounded"
-              />
-              <label htmlFor="isPublic" className="text-sm text-gray-600">
-                Make comment public
-              </label>
-            </div>
+          <div className="flex justify-end">
             <Button 
               onClick={handleAddComment}
               disabled={!newComment.trim() || !user}
@@ -177,35 +159,21 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                       onChange={(e) => setEditText(e.target.value)}
                       className="min-h-[80px]"
                     />
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          id={`editPublic-${comment.id}`}
-                          checked={isPublic}
-                          onChange={(e) => setIsPublic(e.target.checked)}
-                          className="rounded"
-                        />
-                        <label htmlFor={`editPublic-${comment.id}`} className="text-sm text-gray-600">
-                          Make comment public
-                        </label>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button 
-                          onClick={() => handleUpdateComment(comment.id)}
-                          size="sm"
-                          variant="outline"
-                        >
-                          Save
-                        </Button>
-                        <Button 
-                          onClick={cancelEditing}
-                          size="sm"
-                          variant="ghost"
-                        >
-                          Cancel
-                        </Button>
-                      </div>
+                    <div className="flex gap-2 justify-end">
+                      <Button 
+                        onClick={() => handleUpdateComment(comment.id)}
+                        size="sm"
+                        variant="outline"
+                      >
+                        Save
+                      </Button>
+                      <Button 
+                        onClick={cancelEditing}
+                        size="sm"
+                        variant="ghost"
+                      >
+                        Cancel
+                      </Button>
                     </div>
                   </div>
                 ) : (
@@ -213,19 +181,6 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-sm">{comment.user_email}</span>
-                        <Badge variant="outline" className="text-xs">
-                          {comment.is_public ? (
-                            <>
-                              <Eye className="h-3 w-3 mr-1" />
-                              Public
-                            </>
-                          ) : (
-                            <>
-                              <EyeOff className="h-3 w-3 mr-1" />
-                              Private
-                            </>
-                          )}
-                        </Badge>
                         <span className="text-xs text-gray-500">
                           {new Date(comment.created_at).toLocaleString()}
                         </span>

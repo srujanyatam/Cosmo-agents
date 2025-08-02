@@ -7,7 +7,6 @@ export interface Comment {
   file_name: string;
   comment: string;
   conversion_id?: string;
-  is_public?: boolean;
   user_email?: string; // For display purposes
 }
 
@@ -16,13 +15,11 @@ export interface CommentInsert {
   file_name: string;
   comment: string;
   conversion_id?: string;
-  is_public?: boolean;
 }
 
 export interface CommentUpdate {
   id: string;
   comment: string;
-  is_public?: boolean;
 }
 
 export interface CommentWithUser extends Comment {

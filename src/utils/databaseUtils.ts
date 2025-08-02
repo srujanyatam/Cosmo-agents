@@ -111,7 +111,6 @@ export const updateComment = async (comment: CommentUpdate): Promise<Comment | n
       .from('conversion_comments')
       .update({ 
         comment: comment.comment,
-        is_public: comment.is_public,
         updated_at: new Date().toISOString()
       })
       .eq('id', comment.id)

@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { Edit, Save, X, ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
+import { Edit, Save, X, ArrowLeft, ArrowRight, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 import ConversionIssuesPanel from './ConversionIssuesPanel';
 import FileDownloader from './FileDownloader';
 import { supabase } from '@/integrations/supabase/client';
@@ -17,6 +17,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import CodeEditor from './CodeEditor'; // Added import for CodeEditor
+import { CommentSection } from './CommentSection';
 
 interface DataTypeMapping {
   sybaseType: string;
@@ -123,6 +124,45 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
   const [showExplainDialog, setShowExplainDialog] = useState(false);
   const [explanation, setExplanation] = useState('');
   const [isExplaining, setIsExplaining] = useState(false);
+  const [isCommentsExpanded, setIsCommentsExpanded] = useState(false);
+  const [commentCount, setCommentCount] = useState(0);
+
+  // Fetch comment count when file changes
+  useEffect(() => {
+    const fetchCommentCount = async () => {
+      try {
+        // First try to get count by file_id
+        let { data, error } = await supabase
+          .from('conversion_comments')
+          .select('id')
+          .eq('file_id', file.id);
+        
+        // If no comments found by file_id, try by file_name and user_id
+        if ((!data || data.length === 0) && file.name) {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user?.id) {
+            const { data: nameData, error: nameError } = await supabase
+              .from('conversion_comments')
+              .select('id')
+              .eq('file_name', file.name)
+              .eq('user_id', user.id);
+            
+            if (!nameError && nameData !== null) {
+              data = nameData;
+            }
+          }
+        }
+        
+        if (!error && data !== null) {
+          setCommentCount(data.length);
+        }
+      } catch (error) {
+        console.error('Error fetching comment count:', error);
+      }
+    };
+
+    fetchCommentCount();
+  }, [file.id, file.name]);
 
   // Calculate dynamic height based on content length
   const getDynamicHeight = (content: string) => {
@@ -422,15 +462,42 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
           ) : (
             <div className="text-center text-gray-400">No code available.</div>
           )}
-          {file.errorMessage && (
-            <div>
-              <h3 className="text-sm font-medium mb-2 text-red-700">Error:</h3>
-              <div className="bg-red-50 p-4 rounded text-sm text-red-700">
-                {file.errorMessage}
-              </div>
-            </div>
-          )}
-        </TabsContent>
+                     {file.errorMessage && (
+             <div>
+               <h3 className="text-sm font-medium mb-2 text-red-700">Error:</h3>
+               <div className="bg-red-50 p-4 rounded text-sm text-red-700">
+                 {file.errorMessage}
+               </div>
+             </div>
+           )}
+
+           {/* Comments Section */}
+           <div className="mt-6 border-t pt-4">
+             <button
+               onClick={() => setIsCommentsExpanded(!isCommentsExpanded)}
+               className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+             >
+               {isCommentsExpanded ? (
+                 <ChevronUp className="h-4 w-4" />
+               ) : (
+                 <ChevronDown className="h-4 w-4" />
+               )}
+               Comments
+               <Badge variant="secondary" className="ml-1">{commentCount}</Badge>
+             </button>
+             
+             {isCommentsExpanded && (
+               <div className="mt-4">
+                 <CommentSection 
+                   fileId={file.id} 
+                   fileName={file.file_name} 
+                   conversionId={file.conversion_id}
+                   onCommentCountChange={setCommentCount}
+                 />
+               </div>
+             )}
+           </div>
+         </TabsContent>
         
         <TabsContent value="mapping" className="space-y-4">
           {file.dataTypeMapping && file.dataTypeMapping.length > 0 ? (
@@ -726,6 +793,8 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
             </div>
           )}
         </TabsContent>
+        
+        
       </Tabs>
 
       {/* Rewrite Dialog */}

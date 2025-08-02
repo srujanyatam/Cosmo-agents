@@ -54,25 +54,29 @@ export const deployToOracle = async (
 // Comment-related database functions
 export const getComments = async (fileId: string): Promise<Comment[]> => {
   try {
+    // Get current user for debugging
+    const { data: { user } } = await supabase.auth.getUser();
+    console.log('Current user:', user?.id);
+    console.log('Fetching comments for fileId:', fileId);
+
     const { data, error } = await supabase
       .from('conversion_comments')
-      .select(`
-        *,
-        profiles!user_id (
-          email,
-          full_name
-        )
-      `)
+      .select('*')
       .eq('file_id', fileId)
       .order('created_at', { ascending: true });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
+    }
     
-    // Transform the data to include user email
+    console.log('Fetched comments:', data);
+    
+    // Transform the data to include user name from auth
     return (data || []).map(comment => ({
       ...comment,
-      user_email: comment.profiles?.email || 'Unknown User',
-      user_name: comment.profiles?.full_name
+      user_email: comment.user_id === user?.id ? (user?.user_metadata?.full_name || user?.email || 'You') : 'Unknown User',
+      user_name: comment.user_id === user?.id ? (user?.user_metadata?.full_name || 'You') : 'Unknown User'
     }));
   } catch (error) {
     console.error('Error fetching comments:', error);

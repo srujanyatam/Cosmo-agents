@@ -57,7 +57,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
 
     const addedComment = await addComment(commentData);
     if (addedComment) {
-      setComments(prev => [...prev, { ...addedComment, user_email: user.email || 'You' }]);
+      setComments(prev => [...prev, { ...addedComment, user_email: user.user_metadata?.full_name || user.email || 'You' }]);
       setNewComment('');
     }
   };

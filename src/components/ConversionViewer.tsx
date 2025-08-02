@@ -131,27 +131,12 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
   useEffect(() => {
     const fetchCommentCount = async () => {
       try {
-        // First try to get count by file_id
-        let { data, error } = await supabase
+        // Only get comments by file_id - don't fall back to file_name
+        // This ensures re-uploaded files start with 0 comments
+        const { data, error } = await supabase
           .from('conversion_comments')
           .select('id')
           .eq('file_id', file.id);
-        
-        // If no comments found by file_id, try by file_name and user_id
-        if ((!data || data.length === 0) && file.name) {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user?.id) {
-            const { data: nameData, error: nameError } = await supabase
-              .from('conversion_comments')
-              .select('id')
-              .eq('file_name', file.name)
-              .eq('user_id', user.id);
-            
-            if (!nameError && nameData !== null) {
-              data = nameData;
-            }
-          }
-        }
         
         if (!error && data !== null) {
           setCommentCount(data.length);
@@ -162,7 +147,12 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
     };
 
     fetchCommentCount();
-  }, [file.id, file.name]);
+  }, [file.id]);
+
+  // Update comment count when comments are added/removed
+  const handleCommentCountChange = (newCount: number) => {
+    setCommentCount(newCount);
+  };
 
   // Calculate dynamic height based on content length
   const getDynamicHeight = (content: string) => {
@@ -490,9 +480,9 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
                <div className="mt-4">
                  <CommentSection 
                    fileId={file.id} 
-                   fileName={file.file_name} 
+                   fileName={file.name} 
                    conversionId={file.conversion_id}
-                   onCommentCountChange={setCommentCount}
+                   onCommentCountChange={handleCommentCountChange}
                  />
                </div>
              )}

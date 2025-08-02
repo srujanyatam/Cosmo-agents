@@ -63,7 +63,7 @@ export const getComments = async (fileId: string): Promise<Comment[]> => {
       .from('conversion_comments')
       .select('*')
       .eq('file_id', fileId)
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: false });
 
     if (error) {
       console.error('Supabase error:', error);

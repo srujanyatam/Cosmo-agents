@@ -3,7 +3,7 @@
 
 <div align="center">
 
-![Migration Tool Banner](https://via.placeholder.com/800x200/4F46E5/FFFFFF?text=Sybase+to+Oracle+Migration+Tool)
+# 🚀 Sybase to Oracle Migration Tool
 
 **AI-Powered Database Migration Made Simple**
 

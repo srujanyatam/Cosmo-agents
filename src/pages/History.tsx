@@ -836,14 +836,14 @@ const History = () => {
                                      className="relative"
                                    >
                                      <MessageSquare className="h-4 w-4" />
-                                     {fileCommentCounts[file.id] > 0 && (
-                                       <Badge 
-                                         variant="secondary" 
-                                         className="absolute -top-2 -right-2 h-5 w-5 p-0 text-xs flex items-center justify-center"
-                                       >
-                                         {fileCommentCounts[file.id]}
-                                       </Badge>
-                                     )}
+                                                                           {fileCommentCounts[file.id] > 0 && (
+                                        <Badge 
+                                          variant="secondary" 
+                                          className="absolute -top-1 -right-1 h-4 w-4 p-0 text-[10px] flex items-center justify-center"
+                                        >
+                                          {fileCommentCounts[file.id]}
+                                        </Badge>
+                                      )}
                                    </Button>
                                   <Button 
                                     size="sm" 

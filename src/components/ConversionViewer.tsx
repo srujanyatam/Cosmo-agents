@@ -730,7 +730,11 @@ const ConversionViewer: React.FC<ConversionViewerProps> = ({
         </TabsContent>
         
         <TabsContent value="comments" className="space-y-4">
-          <CommentSection unreviewedFileId={file.id} />
+          <CommentSection 
+            fileId={file.id} 
+            fileName={file.file_name} 
+            conversionId={file.conversion_id}
+          />
         </TabsContent>
       </Tabs>
 

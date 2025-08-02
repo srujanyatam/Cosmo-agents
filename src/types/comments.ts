@@ -1,24 +1,28 @@
 export interface Comment {
   id: string;
-  user_id: string;
-  unreviewed_file_id: string;
-  content: string;
-  line_number?: number;
   created_at: string;
   updated_at: string;
+  user_id: string;
+  file_id: string;
+  file_name: string;
+  comment: string;
+  conversion_id?: string;
+  is_public?: boolean;
   user_email?: string; // For display purposes
 }
 
 export interface CommentInsert {
-  unreviewed_file_id: string;
-  content: string;
-  line_number?: number;
+  file_id: string;
+  file_name: string;
+  comment: string;
+  conversion_id?: string;
+  is_public?: boolean;
 }
 
 export interface CommentUpdate {
   id: string;
-  content: string;
-  line_number?: number;
+  comment: string;
+  is_public?: boolean;
 }
 
 export interface CommentWithUser extends Comment {

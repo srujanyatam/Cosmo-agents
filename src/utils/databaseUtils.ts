@@ -52,18 +52,18 @@ export const deployToOracle = async (
 };
 
 // Comment-related database functions
-export const getComments = async (unreviewedFileId: string): Promise<Comment[]> => {
+export const getComments = async (fileId: string): Promise<Comment[]> => {
   try {
     const { data, error } = await supabase
-      .from('comments')
+      .from('conversion_comments')
       .select(`
         *,
-        profiles:user_id (
+        profiles!user_id (
           email,
           full_name
         )
       `)
-      .eq('unreviewed_file_id', unreviewedFileId)
+      .eq('file_id', fileId)
       .order('created_at', { ascending: true });
 
     if (error) throw error;
@@ -72,7 +72,7 @@ export const getComments = async (unreviewedFileId: string): Promise<Comment[]> 
     return (data || []).map(comment => ({
       ...comment,
       user_email: comment.profiles?.email || 'Unknown User',
-      user_name: comment.profiles?.full_name || 'Unknown User'
+      user_name: comment.profiles?.full_name
     }));
   } catch (error) {
     console.error('Error fetching comments:', error);
@@ -82,9 +82,18 @@ export const getComments = async (unreviewedFileId: string): Promise<Comment[]> 
 
 export const addComment = async (comment: CommentInsert): Promise<Comment | null> => {
   try {
+    // Get the current user
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+
     const { data, error } = await supabase
-      .from('comments')
-      .insert(comment)
+      .from('conversion_comments')
+      .insert([{
+        ...comment,
+        user_id: user.id
+      }])
       .select()
       .single();
 
@@ -99,10 +108,10 @@ export const addComment = async (comment: CommentInsert): Promise<Comment | null
 export const updateComment = async (comment: CommentUpdate): Promise<Comment | null> => {
   try {
     const { data, error } = await supabase
-      .from('comments')
-      .update({
-        content: comment.content,
-        line_number: comment.line_number,
+      .from('conversion_comments')
+      .update({ 
+        comment: comment.comment,
+        is_public: comment.is_public,
         updated_at: new Date().toISOString()
       })
       .eq('id', comment.id)
@@ -120,7 +129,7 @@ export const updateComment = async (comment: CommentUpdate): Promise<Comment | n
 export const deleteComment = async (commentId: string): Promise<boolean> => {
   try {
     const { error } = await supabase
-      .from('comments')
+      .from('conversion_comments')
       .delete()
       .eq('id', commentId);
 
